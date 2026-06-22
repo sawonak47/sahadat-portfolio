@@ -3,613 +3,544 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Md Sahadat Hossain (Sawon) — Designer & Digital Strategist</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <title>Md Sahadat Hossain (Sawon) — Creative Portfolio</title>
+  <meta name="description" content="Graphic Designer, Digital Marketer, SEO Specialist & AI Content Creator" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="transition-colors duration-300">
+<body class="font-body bg-white dark:bg-[#0A0E1A] text-gray-800 dark:text-gray-200 transition-colors duration-300">
 
-  <div id="cursor" class="cursor"></div>
-  <div id="cursor-follower" class="cursor-follower"></div>
+  <!-- NAVBAR -->
+  <!-- FULLSCREEN OVERLAY MENU -->
+  <div id="fullOverlay" class="overlay-menu">
+    <div class="overlay-inner">
+      <nav class="overlay-nav-links">
+        <a href="#about" class="overlay-link" data-num="01">About</a>
+        <a href="#skills" class="overlay-link" data-num="02">Skills</a>
+        <a href="#services" class="overlay-link" data-num="03">Services</a>
+        <a href="#portfolio" class="overlay-link" data-num="04">Portfolio</a>
+        <a href="#experience" class="overlay-link" data-num="05">Experience</a>
+        <a href="#testimonials" class="overlay-link" data-num="06">Testimonials</a>
+        <a href="#contact" class="overlay-link" data-num="07">Contact</a>
+      </nav>
+      <div class="overlay-divider"></div>
+      <div class="overlay-bottom">
+        <div class="overlay-socials">
+          <a href="https://www.facebook.com/sawonak47" target="_blank" class="overlay-soc" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/sawonak47" target="_blank" class="overlay-soc" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/sawonhot1/" target="_blank" class="overlay-soc" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-soc" aria-label="Behance"><i class="fab fa-behance"></i></a>
+          <a href="https://x.com/ShSawonhot1" target="_blank" class="overlay-soc" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+        </div>
+        <p class="overlay-email">sawonhot1@gmail.com</p>
+      </div>
+    </div>
+  </div>
 
-  <!-- NAV -->
-  <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300">
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <a href="#home" class="logo font-display text-2xl font-extrabold tracking-tight">
-        <span class="logo-s">S</span><span class="logo-dot">.</span>
+      <a href="#home" class="font-display font-bold text-xl">
+        <span class="text-gradient">Sawon</span><span class="dark:text-white text-gray-900">.</span>
       </a>
-      <ul class="hidden md:flex items-center gap-8 font-mono text-sm tracking-widest uppercase">
+      <ul class="hidden md:flex items-center gap-8 text-sm font-medium">
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#skills" class="nav-link">Skills</a></li>
         <li><a href="#services" class="nav-link">Services</a></li>
-        <li><a href="#portfolio" class="nav-link">Work</a></li>
-        <li><a href="#experience" class="nav-link">Journey</a></li>
+        <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+        <li><a href="#experience" class="nav-link">Experience</a></li>
+        <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
       </ul>
-      <div class="flex items-center gap-4">
-        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
-          <i class="fas fa-moon" id="theme-icon"></i>
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" aria-label="Toggle theme" class="w-10 h-10 rounded-full glass-btn flex items-center justify-center">
+          <i class="fa-solid fa-sun hidden dark:inline text-yellow-400"></i>
+          <i class="fa-solid fa-moon inline dark:hidden text-violet-500"></i>
         </button>
-        <button id="mobile-menu-btn" class="md:hidden theme-btn">
-          <i class="fas fa-bars"></i>
+        <button id="menuBtn" aria-label="Toggle menu" class="ham-wrap">
+          <span class="ham-bar"></span>
+          <span class="ham-bar"></span>
+          <span class="ham-bar"></span>
         </button>
       </div>
     </div>
-    <div id="mobile-menu" class="hidden md:hidden glass-nav px-6 pb-6">
-      <ul class="flex flex-col gap-4 font-mono text-sm tracking-widest uppercase pt-4">
-        <li><a href="#about" class="nav-link block">About</a></li>
-        <li><a href="#skills" class="nav-link block">Skills</a></li>
-        <li><a href="#services" class="nav-link block">Services</a></li>
-        <li><a href="#portfolio" class="nav-link block">Work</a></li>
-        <li><a href="#experience" class="nav-link block">Journey</a></li>
-        <li><a href="#contact" class="nav-link block">Contact</a></li>
+    <div id="mobileMenu" class="md:hidden hidden glass-card mx-4 mt-2 rounded-2xl px-6 py-4">
+      <ul class="flex flex-col gap-4 text-sm font-medium">
       </ul>
     </div>
   </nav>
 
+  <!-- FULLSCREEN OVERLAY MENU -->
+  <div id="fullOverlay" class="overlay-menu">
+    <div class="overlay-inner">
+      <nav class="overlay-nav-links">
+        <a href="#about" class="overlay-link" data-num="01">About</a>
+        <a href="#skills" class="overlay-link" data-num="02">Skills</a>
+        <a href="#services" class="overlay-link" data-num="03">Services</a>
+        <a href="#portfolio" class="overlay-link" data-num="04">Work</a>
+        <a href="#experience" class="overlay-link" data-num="05">Journey</a>
+        <a href="#contact" class="overlay-link" data-num="06">Contact</a>
+      </nav>
+      <div class="overlay-divider"></div>
+      <div class="overlay-bottom">
+        <div class="overlay-socials">
+          <a href="https://www.facebook.com/sawonak47" target="_blank" class="overlay-soc" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/sawonak47" target="_blank" class="overlay-soc" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/sawonhot1/" target="_blank" class="overlay-soc" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-soc" aria-label="Behance"><i class="fab fa-behance"></i></a>
+          <a href="https://x.com/ShSawonhot1" target="_blank" class="overlay-soc" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+        </div>
+        <p class="overlay-email">sawonhot1@gmail.com</p>
+      </div>
+    </div>
+  </div>
+
   <!-- HERO -->
-  <section id="home" class="hero-section min-h-screen flex items-center relative overflow-hidden">
-    <div class="hero-bg-orb orb-1"></div>
-    <div class="hero-bg-orb orb-2"></div>
-    <div class="hero-bg-orb orb-3"></div>
-    <div class="grid-overlay"></div>
-
-    <div class="max-w-7xl mx-auto px-6 w-full pt-24 pb-12">
-      <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-        <div class="flex-1 text-center lg:text-left">
-          <div class="hero-eyebrow font-mono text-sm tracking-widest mb-6 flex items-center justify-center lg:justify-start gap-3">
-            <span class="status-dot"></span>
-            <span>Available for freelance work</span>
-          </div>
-          <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold leading-none mb-6">
-            <span class="hero-name-line block reveal-text">Sahadat</span>
-            <span class="hero-name-line block gradient-text reveal-text delay-1">Hossain</span>
-            <span class="hero-alias font-mono text-xl md:text-2xl font-normal tracking-widest block mt-3 reveal-text delay-2">— Sawon</span>
-          </h1>
-          <p class="hero-roles font-body text-lg md:text-xl max-w-md mx-auto lg:mx-0 mb-10 reveal-text delay-3">
-            Graphic Designer · Digital Marketer · SEO Specialist · AI Content Creator
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start reveal-text delay-4">
-            <a href="#portfolio" class="btn-primary">View My Work <i class="fas fa-arrow-right ml-2"></i></a>
-            <a href="resume.pdf" download class="btn-secondary"><i class="fas fa-download mr-2"></i> Download CV</a>
-          </div>
-          <div class="flex items-center gap-5 mt-10 justify-center lg:justify-start reveal-text delay-4">
-            <span class="font-mono text-xs tracking-widest opacity-50">Follow</span>
-            <div class="social-divider"></div>
-            <a href="https://www.facebook.com/sawonak47" class="social-icon-sm" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://www.instagram.com/sawonak47" class="social-icon-sm" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="https://www.linkedin.com/in/sawonhot1/" class="social-icon-sm" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-            <a href="https://www.behance.net/Sawonhot1" class="social-icon-sm" aria-label="Behance" target="_blank"><i class="fab fa-behance"></i></a>
-            <a href="https://x.com/ShSawonhot1" class="social-icon-sm" aria-label="X/Twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
-          </div>
+  <section id="home" class="relative min-h-screen flex items-center overflow-hidden">
+    <div class="mesh-bg absolute inset-0 pointer-events-none"></div>
+    <div class="orb orb-1 absolute pointer-events-none"></div>
+    <div class="orb orb-2 absolute pointer-events-none"></div>
+    <div class="relative max-w-7xl mx-auto px-6 pt-28 pb-20 flex flex-col lg:flex-row items-center justify-between gap-16 w-full">
+      <div class="flex-1 text-center lg:text-left">
+        <p class="inline-flex items-center gap-2 text-sm font-medium text-violet-500 mb-6 tracking-widest uppercase fade-in" style="animation-delay:.1s">
+          <span class="w-8 h-px bg-violet-500 inline-block"></span>Creative Professional
+        </p>
+        <h1 class="font-display font-bold text-5xl md:text-6xl xl:text-7xl leading-tight mb-6 fade-in" style="animation-delay:.2s">
+          Md Sahadat<br/><span class="text-gradient">Hossain</span><br/>
+          <span class="text-3xl md:text-4xl font-medium dark:text-gray-400 text-gray-500">(Sawon)</span>
+        </h1>
+        <div class="hero-type-wrapper mb-8 fade-in" style="animation-delay:.35s">
+          <span class="dark:text-gray-300 text-gray-600 text-lg md:text-xl">I'm a&nbsp;</span>
+          <span id="typewriter" class="text-gradient font-semibold text-lg md:text-xl"></span>
+          <span class="type-cursor text-violet-500 text-xl font-thin">|</span>
         </div>
-
-        <!-- Profile Image -->
-        <div class="flex-shrink-0 reveal-float">
-          <div class="profile-frame">
-            <div class="profile-ring ring-1"></div>
-            <div class="profile-ring ring-2"></div>
-            <div class="profile-img-wrapper">
-              <img src="profile.jpg" alt="Md Sahadat Hossain Sawon"
-                   class="w-full h-full object-cover"
-                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-              <div class="profile-placeholder" style="display:none;">
-                <i class="fas fa-user text-6xl opacity-30"></i>
-                <p class="font-mono text-xs mt-3 opacity-40">Add profile.jpg</p>
-              </div>
+        <p class="dark:text-gray-400 text-gray-500 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-10 fade-in" style="animation-delay:.45s">
+          Crafting compelling visual identities, data-driven marketing strategies, and AI-powered content that converts — turning ideas into impactful digital experiences.
+        </p>
+        <div class="flex flex-wrap gap-4 justify-center lg:justify-start fade-in" style="animation-delay:.55s">
+          <a href="#portfolio" class="btn-primary">View My Work <i class="fa-solid fa-arrow-right ml-2"></i></a>
+          <a href="resume.pdf" download class="btn-outline"><i class="fa-solid fa-download mr-2"></i> Download CV</a>
+        </div>
+        <div class="flex gap-4 justify-center lg:justify-start mt-10 fade-in" style="animation-delay:.65s">
+          <a href="https://www.facebook.com/sawonak47" target="_blank" aria-label="Facebook" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://x.com/ShSawonhot1" target="_blank" aria-label="Twitter" class="social-icon"><i class="fab fa-x-twitter"></i></a>
+          <a href="https://www.linkedin.com/in/sawonhot1/" target="_blank" aria-label="LinkedIn" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.instagram.com/sawonak47" target="_blank" aria-label="Instagram" class="social-icon"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.behance.net/Sawonhot1" target="_blank" aria-label="Behance" class="social-icon"><i class="fab fa-behance"></i></a>
+          <a href="https://www.fiverr.com/sawonhot1" target="_blank" aria-label="Fiverr" class="social-icon"><i class="fas fa-fire"></i></a>
+        </div>
+      </div>
+      <div class="flex-shrink-0 flex items-center justify-center fade-in" style="animation-delay:.3s">
+        <div class="profile-ring">
+          <div class="profile-img-wrap">
+            <img src="profile.jpg" alt="Md Sahadat Hossain Sawon" class="profile-img"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;background:rgba(124,58,237,0.1);">
+              <i class="fas fa-user" style="font-size:80px;color:rgba(124,58,237,0.4);"></i>
             </div>
-            <div class="float-badge badge-tl"><i class="fas fa-palette mr-2"></i>Designer</div>
-            <div class="float-badge badge-br"><i class="fas fa-chart-line mr-2"></i>Marketer</div>
           </div>
         </div>
-      </div>
-
-      <!-- Stats bar -->
-      <div class="stats-bar mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div class="stat-item text-center">
-          <div class="stat-number font-display font-extrabold text-4xl">8+</div>
-          <div class="stat-label font-mono text-xs tracking-widest mt-1">Years Experience</div>
-        </div>
-        <div class="stat-item text-center">
-          <div class="stat-number font-display font-extrabold text-4xl">150+</div>
-          <div class="stat-label font-mono text-xs tracking-widest mt-1">Projects Done</div>
-        </div>
-        <div class="stat-item text-center">
-          <div class="stat-number font-display font-extrabold text-4xl">80+</div>
-          <div class="stat-label font-mono text-xs tracking-widest mt-1">Happy Clients</div>
-        </div>
-        <div class="stat-item text-center">
-          <div class="stat-number font-display font-extrabold text-4xl">6</div>
-          <div class="stat-label font-mono text-xs tracking-widest mt-1">Companies Worked</div>
-        </div>
+        <div class="badge badge-tl glass-card"><i class="fa-solid fa-star text-yellow-400 text-xs"></i><span class="text-xs font-semibold">8+ Years Exp.</span></div>
+        <div class="badge badge-br glass-card"><i class="fa-solid fa-check-circle text-green-400 text-xs"></i><span class="text-xs font-semibold">150+ Projects</span></div>
       </div>
     </div>
-
-    <div class="scroll-hint">
-      <span class="font-mono text-xs tracking-widest">Scroll</span>
-      <div class="scroll-line"></div>
-    </div>
+    <a href="#about" class="absolute bottom-8 left-1/2 -translate-x-1/2 scroll-indicator">
+      <i class="fa-solid fa-chevron-down text-violet-500"></i>
+    </a>
   </section>
+
+  <!-- STATS -->
+  <div class="py-10 relative z-10">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="glass-card text-center p-6 rounded-2xl reveal"><p class="font-display font-bold text-4xl text-gradient mb-1" data-count="150">0</p><p class="text-sm dark:text-gray-400 text-gray-500">Projects Done</p></div>
+      <div class="glass-card text-center p-6 rounded-2xl reveal"><p class="font-display font-bold text-4xl text-gradient mb-1" data-count="80">0</p><p class="text-sm dark:text-gray-400 text-gray-500">Happy Clients</p></div>
+      <div class="glass-card text-center p-6 rounded-2xl reveal"><p class="font-display font-bold text-4xl text-gradient mb-1" data-count="8">0</p><p class="text-sm dark:text-gray-400 text-gray-500">Years Experience</p></div>
+      <div class="glass-card text-center p-6 rounded-2xl reveal"><p class="font-display font-bold text-4xl text-gradient mb-1" data-count="6">0</p><p class="text-sm dark:text-gray-400 text-gray-500">Companies Worked</p></div>
+    </div>
+  </div>
 
   <!-- ABOUT -->
   <section id="about" class="section-pad">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">Who I Am</span>
-        <h2 class="section-title">About <span class="gradient-text">Me</span></h2>
+      <div class="section-header reveal">
+        <p class="eyebrow">Who I Am</p>
+        <h2 class="section-title">About <span class="text-gradient">Me</span></h2>
       </div>
-      <div class="grid md:grid-cols-2 gap-16 items-start mt-16">
-       <div style="padding:1rem 0">
-<h2 class="sr-only">About section profile card preview for Sawon portfolio</h2>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px">
-
-  <!-- Left: Profile Photo Card -->
-  <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-xl);padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;">
-    
-    <!-- Glow ring around photo -->
-    <div style="width:140px;height:140px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#06B6D4);padding:3px;flex-shrink:0;">
-      <div style="width:100%;height:100%;border-radius:50%;background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-        <img src="profile.jpg" alt="Sawon" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
-        <div style="display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:var(--color-background-secondary);">
-          <i class="ti ti-user" style="font-size:48px;color:var(--color-text-secondary);" aria-hidden="true"></i>
-        </div>
-      </div>
-    </div>
-
-    <!-- Name & role -->
-    <div style="text-align:center;">
-      <p style="font-size:17px;font-weight:500;margin:0;color:var(--color-text-primary);">Md Sahadat Hossain</p>
-      <p style="font-size:13px;color:var(--color-text-secondary);margin:4px 0 0;">(Sawon)</p>
-    </div>
-
-    <!-- Role tags -->
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;">
-      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#EDE9FE;color:#5B21B6;font-weight:500;">Graphic Designer</span>
-      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#E0F2FE;color:#0369A1;font-weight:500;">Digital Marketer</span>
-      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#DCFCE7;color:#166534;font-weight:500;">SEO Specialist</span>
-      <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:#FDF4FF;color:#7E22CE;font-weight:500;">AI Creator</span>
-    </div>
-
-    <!-- Status -->
-    <div style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:var(--color-background-success);border:0.5px solid var(--color-border-success);">
-      <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;display:inline-block;"></span>
-      <span style="font-size:12px;font-weight:500;color:var(--color-text-success);">Available for freelance</span>
-    </div>
-
-    <!-- Social links -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-      <a href="https://www.facebook.com/sawonak47" target="_blank" style="width:32px;height:32px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--color-text-secondary);" aria-label="Facebook"><i class="ti ti-brand-facebook" style="font-size:16px;" aria-hidden="true"></i></a>
-      <a href="https://www.instagram.com/sawonak47" target="_blank" style="width:32px;height:32px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--color-text-secondary);" aria-label="Instagram"><i class="ti ti-brand-instagram" style="font-size:16px;" aria-hidden="true"></i></a>
-      <a href="https://www.linkedin.com/in/sawonhot1/" target="_blank" style="width:32px;height:32px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--color-text-secondary);" aria-label="LinkedIn"><i class="ti ti-brand-linkedin" style="font-size:16px;" aria-hidden="true"></i></a>
-      <a href="https://www.behance.net/Sawonhot1" target="_blank" style="width:32px;height:32px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--color-text-secondary);" aria-label="Behance"><i class="ti ti-brand-behance" style="font-size:16px;" aria-hidden="true"></i></a>
-      <a href="https://www.fiverr.com/sawonhot1" target="_blank" style="width:32px;height:32px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--color-text-secondary);" aria-label="Fiverr"><i class="ti ti-flame" style="font-size:16px;" aria-hidden="true"></i></a>
-    </div>
-  </div>
-
-  <!-- Right: Stats + Info -->
-  <div style="display:flex;flex-direction:column;gap:12px;">
-
-    <!-- Stats grid -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;text-align:center;">
-        <p style="font-size:24px;font-weight:500;margin:0;color:#7C3AED;">8+</p>
-        <p style="font-size:11px;color:var(--color-text-secondary);margin:3px 0 0;">Years Exp.</p>
-      </div>
-      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;text-align:center;">
-        <p style="font-size:24px;font-weight:500;margin:0;color:#06B6D4;">150+</p>
-        <p style="font-size:11px;color:var(--color-text-secondary);margin:3px 0 0;">Projects</p>
-      </div>
-      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;text-align:center;">
-        <p style="font-size:24px;font-weight:500;margin:0;color:#10B981;">80+</p>
-        <p style="font-size:11px;color:var(--color-text-secondary);margin:3px 0 0;">Clients</p>
-      </div>
-      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;text-align:center;">
-        <p style="font-size:24px;font-weight:500;margin:0;color:#F59E0B;">6</p>
-        <p style="font-size:11px;color:var(--color-text-secondary);margin:3px 0 0;">Companies</p>
-      </div>
-    </div>
-
-    <!-- Personal info -->
-    <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;flex:1;">
-      <p style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);margin:0 0 12px;">Personal Info</p>
-      <div style="display:flex;flex-direction:column;gap:9px;">
-        <div style="display:flex;gap:8px;align-items:flex-start;">
-          <i class="ti ti-calendar" style="font-size:15px;color:var(--color-text-secondary);margin-top:1px;flex-shrink:0;" aria-hidden="true"></i>
-          <div><p style="font-size:11px;color:var(--color-text-secondary);margin:0;">Date of Birth</p><p style="font-size:13px;font-weight:500;margin:1px 0 0;color:var(--color-text-primary);">01 December 1995</p></div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:flex-start;">
-          <i class="ti ti-map-pin" style="font-size:15px;color:var(--color-text-secondary);margin-top:1px;flex-shrink:0;" aria-hidden="true"></i>
-          <div><p style="font-size:11px;color:var(--color-text-secondary);margin:0;">Location</p><p style="font-size:13px;font-weight:500;margin:1px 0 0;color:var(--color-text-primary);">Bhola, Bangladesh</p></div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:flex-start;">
-          <i class="ti ti-mail" style="font-size:15px;color:var(--color-text-secondary);margin-top:1px;flex-shrink:0;" aria-hidden="true"></i>
-          <div><p style="font-size:11px;color:var(--color-text-secondary);margin:0;">Email</p><p style="font-size:12px;font-weight:500;margin:1px 0 0;color:#7C3AED;">sawonhot1@gmail.com</p></div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:flex-start;">
-          <i class="ti ti-language" style="font-size:15px;color:var(--color-text-secondary);margin-top:1px;flex-shrink:0;" aria-hidden="true"></i>
-          <div><p style="font-size:11px;color:var(--color-text-secondary);margin:0;">Languages</p>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
-              <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#EDE9FE;color:#5B21B6;">Bengali</span>
-              <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#E0F2FE;color:#0369A1;">English</span>
-              <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#FEF9C3;color:#713F12;">Hindi</span>
+      <div class="grid lg:grid-cols-2 gap-16 items-start mt-16">
+        <div class="relative reveal">
+          <div class="glass-card rounded-3xl p-8">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="info-row"><span class="info-label">Full Name</span><span class="info-value">Md. Sahadat Hossain</span></div>
+              <div class="info-row"><span class="info-label">Nickname</span><span class="info-value">Sawon</span></div>
+              <div class="info-row"><span class="info-label">Date of Birth</span><span class="info-value">01 Dec 1995</span></div>
+              <div class="info-row"><span class="info-label">Blood Group</span><span class="info-value">A+</span></div>
+              <div class="info-row"><span class="info-label">Religion</span><span class="info-value">Islam (Sunni)</span></div>
+              <div class="info-row"><span class="info-label">Nationality</span><span class="info-value">Bangladeshi</span></div>
+              <div class="info-row"><span class="info-label">Father</span><span class="info-value">Md. Rafiqul Islam</span></div>
+              <div class="info-row"><span class="info-label">Mother</span><span class="info-value">Nasrin Jahan</span></div>
+              <div class="info-row"><span class="info-label">Height / Weight</span><span class="info-value">5'9" / 74 kg</span></div>
+              <div class="info-row"><span class="info-label">Sex</span><span class="info-value">Male</span></div>
+              <div class="info-row col-span-2"><span class="info-label">Address</span><span class="info-value">Vocational Road Chorgula, Ward-9, Bhola Sadar, Dist. Bhola</span></div>
+              <div class="info-row col-span-2"><span class="info-label">Email</span><span class="info-value"><a href="mailto:sawonhot1@gmail.com" style="color:#7C3AED">sawonhot1@gmail.com</a></span></div>
+              <div class="info-row col-span-2"><span class="info-label">Freelance</span><span class="info-value" style="color:#4ade80">● Available</span></div>
             </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:flex-start;">
-          <i class="ti ti-droplet" style="font-size:15px;color:var(--color-text-secondary);margin-top:1px;flex-shrink:0;" aria-hidden="true"></i>
-          <div><p style="font-size:11px;color:var(--color-text-secondary);margin:0;">Blood Group</p><p style="font-size:13px;font-weight:500;margin:1px 0 0;color:#DC2626;">A+</p></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<p style="font-size:12px;color:var(--color-text-secondary);margin:16px 0 0;text-align:center;">
-  <i class="ti ti-info-circle" style="font-size:14px;vertical-align:-2px;" aria-hidden="true"></i>
-
-</p>
-</div>
-        <div>
-          <p class="text-body text-lg leading-relaxed mb-4">
-            I'm <strong class="gradient-text">Md Sahadat Hossain</strong>, known as Sawon — a multi-disciplinary creative and digital strategist based in Bangladesh. I bridge the gap between beautiful design and measurable business results.
-          </p>
-          <p class="text-body leading-relaxed mb-6">
-            I want to run a responsible position where I can use my interpersonal skills, creativity, and my learning experiences to develop my career and contribute to the welfare of your institution.
-          </p>
-
-          <!-- Personal Info Grid -->
-          <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="info-chip"><span class="info-label">Full Name</span><span>Md. Sahadat Hossain</span></div>
-            <div class="info-chip"><span class="info-label">Alias</span><span>Sawon</span></div>
-            <div class="info-chip"><span class="info-label">Date of Birth</span><span>01 December 1995</span></div>
-            <div class="info-chip"><span class="info-label">Blood Group</span><span>A+</span></div>
-            <div class="info-chip"><span class="info-label">Religion</span><span>Islam (Sunni)</span></div>
-            <div class="info-chip"><span class="info-label">Nationality</span><span>Bangladeshi</span></div>
-            <div class="info-chip"><span class="info-label">Father</span><span>Md. Rafiqul Islam</span></div>
-            <div class="info-chip"><span class="info-label">Mother</span><span>Nasrin Jahan</span></div>
-            <div class="info-chip"><span class="info-label">Height / Weight</span><span>5'9" / 74 kg</span></div>
-            <div class="info-chip"><span class="info-label">Location</span><span>Bhola, Bangladesh</span></div>
-          </div>
-
-          <!-- Language -->
-          <div class="glass-card p-4 mb-6">
-            <p class="font-mono text-xs text-violet mb-3 tracking-widest uppercase" style="color:var(--violet)">Languages</p>
-            <div class="flex flex-wrap gap-2">
-              <span class="tool-chip"><i class="fas fa-language mr-2"></i>Bengali — Native</span>
-              <span class="tool-chip"><i class="fas fa-language mr-2"></i>English — Good</span>
-              <span class="tool-chip"><i class="fas fa-language mr-2"></i>Hindi — Good</span>
-            </div>
-          </div>
-
-          <a href="resume.pdf" download class="btn-primary inline-flex items-center gap-2">
-            <i class="fas fa-file-arrow-down"></i> Download Resume
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- EDUCATION -->
-  <section id="education" class="section-pad bg-alt">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">Academic Background</span>
-        <h2 class="section-title">Educational <span class="gradient-text">Qualification</span></h2>
-      </div>
-      <div class="timeline mt-16">
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
-              <div>
-                <h3 class="font-display font-bold text-xl">B.Sc — Computer Science</h3>
-                <p class="font-mono text-sm opacity-60">University of Grovel Village, Barisal</p>
+            <!-- Languages -->
+            <div class="border-t dark:border-white/10 border-gray-200 pt-5">
+              <p class="text-xs font-semibold uppercase tracking-widest dark:text-gray-500 text-gray-400 mb-3">Language Skills</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="lang-badge"><i class="fas fa-language mr-1"></i>Bengali — Native</span>
+                <span class="lang-badge"><i class="fas fa-language mr-1"></i>English — Good</span>
+                <span class="lang-badge"><i class="fas fa-language mr-1"></i>Hindi — Good</span>
               </div>
-              <span class="timeline-date">2022</span>
-            </div>
-            <div class="flex flex-wrap gap-3 mt-2">
-              <span class="edu-badge"><i class="fas fa-star mr-1"></i>CGPA: 3.22</span>
-              <span class="edu-badge"><i class="fas fa-graduation-cap mr-1"></i>Bachelor Degree</span>
-              <span class="edu-badge"><i class="fas fa-desktop mr-1"></i>Computer Science</span>
             </div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
-              <div>
-                <h3 class="font-display font-bold text-xl">Diploma — Computer Science (HSC)</h3>
-                <p class="font-mono text-sm opacity-60">Elisha Islamia Model College</p>
+        <div class="reveal">
+          <h3 class="font-display font-bold text-3xl mb-6">I Design, Market &amp; <span class="text-gradient">Create</span></h3>
+          <p class="dark:text-gray-400 text-gray-600 leading-relaxed mb-4">Hi, I'm <strong class="dark:text-white text-gray-800">Md Sahadat Hossain</strong>, known as Sawon — a multidisciplinary creative professional based in Bangladesh. I blend aesthetics with strategy to help brands stand out in the digital age.</p>
+          <p class="dark:text-gray-400 text-gray-600 leading-relaxed mb-6">I want to run a responsible position where I can use my interpersonal skills, creativity, and my learning experiences to develop my career and contribute to the welfare of your institution.</p>
+
+          <!-- Education Cards -->
+          <h4 class="font-display font-semibold text-lg mb-4" style="color:#7C3AED">🎓 Educational Qualification</h4>
+          <div class="space-y-3 mb-8">
+            <div class="edu-card glass-card p-4 rounded-xl">
+              <div class="flex justify-between items-start gap-2">
+                <div>
+                  <p class="font-semibold text-sm">B.Sc — Computer Science</p>
+                  <p class="text-xs dark:text-gray-400 text-gray-500 mt-0.5">University of Grovel Village, Barisal</p>
+                </div>
+                <span class="edu-year">2022</span>
               </div>
-              <span class="timeline-date">2014</span>
+              <div class="flex gap-2 mt-2">
+                <span class="edu-tag">CGPA: 3.22</span>
+                <span class="edu-tag">Bachelor</span>
+              </div>
             </div>
-            <div class="flex flex-wrap gap-3 mt-2">
-              <span class="edu-badge"><i class="fas fa-star mr-1"></i>GPA: 3.25</span>
-              <span class="edu-badge"><i class="fas fa-building-columns mr-1"></i>Board: BTEB</span>
-              <span class="edu-badge"><i class="fas fa-desktop mr-1"></i>Computer Science</span>
+            <div class="edu-card glass-card p-4 rounded-xl">
+              <div class="flex justify-between items-start gap-2">
+                <div>
+                  <p class="font-semibold text-sm">Diploma — Computer Science (HSC)</p>
+                  <p class="text-xs dark:text-gray-400 text-gray-500 mt-0.5">Elisha Islamia Model College · BTEB</p>
+                </div>
+                <span class="edu-year">2014</span>
+              </div>
+              <div class="flex gap-2 mt-2">
+                <span class="edu-tag">GPA: 3.25</span>
+                <span class="edu-tag">BTEB</span>
+              </div>
+            </div>
+            <div class="edu-card glass-card p-4 rounded-xl">
+              <div class="flex justify-between items-start gap-2">
+                <div>
+                  <p class="font-semibold text-sm">SSC — Computer Science</p>
+                  <p class="text-xs dark:text-gray-400 text-gray-500 mt-0.5">Bhola Technical School & College, Bhola · BTEB</p>
+                </div>
+                <span class="edu-year">2010</span>
+              </div>
+              <div class="flex gap-2 mt-2">
+                <span class="edu-tag">GPA: 3.77</span>
+                <span class="edu-tag">BTEB</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
-              <div>
-                <h3 class="font-display font-bold text-xl">SSC — Computer Science</h3>
-                <p class="font-mono text-sm opacity-60">Bhola Technical School & College, Bhola</p>
-              </div>
-              <span class="timeline-date">2010</span>
-            </div>
-            <div class="flex flex-wrap gap-3 mt-2">
-              <span class="edu-badge"><i class="fas fa-star mr-1"></i>GPA: 3.77</span>
-              <span class="edu-badge"><i class="fas fa-building-columns mr-1"></i>Board: BTEB</span>
-              <span class="edu-badge"><i class="fas fa-desktop mr-1"></i>Computer Science</span>
-            </div>
-          </div>
+          <a href="resume.pdf" download class="btn-primary inline-flex items-center gap-2"><i class="fa-solid fa-download"></i> Download Resume</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- SKILLS -->
-  <section id="skills" class="section-pad">
+  <section id="skills" class="section-pad bg-subtle">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">What I Know</span>
-        <h2 class="section-title">My <span class="gradient-text">Skills</span></h2>
+      <div class="section-header reveal">
+        <p class="eyebrow">Expertise</p>
+        <h2 class="section-title">My <span class="text-gradient">Skills</span></h2>
       </div>
-      <div class="grid md:grid-cols-2 gap-16 mt-16">
-        <div class="space-y-8">
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Graphic Design</span><span class="font-mono text-sm">92%</span></div><div class="skill-track"><div class="skill-bar" style="--target:92%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Digital Marketing</span><span class="font-mono text-sm">85%</span></div><div class="skill-track"><div class="skill-bar" style="--target:85%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">SEO / SEM</span><span class="font-mono text-sm">88%</span></div><div class="skill-track"><div class="skill-bar" style="--target:88%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">AI Content Creation</span><span class="font-mono text-sm">80%</span></div><div class="skill-track"><div class="skill-bar" style="--target:80%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Social Media Strategy</span><span class="font-mono text-sm">78%</span></div><div class="skill-track"><div class="skill-bar" style="--target:78%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Technical Support</span><span class="font-mono text-sm">82%</span></div><div class="skill-track"><div class="skill-bar" style="--target:82%"></div></div></div>
-        </div>
-        <div>
-          <h3 class="font-display font-bold text-xl mb-6">Tools & Platforms</h3>
-          <div class="tools-grid">
-            <div class="tool-chip"><i class="fab fa-adobe mr-2"></i>Photoshop</div>
-            <div class="tool-chip"><i class="fab fa-figma mr-2"></i>Figma</div>
-            <div class="tool-chip"><i class="fas fa-vector-square mr-2"></i>Illustrator</div>
-            <div class="tool-chip"><i class="fab fa-google mr-2"></i>Google Ads</div>
-            <div class="tool-chip"><i class="fab fa-facebook mr-2"></i>Meta Ads</div>
-            <div class="tool-chip"><i class="fas fa-search mr-2"></i>Ahrefs</div>
-            <div class="tool-chip"><i class="fas fa-chart-bar mr-2"></i>SEMrush</div>
-            <div class="tool-chip"><i class="fas fa-robot mr-2"></i>ChatGPT</div>
-            <div class="tool-chip"><i class="fas fa-magic mr-2"></i>MidJourney</div>
-            <div class="tool-chip"><i class="fab fa-wordpress mr-2"></i>WordPress</div>
-            <div class="tool-chip"><i class="fab fa-mailchimp mr-2"></i>Mailchimp</div>
-            <div class="tool-chip"><i class="fab fa-canva mr-2"></i>Canva</div>
+      <div class="grid md:grid-cols-2 gap-12 mt-16">
+        <div class="reveal">
+          <h3 class="font-display font-semibold text-xl mb-6 flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(124,58,237,0.15)"><i class="fa-solid fa-pen-nib text-sm" style="color:#7C3AED"></i></span>Graphic Design
+          </h3>
+          <div class="space-y-5">
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>Adobe Photoshop</span><span class="text-gradient font-semibold">95%</span></div><div class="skill-bar"><div class="skill-fill" data-width="95"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>Adobe Illustrator</span><span class="text-gradient font-semibold">90%</span></div><div class="skill-bar"><div class="skill-fill" data-width="90"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>Figma / UI Design</span><span class="text-gradient font-semibold">85%</span></div><div class="skill-bar"><div class="skill-fill" data-width="85"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>Canva / Motion Graphics</span><span class="text-gradient font-semibold">88%</span></div><div class="skill-bar"><div class="skill-fill" data-width="88"></div></div></div>
           </div>
+        </div>
+        <div class="reveal">
+          <h3 class="font-display font-semibold text-xl mb-6 flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(6,182,212,0.15)"><i class="fa-solid fa-chart-line text-sm" style="color:#06B6D4"></i></span>Digital Marketing & SEO
+          </h3>
+          <div class="space-y-5">
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>SEO & SEM</span><span class="text-gradient font-semibold">92%</span></div><div class="skill-bar"><div class="skill-fill" data-width="92"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>Social Media Marketing</span><span class="text-gradient font-semibold">90%</span></div><div class="skill-bar"><div class="skill-fill" data-width="90"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>Google & Meta Ads</span><span class="text-gradient font-semibold">87%</span></div><div class="skill-bar"><div class="skill-fill" data-width="87"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2 text-sm"><span>AI Content Creation</span><span class="text-gradient font-semibold">93%</span></div><div class="skill-bar"><div class="skill-fill" data-width="93"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-16 reveal">
+        <h3 class="text-center font-display font-semibold text-lg mb-8 dark:text-gray-300 text-gray-600">Tools & Platforms</h3>
+        <div class="flex flex-wrap justify-center gap-3">
+          <span class="tech-tag"><i class="fab fa-google mr-2" style="color:#4285F4"></i>Google Analytics</span>
+          <span class="tech-tag"><i class="fab fa-wordpress mr-2" style="color:#21759B"></i>WordPress</span>
+          <span class="tech-tag"><i class="fa-solid fa-robot mr-2" style="color:#A78BFA"></i>ChatGPT / AI Tools</span>
+          <span class="tech-tag"><i class="fab fa-meta mr-2" style="color:#1877F2"></i>Meta Ads</span>
+          <span class="tech-tag"><i class="fa-solid fa-magnifying-glass mr-2" style="color:#F97316"></i>Ahrefs / SEMrush</span>
+          <span class="tech-tag"><i class="fa-solid fa-envelope mr-2" style="color:#F43F5E"></i>Mailchimp</span>
+          <span class="tech-tag"><i class="fab fa-figma mr-2" style="color:#F24E1E"></i>Figma</span>
+          <span class="tech-tag"><i class="fab fa-adobe mr-2" style="color:#FF0000"></i>Photoshop</span>
+          <span class="tech-tag"><i class="fab fa-canva mr-2" style="color:#00C4CC"></i>Canva</span>
+          <span class="tech-tag"><i class="fa-solid fa-chart-bar mr-2" style="color:#22D3EE"></i>Search Console</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- SERVICES -->
-  <section id="services" class="section-pad bg-alt">
+  <section id="services" class="section-pad">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">What I Do</span>
-        <h2 class="section-title">My <span class="gradient-text">Services</span></h2>
+      <div class="section-header reveal">
+        <p class="eyebrow">What I Offer</p>
+        <h2 class="section-title">My <span class="text-gradient">Services</span></h2>
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-pen-nib"></i></div>
-          <h3 class="service-title">Graphic Design</h3>
-          <p class="service-desc">Logo design, brand identity, social media visuals, print materials, and UI/UX mockups that stop the scroll.</p>
-          <div class="service-tags"><span>Branding</span><span>Print</span><span>UI/UX</span></div>
+        <div class="service-card glass-card p-7 rounded-2xl reveal">
+          <div class="service-icon" style="background:rgba(124,58,237,0.12)"><i class="fa-solid fa-pen-nib text-2xl" style="color:#7C3AED"></i></div>
+          <h3 class="font-display font-semibold text-lg mt-6 mb-3">Graphic Design</h3>
+          <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Brand identity, logos, social media visuals, UI mockups, print materials and motion graphics that captivate.</p>
+          <a href="#contact" class="mt-5 inline-flex items-center gap-2 text-sm font-medium service-link" style="color:#7C3AED">Get Started <i class="fa-solid fa-arrow-right text-xs"></i></a>
         </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-bullhorn"></i></div>
-          <h3 class="service-title">Digital Marketing</h3>
-          <p class="service-desc">Performance-driven campaigns across Google, Meta, and email that turn clicks into customers.</p>
-          <div class="service-tags"><span>PPC</span><span>Email</span><span>Analytics</span></div>
+        <div class="service-card glass-card p-7 rounded-2xl reveal" style="animation-delay:.1s">
+          <div class="service-icon" style="background:rgba(6,182,212,0.12)"><i class="fa-solid fa-bullhorn text-2xl" style="color:#06B6D4"></i></div>
+          <h3 class="font-display font-semibold text-lg mt-6 mb-3">Digital Marketing</h3>
+          <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">End-to-end campaigns across Google, Meta and email — strategy, execution, and optimisation for real ROI.</p>
+          <a href="#contact" class="mt-5 inline-flex items-center gap-2 text-sm font-medium service-link" style="color:#06B6D4">Get Started <i class="fa-solid fa-arrow-right text-xs"></i></a>
         </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-search"></i></div>
-          <h3 class="service-title">SEO Strategy</h3>
-          <p class="service-desc">Technical SEO audits, keyword research, on-page optimization, and link building to own page one.</p>
-          <div class="service-tags"><span>Technical</span><span>On-Page</span><span>Link Building</span></div>
+        <div class="service-card glass-card p-7 rounded-2xl reveal" style="animation-delay:.2s">
+          <div class="service-icon" style="background:rgba(16,185,129,0.12)"><i class="fa-solid fa-magnifying-glass-chart text-2xl" style="color:#10B981"></i></div>
+          <h3 class="font-display font-semibold text-lg mt-6 mb-3">SEO Specialist</h3>
+          <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Technical SEO, keyword research, on-page optimisation and link building that drive organic traffic and rankings.</p>
+          <a href="#contact" class="mt-5 inline-flex items-center gap-2 text-sm font-medium service-link" style="color:#10B981">Get Started <i class="fa-solid fa-arrow-right text-xs"></i></a>
         </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-robot"></i></div>
-          <h3 class="service-title">AI Content</h3>
-          <p class="service-desc">AI-powered blog posts, copy, scripts, and visuals that scale your content engine without sacrificing quality.</p>
-          <div class="service-tags"><span>Copywriting</span><span>Scripts</span><span>Visuals</span></div>
+        <div class="service-card glass-card p-7 rounded-2xl reveal" style="animation-delay:.3s">
+          <div class="service-icon" style="background:rgba(236,72,153,0.12)"><i class="fa-solid fa-robot text-2xl" style="color:#EC4899"></i></div>
+          <h3 class="font-display font-semibold text-lg mt-6 mb-3">AI Content Creation</h3>
+          <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Leveraging cutting-edge AI tools to produce high-quality, SEO-optimised blogs, copy and social content at scale.</p>
+          <a href="#contact" class="mt-5 inline-flex items-center gap-2 text-sm font-medium service-link" style="color:#EC4899">Get Started <i class="fa-solid fa-arrow-right text-xs"></i></a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- PORTFOLIO -->
-  <section id="portfolio" class="section-pad">
+  <section id="portfolio" class="section-pad bg-subtle">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">Selected Work</span>
-        <h2 class="section-title">Portfolio <span class="gradient-text">Gallery</span></h2>
+      <div class="section-header reveal">
+        <p class="eyebrow">My Work</p>
+        <h2 class="section-title">Portfolio <span class="text-gradient">Gallery</span></h2>
       </div>
       <!-- Portfolio Links -->
-      <div class="flex flex-wrap gap-4 justify-center mt-8 mb-4">
-        <a href="https://www.fiverr.com/sawonhot1" target="_blank" class="btn-secondary text-sm"><i class="fas fa-external-link-alt mr-2"></i>Fiverr Profile</a>
-        <a href="https://www.behance.net/Sawonhot1" target="_blank" class="btn-secondary text-sm"><i class="fab fa-behance mr-2"></i>Behance Portfolio</a>
-        <a href="https://sites.google.com/view/design-and-digital-hub" target="_blank" class="btn-secondary text-sm"><i class="fas fa-globe mr-2"></i>Design & Digital Hub</a>
+      <div class="flex flex-wrap justify-center gap-3 mt-8 reveal">
+        <a href="https://www.fiverr.com/sawonhot1" target="_blank" class="portfolio-ext-btn"><i class="fas fa-fire mr-2" style="color:#1DBF73"></i>Fiverr Profile</a>
+        <a href="https://www.behance.net/Sawonhot1" target="_blank" class="portfolio-ext-btn"><i class="fab fa-behance mr-2" style="color:#1769FF"></i>Behance</a>
+        <a href="https://sites.google.com/view/design-and-digital-hub" target="_blank" class="portfolio-ext-btn"><i class="fas fa-globe mr-2" style="color:#4285F4"></i>Design & Digital Hub</a>
       </div>
-      <div class="portfolio-filters flex flex-wrap gap-3 justify-center mt-6">
+      <div class="flex flex-wrap justify-center gap-3 mt-8 mb-12 reveal">
         <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="design">Design</button>
+        <button class="filter-btn" data-filter="design">Graphic Design</button>
         <button class="filter-btn" data-filter="marketing">Marketing</button>
         <button class="filter-btn" data-filter="seo">SEO</button>
         <button class="filter-btn" data-filter="ai">AI Content</button>
       </div>
-      <div class="portfolio-grid mt-10" id="portfolio-grid">
-        <div class="portfolio-item" data-category="design">
-          <div class="portfolio-card">
-            <div class="portfolio-thumb design-thumb"><i class="fas fa-palette text-5xl"></i><span class="thumb-label">Brand Identity</span></div>
-            <div class="portfolio-overlay"><h4 class="font-display font-bold text-lg">Sunrise Brand Kit</h4><p class="text-sm opacity-75 mt-1">Full brand identity for a wellness startup</p><div class="flex gap-3 mt-4"><a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-eye"></i></a><a href="https://www.fiverr.com/sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-link"></i></a></div></div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="portfolioGrid">
+        <div class="portfolio-item reveal" data-category="design">
+          <div class="portfolio-card glass-card rounded-2xl overflow-hidden">
+            <div class="portfolio-thumb" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)">
+              <div class="portfolio-overlay"><div class="text-white text-center"><i class="fa-solid fa-eye text-2xl mb-3 block"></i><p class="font-semibold">View Project</p></div></div>
+              <div class="abs-center"><i class="fa-solid fa-palette text-7xl" style="color:rgba(255,255,255,0.2)"></i></div>
+            </div>
+            <div class="p-5"><span class="text-xs font-medium uppercase tracking-wide" style="color:#7C3AED">Graphic Design</span><h4 class="font-display font-semibold mt-1 mb-2">Brand Identity Projects</h4><p class="text-sm dark:text-gray-400 text-gray-500">Logo, color system, typography and full brand guidelines for startups.</p></div>
           </div>
-          <div class="portfolio-meta"><span class="portfolio-tag">Graphic Design</span><h4 class="font-semibold mt-1">Sunrise Brand Kit</h4></div>
         </div>
-        <div class="portfolio-item" data-category="marketing">
-          <div class="portfolio-card">
-            <div class="portfolio-thumb marketing-thumb"><i class="fas fa-chart-line text-5xl"></i><span class="thumb-label">Paid Ads</span></div>
-            <div class="portfolio-overlay"><h4 class="font-display font-bold text-lg">Meta Ads Campaign</h4><p class="text-sm opacity-75 mt-1">3x ROAS for e-commerce client</p><div class="flex gap-3 mt-4"><a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-eye"></i></a><a href="https://www.fiverr.com/sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-link"></i></a></div></div>
+        <div class="portfolio-item reveal" data-category="marketing" style="animation-delay:.1s">
+          <div class="portfolio-card glass-card rounded-2xl overflow-hidden">
+            <div class="portfolio-thumb" style="background:linear-gradient(135deg,#06B6D4,#10B981)">
+              <div class="portfolio-overlay"><div class="text-white text-center"><i class="fa-solid fa-eye text-2xl mb-3 block"></i><p class="font-semibold">View Project</p></div></div>
+              <div class="abs-center"><i class="fa-solid fa-chart-line text-7xl" style="color:rgba(255,255,255,0.2)"></i></div>
+            </div>
+            <div class="p-5"><span class="text-xs font-medium uppercase tracking-wide" style="color:#06B6D4">Digital Marketing</span><h4 class="font-display font-semibold mt-1 mb-2">Meta Ads — 3x ROAS</h4><p class="text-sm dark:text-gray-400 text-gray-500">Scaled e-commerce brand from $5k to $50k monthly revenue.</p></div>
           </div>
-          <div class="portfolio-meta"><span class="portfolio-tag">Digital Marketing</span><h4 class="font-semibold mt-1">Meta Ads Campaign</h4></div>
         </div>
-        <div class="portfolio-item" data-category="seo">
-          <div class="portfolio-card">
-            <div class="portfolio-thumb seo-thumb"><i class="fas fa-search text-5xl"></i><span class="thumb-label">SEO Audit</span></div>
-            <div class="portfolio-overlay"><h4 class="font-display font-bold text-lg">TechBlog SEO Boost</h4><p class="text-sm opacity-75 mt-1">200% organic traffic increase in 6 months</p><div class="flex gap-3 mt-4"><a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-eye"></i></a><a href="https://www.fiverr.com/sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-link"></i></a></div></div>
+        <div class="portfolio-item reveal" data-category="seo" style="animation-delay:.2s">
+          <div class="portfolio-card glass-card rounded-2xl overflow-hidden">
+            <div class="portfolio-thumb" style="background:linear-gradient(135deg,#10B981,#F59E0B)">
+              <div class="portfolio-overlay"><div class="text-white text-center"><i class="fa-solid fa-eye text-2xl mb-3 block"></i><p class="font-semibold">View Project</p></div></div>
+              <div class="abs-center"><i class="fa-solid fa-magnifying-glass text-7xl" style="color:rgba(255,255,255,0.2)"></i></div>
+            </div>
+            <div class="p-5"><span class="text-xs font-medium uppercase tracking-wide" style="color:#10B981">SEO</span><h4 class="font-display font-semibold mt-1 mb-2">Organic Traffic 400% Growth</h4><p class="text-sm dark:text-gray-400 text-gray-500">Blog SEO strategy that took a client to page 1 in 90 days.</p></div>
           </div>
-          <div class="portfolio-meta"><span class="portfolio-tag">SEO</span><h4 class="font-semibold mt-1">TechBlog SEO Boost</h4></div>
         </div>
-        <div class="portfolio-item" data-category="ai">
-          <div class="portfolio-card">
-            <div class="portfolio-thumb ai-thumb"><i class="fas fa-robot text-5xl"></i><span class="thumb-label">AI Content</span></div>
-            <div class="portfolio-overlay"><h4 class="font-display font-bold text-lg">AI Blog Engine</h4><p class="text-sm opacity-75 mt-1">40 SEO articles/month via AI pipeline</p><div class="flex gap-3 mt-4"><a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-eye"></i></a><a href="https://www.fiverr.com/sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-link"></i></a></div></div>
+        <div class="portfolio-item reveal" data-category="ai" style="animation-delay:.1s">
+          <div class="portfolio-card glass-card rounded-2xl overflow-hidden">
+            <div class="portfolio-thumb" style="background:linear-gradient(135deg,#EC4899,#7C3AED)">
+              <div class="portfolio-overlay"><div class="text-white text-center"><i class="fa-solid fa-eye text-2xl mb-3 block"></i><p class="font-semibold">View Project</p></div></div>
+              <div class="abs-center"><i class="fa-solid fa-robot text-7xl" style="color:rgba(255,255,255,0.2)"></i></div>
+            </div>
+            <div class="p-5"><span class="text-xs font-medium uppercase tracking-wide" style="color:#EC4899">AI Content</span><h4 class="font-display font-semibold mt-1 mb-2">AI Content Engine — 50 Articles/mo</h4><p class="text-sm dark:text-gray-400 text-gray-500">Fully automated content pipeline for fintech publication.</p></div>
           </div>
-          <div class="portfolio-meta"><span class="portfolio-tag">AI Content</span><h4 class="font-semibold mt-1">AI Blog Engine</h4></div>
         </div>
-        <div class="portfolio-item" data-category="design">
-          <div class="portfolio-card">
-            <div class="portfolio-thumb design-thumb"><i class="fas fa-mobile-alt text-5xl"></i><span class="thumb-label">Social Media Kit</span></div>
-            <div class="portfolio-overlay"><h4 class="font-display font-bold text-lg">Social Media Pack</h4><p class="text-sm opacity-75 mt-1">30-piece template kit for fashion brand</p><div class="flex gap-3 mt-4"><a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-eye"></i></a><a href="https://www.fiverr.com/sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-link"></i></a></div></div>
+        <div class="portfolio-item reveal" data-category="design" style="animation-delay:.2s">
+          <div class="portfolio-card glass-card rounded-2xl overflow-hidden">
+            <div class="portfolio-thumb" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">
+              <div class="portfolio-overlay"><div class="text-white text-center"><i class="fa-solid fa-eye text-2xl mb-3 block"></i><p class="font-semibold">View Project</p></div></div>
+              <div class="abs-center"><i class="fa-solid fa-mobile-screen text-7xl" style="color:rgba(255,255,255,0.2)"></i></div>
+            </div>
+            <div class="p-5"><span class="text-xs font-medium uppercase tracking-wide" style="color:#7C3AED">Graphic Design</span><h4 class="font-display font-semibold mt-1 mb-2">Social Media Kit — Lifestyle Brand</h4><p class="text-sm dark:text-gray-400 text-gray-500">120+ templates designed for Instagram, LinkedIn and Twitter.</p></div>
           </div>
-          <div class="portfolio-meta"><span class="portfolio-tag">Graphic Design</span><h4 class="font-semibold mt-1">Social Media Pack</h4></div>
         </div>
-        <div class="portfolio-item" data-category="marketing">
-          <div class="portfolio-card">
-            <div class="portfolio-thumb marketing-thumb"><i class="fas fa-envelope-open-text text-5xl"></i><span class="thumb-label">Email Campaign</span></div>
-            <div class="portfolio-overlay"><h4 class="font-display font-bold text-lg">Email Drip Series</h4><p class="text-sm opacity-75 mt-1">42% open rate for SaaS product launch</p><div class="flex gap-3 mt-4"><a href="https://www.behance.net/Sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-eye"></i></a><a href="https://www.fiverr.com/sawonhot1" target="_blank" class="overlay-btn"><i class="fas fa-link"></i></a></div></div>
+        <div class="portfolio-item reveal" data-category="marketing" style="animation-delay:.3s">
+          <div class="portfolio-card glass-card rounded-2xl overflow-hidden">
+            <div class="portfolio-thumb" style="background:linear-gradient(135deg,#3B82F6,#06B6D4)">
+              <div class="portfolio-overlay"><div class="text-white text-center"><i class="fa-solid fa-eye text-2xl mb-3 block"></i><p class="font-semibold">View Project</p></div></div>
+              <div class="abs-center"><i class="fa-solid fa-envelope-open-text text-7xl" style="color:rgba(255,255,255,0.2)"></i></div>
+            </div>
+            <div class="p-5"><span class="text-xs font-medium uppercase tracking-wide" style="color:#06B6D4">Digital Marketing</span><h4 class="font-display font-semibold mt-1 mb-2">Email Funnel — 35% Open Rate</h4><p class="text-sm dark:text-gray-400 text-gray-500">7-step email onboarding sequence that doubled conversions.</p></div>
           </div>
-          <div class="portfolio-meta"><span class="portfolio-tag">Digital Marketing</span><h4 class="font-semibold mt-1">Email Drip Series</h4></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- EXPERIENCE TIMELINE -->
-  <section id="experience" class="section-pad bg-alt">
+  <!-- EXPERIENCE -->
+  <section id="experience" class="section-pad">
     <div class="max-w-4xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">My Path</span>
-        <h2 class="section-title">Experience <span class="gradient-text">Timeline</span></h2>
+      <div class="section-header reveal">
+        <p class="eyebrow">Career Path</p>
+        <h2 class="section-title">Experience <span class="text-gradient">Timeline</span></h2>
       </div>
       <div class="timeline mt-16">
 
-        <div class="timeline-item">
+        <div class="timeline-item reveal">
           <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
+          <div class="timeline-content glass-card p-6 rounded-2xl">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div>
-                <h3 class="font-display font-bold text-xl">Mentors Graphic Designer</h3>
-                <p class="font-mono text-sm opacity-60">E-Learning and Earning Ltd</p>
+                <h4 class="font-display font-semibold text-lg">Mentors Graphic Designer</h4>
+                <p class="text-sm font-medium" style="color:#7C3AED">E-Learning and Earning Ltd</p>
               </div>
-              <span class="timeline-date">2023 – Present</span>
+              <span class="timeline-badge">2023 – Present</span>
             </div>
-            <p class="text-body leading-relaxed">Leading graphic design mentorship and e-learning content creation. Teaching design principles, brand identity, and digital tools to the next generation of designers.</p>
+            <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Leading graphic design mentorship and e-learning content creation. Teaching design principles, brand identity, and digital tools to the next generation of designers.</p>
             <div class="flex flex-wrap gap-2 mt-3">
-              <span class="edu-badge">Mentoring</span><span class="edu-badge">E-Learning</span><span class="edu-badge">Graphic Design</span>
+              <span class="skill-tag">Mentoring</span><span class="skill-tag">E-Learning</span><span class="skill-tag">Graphic Design</span>
             </div>
           </div>
         </div>
 
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
+        <div class="timeline-item reveal">
+          <div class="timeline-dot" style="background:#06B6D4;box-shadow:0 0 0 4px rgba(6,182,212,0.2)"></div>
+          <div class="timeline-content glass-card p-6 rounded-2xl">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div>
-                <h3 class="font-display font-bold text-xl">Co-ordinator — Digital Marketer</h3>
-                <p class="font-mono text-sm opacity-60">SEBPO Bangladesh (Her Power Project)</p>
+                <h4 class="font-display font-semibold text-lg">Co-ordinator — Digital Marketer</h4>
+                <p class="text-sm font-medium" style="color:#06B6D4">SEBPO Bangladesh (Her Power Project)</p>
               </div>
-              <span class="timeline-date">June 2023 · 1 yr</span>
+              <span class="timeline-badge">June 2023 · 1 yr</span>
             </div>
-            <p class="text-body leading-relaxed">Coordinated digital marketing initiatives under the Her Power Project. Managed campaigns, team communication, and performance tracking across multiple digital platforms.</p>
+            <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Coordinated digital marketing initiatives under the Her Power Project. Managed campaigns, team communication, and performance tracking across multiple digital platforms.</p>
             <div class="flex flex-wrap gap-2 mt-3">
-              <span class="edu-badge">Coordination</span><span class="edu-badge">Digital Marketing</span><span class="edu-badge">Team Lead</span>
+              <span class="skill-tag">Coordination</span><span class="skill-tag">Digital Marketing</span><span class="skill-tag">Team Lead</span>
             </div>
           </div>
         </div>
 
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
+        <div class="timeline-item reveal">
+          <div class="timeline-dot" style="background:#10B981;box-shadow:0 0 0 4px rgba(16,185,129,0.2)"></div>
+          <div class="timeline-content glass-card p-6 rounded-2xl">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div>
-                <h3 class="font-display font-bold text-xl">Senior Technical Support Engineer</h3>
-                <p class="font-mono text-sm opacity-60">Total Barakah Housing Bangladesh Limited</p>
+                <h4 class="font-display font-semibold text-lg">Senior Technical Support Engineer</h4>
+                <p class="text-sm font-medium" style="color:#10B981">Total Barakah Housing Bangladesh Limited</p>
               </div>
-              <span class="timeline-date">January 2022 · 1 yr</span>
+              <span class="timeline-badge">January 2022 · 1 yr</span>
             </div>
-            <p class="text-body leading-relaxed">Provided senior-level technical support for housing management systems. Handled troubleshooting, system maintenance, and cross-department technical coordination.</p>
+            <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Provided senior-level technical support for housing management systems. Handled troubleshooting, system maintenance, and cross-department technical coordination.</p>
             <div class="flex flex-wrap gap-2 mt-3">
-              <span class="edu-badge">Technical Support</span><span class="edu-badge">System Admin</span><span class="edu-badge">IT Solutions</span>
+              <span class="skill-tag">Technical Support</span><span class="skill-tag">System Admin</span><span class="skill-tag">IT Solutions</span>
             </div>
           </div>
         </div>
 
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
+        <div class="timeline-item reveal">
+          <div class="timeline-dot" style="background:#F59E0B;box-shadow:0 0 0 4px rgba(245,158,11,0.2)"></div>
+          <div class="timeline-content glass-card p-6 rounded-2xl">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div>
-                <h3 class="font-display font-bold text-xl">Graphics Designer & Digital Marketer</h3>
-                <p class="font-mono text-sm opacity-60">Freelancer (Fiverr · Behance)</p>
+                <h4 class="font-display font-semibold text-lg">Graphics Designer & Digital Marketer</h4>
+                <p class="text-sm font-medium" style="color:#F59E0B">Freelancer — Fiverr · Behance · Self-Employed</p>
               </div>
-              <span class="timeline-date">January 2017 – Present</span>
+              <span class="timeline-badge">Jan 2017 – Present</span>
             </div>
-            <p class="text-body leading-relaxed">Providing professional graphic design and digital marketing services to clients worldwide. Delivered 150+ projects across branding, social media, SEO, and AI content creation.</p>
+            <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Providing professional graphic design and digital marketing services to clients worldwide. Delivered 150+ projects across branding, social media, SEO, and AI content creation.</p>
             <div class="flex flex-wrap gap-2 mt-3">
-              <span class="edu-badge">Freelance</span><span class="edu-badge">Fiverr</span><span class="edu-badge">Global Clients</span>
+              <span class="skill-tag">Freelance</span><span class="skill-tag">Global Clients</span><span class="skill-tag">8+ Years</span>
             </div>
-            <div class="flex flex-wrap gap-3 mt-3">
-              <a href="https://www.fiverr.com/sawonhot1" target="_blank" class="portfolio-link-btn"><i class="fas fa-link mr-1"></i>Fiverr</a>
-              <a href="https://www.behance.net/Sawonhot1" target="_blank" class="portfolio-link-btn"><i class="fab fa-behance mr-1"></i>Behance</a>
-              <a href="https://sites.google.com/view/design-and-digital-hub" target="_blank" class="portfolio-link-btn"><i class="fas fa-globe mr-1"></i>Portfolio Site</a>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <a href="https://www.fiverr.com/sawonhot1" target="_blank" class="ext-link"><i class="fas fa-fire mr-1"></i>Fiverr</a>
+              <a href="https://www.behance.net/Sawonhot1" target="_blank" class="ext-link"><i class="fab fa-behance mr-1"></i>Behance</a>
+              <a href="https://sites.google.com/view/design-and-digital-hub" target="_blank" class="ext-link"><i class="fas fa-globe mr-1"></i>Portfolio Site</a>
             </div>
           </div>
         </div>
 
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
+        <div class="timeline-item reveal">
+          <div class="timeline-dot" style="background:#EC4899;box-shadow:0 0 0 4px rgba(236,72,153,0.2)"></div>
+          <div class="timeline-content glass-card p-6 rounded-2xl">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div>
-                <h3 class="font-display font-bold text-xl">Technical Supporter</h3>
-                <p class="font-mono text-sm opacity-60">Bangladesh Election Commission — Mehendiganj Upazila</p>
+                <h4 class="font-display font-semibold text-lg">Technical Supporter</h4>
+                <p class="text-sm font-medium" style="color:#EC4899">Bangladesh Election Commission — Mehendiganj Upazila</p>
               </div>
-              <span class="timeline-date">Jan 2020 – Jul 2020</span>
+              <span class="timeline-badge">Jan 2020 – Jul 2020</span>
             </div>
-            <p class="text-body leading-relaxed">Provided technical support for the election commission's digital operations, data management, and IT infrastructure during election periods.</p>
+            <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Provided technical support for election commission's digital operations, data management, and IT infrastructure during election periods.</p>
             <div class="flex flex-wrap gap-2 mt-3">
-              <span class="edu-badge">Government</span><span class="edu-badge">Technical Support</span><span class="edu-badge">Data Management</span>
+              <span class="skill-tag">Government</span><span class="skill-tag">Technical Support</span><span class="skill-tag">Data Management</span>
             </div>
           </div>
         </div>
 
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-content glass-card p-6">
-            <div class="flex flex-wrap justify-between items-start gap-3 mb-3">
+        <div class="timeline-item reveal">
+          <div class="timeline-dot" style="background:#8B5CF6;box-shadow:0 0 0 4px rgba(139,92,246,0.2)"></div>
+          <div class="timeline-content glass-card p-6 rounded-2xl">
+            <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div>
-                <h3 class="font-display font-bold text-xl">Computer Operator</h3>
-                <p class="font-mono text-sm opacity-60">Upazila and Union Parishad — Bhola</p>
+                <h4 class="font-display font-semibold text-lg">Computer Operator</h4>
+                <p class="text-sm font-medium" style="color:#8B5CF6">Upazila and Union Parishad — Bhola</p>
               </div>
-              <span class="timeline-date">Jun 2019 – Dec 2019</span>
+              <span class="timeline-badge">Jun 2019 – Dec 2019</span>
             </div>
-            <p class="text-body leading-relaxed">Managed computer operations, data entry, and digital documentation for local government office in Bhola district.</p>
+            <p class="text-sm dark:text-gray-400 text-gray-500 leading-relaxed">Managed computer operations, data entry, and digital documentation for local government office in Bhola district.</p>
             <div class="flex flex-wrap gap-2 mt-3">
-              <span class="edu-badge">Government</span><span class="edu-badge">Data Entry</span><span class="edu-badge">Office Management</span>
+              <span class="skill-tag">Government</span><span class="skill-tag">Data Entry</span><span class="skill-tag">Office Management</span>
             </div>
           </div>
         </div>
@@ -619,141 +550,122 @@
   </section>
 
   <!-- TESTIMONIALS -->
-  <section id="testimonials" class="section-pad">
-    <div class="max-w-5xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">Social Proof</span>
-        <h2 class="section-title">What Clients <span class="gradient-text">Say</span></h2>
+  <section id="testimonials" class="section-pad bg-subtle">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="section-header reveal">
+        <p class="eyebrow">Kind Words</p>
+        <h2 class="section-title">Client <span class="text-gradient">Testimonials</span></h2>
       </div>
-      <div class="testimonial-slider mt-16" id="testimonial-slider">
-        <div class="testimonial-track" id="testimonial-track">
-          <div class="testimonial-slide">
-            <div class="glass-card p-8">
-              <div class="flex gap-2 mb-6"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i></div>
-              <p class="text-lg leading-relaxed text-body mb-6">"Sawon completely transformed our brand. The logo, color system, and social templates he delivered were not just beautiful — they drove real engagement. Our Instagram following doubled in 2 months."</p>
-              <div class="flex items-center gap-4">
-                <div class="client-avatar"><i class="fas fa-user"></i></div>
-                <div><div class="font-semibold">Rafiqul Islam</div><div class="font-mono text-xs opacity-50">CEO, NovaTech Solutions</div></div>
-                <div class="ml-auto"><span class="quote-mark">"</span></div>
+      <div class="relative mt-16 reveal">
+        <div class="testimonials-wrapper overflow-hidden">
+          <div id="testimonialSlider" class="testimonials-track flex transition-transform duration-500 ease-in-out">
+            <div class="testimonial-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-3">
+              <div class="glass-card p-8 rounded-2xl h-full flex flex-col">
+                <div class="flex gap-1 mb-5"><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i></div>
+                <p class="dark:text-gray-300 text-gray-600 leading-relaxed text-sm flex-1">"Sawon completely transformed our brand. The new identity is sharp, modern and perfectly captures who we are. Clients notice immediately. The turnaround was faster than expected."</p>
+                <div class="flex items-center gap-4 mt-6 pt-6 border-t dark:border-white/10 border-gray-200">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style="background:rgba(124,58,237,0.15);color:#7C3AED">AK</div>
+                  <div><p class="font-semibold text-sm">Ahmed Karim</p><p class="text-xs dark:text-gray-500 text-gray-400">CEO, TechStart BD</p></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="testimonial-slide">
-            <div class="glass-card p-8">
-              <div class="flex gap-2 mb-6"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i></div>
-              <p class="text-lg leading-relaxed text-body mb-6">"Our organic traffic went from 2K to 18K monthly visitors in 5 months. Sawon's SEO strategy was methodical, transparent, and delivered results that have held for over a year now."</p>
-              <div class="flex items-center gap-4">
-                <div class="client-avatar"><i class="fas fa-user"></i></div>
-                <div><div class="font-semibold">Tasnim Akter</div><div class="font-mono text-xs opacity-50">Founder, StyleHouse BD</div></div>
-                <div class="ml-auto"><span class="quote-mark">"</span></div>
+            <div class="testimonial-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-3">
+              <div class="glass-card p-8 rounded-2xl h-full flex flex-col">
+                <div class="flex gap-1 mb-5"><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i></div>
+                <p class="dark:text-gray-300 text-gray-600 leading-relaxed text-sm flex-1">"Our Google rankings jumped from page 5 to page 1 for our core keywords within 3 months. Sawon's SEO strategy was methodical, transparent and delivered beyond what we paid for."</p>
+                <div class="flex items-center gap-4 mt-6 pt-6 border-t dark:border-white/10 border-gray-200">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style="background:rgba(6,182,212,0.15);color:#06B6D4">SR</div>
+                  <div><p class="font-semibold text-sm">Sadia Rahman</p><p class="text-xs dark:text-gray-500 text-gray-400">Marketing Head, EcomPlus</p></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="testimonial-slide">
-            <div class="glass-card p-8">
-              <div class="flex gap-2 mb-6"><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i></div>
-              <p class="text-lg leading-relaxed text-body mb-6">"The AI content pipeline Sawon built for us produces 40 high-quality, SEO-optimized articles per month. Our content costs dropped 60% while quality actually improved. Remarkable work."</p>
-              <div class="flex items-center gap-4">
-                <div class="client-avatar"><i class="fas fa-user"></i></div>
-                <div><div class="font-semibold">Hasan Mahmud</div><div class="font-mono text-xs opacity-50">Marketing Director, GrowthLab</div></div>
-                <div class="ml-auto"><span class="quote-mark">"</span></div>
+            <div class="testimonial-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-3">
+              <div class="glass-card p-8 rounded-2xl h-full flex flex-col">
+                <div class="flex gap-1 mb-5"><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star-half-stroke text-yellow-400 text-sm"></i></div>
+                <p class="dark:text-gray-300 text-gray-600 leading-relaxed text-sm flex-1">"The AI content strategy Sawon built for us produces 40+ quality articles monthly. Our editorial team now focuses on high-level decisions while AI handles the heavy lifting."</p>
+                <div class="flex items-center gap-4 mt-6 pt-6 border-t dark:border-white/10 border-gray-200">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style="background:rgba(236,72,153,0.15);color:#EC4899">MN</div>
+                  <div><p class="font-semibold text-sm">Mark Nguyen</p><p class="text-xs dark:text-gray-500 text-gray-400">Editor-in-Chief, FinTech Weekly</p></div>
+                </div>
+              </div>
+            </div>
+            <div class="testimonial-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-3">
+              <div class="glass-card p-8 rounded-2xl h-full flex flex-col">
+                <div class="flex gap-1 mb-5"><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i><i class="fa-solid fa-star text-yellow-400 text-sm"></i></div>
+                <p class="dark:text-gray-300 text-gray-600 leading-relaxed text-sm flex-1">"Our Meta Ads ROAS tripled after Sawon restructured our campaigns. He also redesigned our ad creatives, and the difference in engagement was night and day. Highly recommend!"</p>
+                <div class="flex items-center gap-4 mt-6 pt-6 border-t dark:border-white/10 border-gray-200">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style="background:rgba(16,185,129,0.15);color:#10B981">FA</div>
+                  <div><p class="font-semibold text-sm">Fahmida Akter</p><p class="text-xs dark:text-gray-500 text-gray-400">Founder, StyleBD</p></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="flex items-center justify-center gap-6 mt-8">
-          <button class="slider-btn" id="prev-btn"><i class="fas fa-chevron-left"></i></button>
-          <div class="slider-dots" id="slider-dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-          <button class="slider-btn" id="next-btn"><i class="fas fa-chevron-right"></i></button>
+        <div class="flex items-center justify-center gap-4 mt-8">
+          <button id="prevBtn" class="w-10 h-10 glass-btn rounded-full flex items-center justify-center"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+          <div id="sliderDots" class="flex gap-2"></div>
+          <button id="nextBtn" class="w-10 h-10 glass-btn rounded-full flex items-center justify-center"><i class="fa-solid fa-chevron-right text-sm"></i></button>
         </div>
       </div>
     </div>
   </section>
 
   <!-- CONTACT -->
-  <section id="contact" class="section-pad bg-alt">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="section-header">
-        <span class="section-eyebrow">Get In Touch</span>
-        <h2 class="section-title">Let's <span class="gradient-text">Work Together</span></h2>
+  <section id="contact" class="section-pad">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="section-header reveal">
+        <p class="eyebrow">Let's Connect</p>
+        <h2 class="section-title">Get In <span class="text-gradient">Touch</span></h2>
       </div>
-      <div class="grid md:grid-cols-2 gap-16 mt-16">
-        <div>
-          <p class="text-body text-lg leading-relaxed mb-8">Ready to elevate your brand, grow your traffic, or build something extraordinary? Drop me a message — I respond within 24 hours.</p>
-          <div class="space-y-5">
-            <div class="contact-info-row">
-              <div class="contact-icon"><i class="fas fa-envelope"></i></div>
-              <div>
-                <div class="font-mono text-xs opacity-50 mb-1">Email</div>
-                <a href="mailto:sawonhot1@gmail.com" class="contact-link">sawonhot1@gmail.com</a>
-              </div>
+      <div class="grid lg:grid-cols-2 gap-16 mt-16">
+        <div class="reveal">
+          <h3 class="font-display font-semibold text-2xl mb-6">Have a project in mind?</h3>
+          <p class="dark:text-gray-400 text-gray-500 leading-relaxed mb-10">Whether you need a brand refresh, a killer SEO strategy, or an AI content system — let's talk. I'm available for freelance projects, collaborations and full-time opportunities.</p>
+          <div class="space-y-4 mb-10">
+            <div class="glass-card p-5 rounded-2xl flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(124,58,237,0.12)"><i class="fa-solid fa-envelope" style="color:#7C3AED"></i></div>
+              <div><p class="text-xs dark:text-gray-500 text-gray-400 mb-1">Email</p><a href="mailto:sawonhot1@gmail.com" class="font-medium text-sm hover:underline" style="color:#7C3AED">sawonhot1@gmail.com</a></div>
             </div>
-            <div class="contact-info-row">
-              <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
-              <div>
-                <div class="font-mono text-xs opacity-50 mb-1">WhatsApp</div>
-                <a href="https://wa.me/8801613808700" class="contact-link" target="_blank">+880 1613 808 700</a>
-              </div>
+            <div class="glass-card p-5 rounded-2xl flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.12)"><i class="fab fa-whatsapp" style="color:#25D366"></i></div>
+              <div><p class="text-xs dark:text-gray-500 text-gray-400 mb-1">WhatsApp</p><a href="https://wa.me/8801613808700" target="_blank" class="font-medium text-sm">+880 1613 808 700</a></div>
             </div>
-            <div class="contact-info-row">
-              <div class="contact-icon"><i class="fas fa-phone"></i></div>
-              <div>
-                <div class="font-mono text-xs opacity-50 mb-1">Phone</div>
-                <a href="tel:+8801703808700" class="contact-link">+880 1703 808 700</a>
-              </div>
+            <div class="glass-card p-5 rounded-2xl flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,0.12)"><i class="fa-solid fa-phone" style="color:#10B981"></i></div>
+              <div><p class="text-xs dark:text-gray-500 text-gray-400 mb-1">Phone</p><a href="tel:+8801703808700" class="font-medium text-sm">+880 1703 808 700</a></div>
             </div>
-            <div class="contact-info-row">
-              <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
-              <div>
-                <div class="font-mono text-xs opacity-50 mb-1">Address</div>
-                <span class="text-body text-sm">Vocational Road Chorgula, Ward 9<br>Bhola Sadar, Dist. Bhola, Bangladesh</span>
-              </div>
+            <div class="glass-card p-5 rounded-2xl flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(245,158,11,0.12)"><i class="fa-solid fa-location-dot" style="color:#F59E0B"></i></div>
+              <div><p class="text-xs dark:text-gray-500 text-gray-400 mb-1">Address</p><p class="font-medium text-sm">Vocational Road Chorgula, Ward-9<br/>Bhola Sadar, Dist. Bhola, Bangladesh</p></div>
             </div>
           </div>
-          <div class="mt-10">
-            <p class="font-mono text-xs tracking-widest opacity-50 mb-4 uppercase">Connect On</p>
-            <div class="flex gap-4">
-              <a href="https://www.facebook.com/sawonak47" class="social-icon" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
-              <a href="https://www.instagram.com/sawonak47" class="social-icon" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
-              <a href="https://www.linkedin.com/in/sawonhot1/" class="social-icon" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-              <a href="https://x.com/ShSawonhot1" class="social-icon" aria-label="Twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
-              <a href="https://www.behance.net/Sawonhot1" class="social-icon" aria-label="Behance" target="_blank"><i class="fab fa-behance"></i></a>
-            </div>
+          <h4 class="font-semibold text-sm mb-4 dark:text-gray-300 text-gray-600">Follow Me</h4>
+          <div class="flex gap-3 flex-wrap">
+            <a href="https://www.facebook.com/sawonak47" target="_blank" class="social-icon-lg"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://x.com/ShSawonhot1" target="_blank" class="social-icon-lg"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/sawonhot1/" target="_blank" class="social-icon-lg"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/sawonak47" target="_blank" class="social-icon-lg"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.behance.net/Sawonhot1" target="_blank" class="social-icon-lg"><i class="fab fa-behance"></i></a>
+            <a href="https://www.fiverr.com/sawonhot1" target="_blank" class="social-icon-lg"><i class="fas fa-fire"></i></a>
           </div>
         </div>
-
-        <!-- Contact Form → Google Form -->
-        <div class="glass-card p-8">
-          <form id="contact-form" class="space-y-5">
-            <div class="form-group">
-              <label class="form-label">Your Name</label>
-              <input type="text" class="form-input" placeholder="e.g. Rahman Ali" required />
+        <div class="reveal">
+          <form id="contactForm" class="glass-card p-8 rounded-2xl space-y-5">
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div class="form-group"><label class="form-label">Your Name</label><input type="text" placeholder="John Doe" class="form-input" required /></div>
+              <div class="form-group"><label class="form-label">Email Address</label><input type="email" placeholder="john@example.com" class="form-input" required /></div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Email Address</label>
-              <input type="email" class="form-input" placeholder="you@example.com" required />
+            <div class="form-group"><label class="form-label">Subject</label><input type="text" placeholder="Project Discussion" class="form-input" required /></div>
+            <div class="form-group"><label class="form-label">Service Needed</label>
+              <select class="form-input"><option value="">Select a service</option><option>Graphic Design</option><option>Digital Marketing</option><option>SEO Specialist</option><option>AI Content Creation</option><option>Multiple Services</option></select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Service Needed</label>
-              <select class="form-input">
-                <option value="">Select a service…</option>
-                <option>Graphic Design</option>
-                <option>Digital Marketing</option>
-                <option>SEO Strategy</option>
-                <option>AI Content Creation</option>
-                <option>Multiple Services</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Your Message</label>
-              <textarea class="form-input" rows="4" placeholder="Tell me about your project…" required></textarea>
-            </div>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdjaOngibEWHydfUW91zw_dc6NRQCnJz79I3A1-YydKWDjM2w/viewform?usp=dialog" class="btn-primary w-full justify-center" id="submit-btn" style="text-align: center; display: inline-block; text-decoration: none;">
-<span id="btn-text"><i class="fas fa-paper-plane mr-2"></i> Send Message</span>
-<span id="btn-loading" class="hidden"><i class="fas fa-spinner fa-spin mr-2"></i> Opening Form</span>
-</a>
-            <p style="text-align:center; font-size:0.72rem; color:var(--text-muted); margin-top:6px;">
-              <i class="fas fa-lock mr-1"></i> Google Form-এ নিয়ে যাওয়া হবে
+            <div class="form-group"><label class="form-label">Message</label><textarea rows="5" placeholder="Tell me about your project..." class="form-input resize-none" required></textarea></div>
+            <button type="submit" class="btn-primary w-full justify-center">
+              <span id="formBtnText"><i class="fa-solid fa-paper-plane mr-2"></i> Send Message</span>
+              <span id="formBtnLoading" class="hidden"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Opening Form…</span>
+            </button>
+            <p class="text-center" style="font-size:0.72rem; color:#888; margin-top:4px;">
+              <i class="fa-solid fa-lock mr-1"></i> Submit করলে Google Form নতুন tab-এ খুলবে
             </p>
           </form>
         </div>
@@ -762,28 +674,24 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="footer">
-    <div class="max-w-7xl mx-auto px-6 py-10">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="text-center md:text-left">
-          <div class="font-display font-extrabold text-2xl mb-1"><span class="gradient-text">Sawon</span></div>
-          <p class="font-mono text-xs opacity-40">Graphic Designer · Digital Marketer · SEO Specialist · AI Content Creator</p>
-          <p class="font-mono text-xs opacity-30 mt-1">Bhola, Bangladesh · sawonhot1@gmail.com</p>
-        </div>
-        <div class="flex gap-5">
-          <a href="https://www.facebook.com/sawonak47" class="social-icon-sm" target="_blank"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://www.instagram.com/sawonak47" class="social-icon-sm" target="_blank"><i class="fab fa-instagram"></i></a>
-          <a href="https://www.linkedin.com/in/sawonhot1/" class="social-icon-sm" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-          <a href="https://www.behance.net/Sawonhot1" class="social-icon-sm" target="_blank"><i class="fab fa-behance"></i></a>
-          <a href="https://x.com/ShSawonhot1" class="social-icon-sm" target="_blank"><i class="fab fa-x-twitter"></i></a>
-        </div>
-        <p class="font-mono text-xs opacity-40">© 2025 Md Sahadat Hossain. All rights reserved.</p>
+  <footer class="py-10 border-t dark:border-white/10 border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <p class="font-display font-bold text-2xl mb-2"><span class="text-gradient">Sawon</span>.</p>
+      <p class="text-sm dark:text-gray-500 text-gray-400 mb-2">Graphic Designer · Digital Marketer · SEO Specialist · AI Content Creator</p>
+      <p class="text-xs dark:text-gray-600 text-gray-400 mb-6">Bhola, Bangladesh · <a href="mailto:sawonhot1@gmail.com" class="hover:underline">sawonhot1@gmail.com</a> · +880 1703 808 700</p>
+      <div class="flex justify-center gap-4 mb-8">
+        <a href="https://www.facebook.com/sawonak47" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://x.com/ShSawonhot1" target="_blank" class="social-icon"><i class="fab fa-x-twitter"></i></a>
+        <a href="https://www.linkedin.com/in/sawonhot1/" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://www.instagram.com/sawonak47" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.behance.net/Sawonhot1" target="_blank" class="social-icon"><i class="fab fa-behance"></i></a>
       </div>
+      <p class="text-xs dark:text-gray-600 text-gray-400">© <span id="year"></span> Md Sahadat Hossain (Sawon). All rights reserved. Crafted with <i class="fa-solid fa-heart text-red-400 text-xs"></i> in Bangladesh.</p>
     </div>
   </footer>
 
-  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
-    <i class="fas fa-chevron-up"></i>
+  <button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 btn-primary rounded-full hidden items-center justify-center shadow-2xl z-50">
+    <i class="fa-solid fa-chevron-up text-sm"></i>
   </button>
 
   <script src="script.js"></script>
