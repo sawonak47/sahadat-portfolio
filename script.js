@@ -42,26 +42,9 @@ window.addEventListener('scroll', () => {
 
 // ── MOBILE MENU ──
 const menuBtn = document.getElementById('mobile-menu-btn');
-const mobileMenu = document.getElementById('mobile-menu');
 
-if (menuBtn) {
-  menuBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
-    const icon = menuBtn.querySelector('i');
-    if (mobileMenu.classList.contains('hidden')) {
-      icon.className = 'fas fa-bars';
-    } else {
-      icon.className = 'fas fa-times';
-    }
-  });
-}
 
-document.querySelectorAll('#mobile-menu .nav-link').forEach(link => {
-  link.addEventListener('click', () => {
-    mobileMenu.classList.add('hidden');
-    menuBtn.querySelector('i').className = 'fas fa-bars';
-  });
-});
+// overlay menu handled below
 
 // ── DARK / LIGHT MODE ──
 const html = document.documentElement;
@@ -301,3 +284,38 @@ document.querySelectorAll('.service-card').forEach(card => {
 });
 
 console.log('%c✦ Sawon Portfolio Loaded ✦', 'color: #6C3EFF; font-size: 16px; font-weight: bold;');
+
+// ══════════════════════
+// FULLSCREEN OVERLAY MENU
+// ══════════════════════
+(function() {
+  const overlay = document.getElementById('fullOverlay');
+  const btn = document.getElementById('menuBtn');
+
+  if (!overlay || !btn) return;
+
+  function openMenu() {
+    overlay.classList.add('open');
+    btn.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    overlay.classList.remove('open');
+    btn.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', () => {
+    overlay.classList.contains('open') ? closeMenu() : openMenu();
+  });
+
+  document.querySelectorAll('.overlay-link').forEach(link => {
+    link.addEventListener('click', () => {
+      setTimeout(closeMenu, 300);
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeMenu();
+  });
+})();
