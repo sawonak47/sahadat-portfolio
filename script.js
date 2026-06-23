@@ -40,11 +40,36 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// ── MOBILE MENU ──
-const menuBtn = document.getElementById('mobile-menu-btn');
+// ── FULLSCREEN OVERLAY MENU ──
+const hamBtn = document.getElementById('hamBtn');
+const foOverlay = document.getElementById('fullOverlay');
 
+function openFO() {
+  if (!foOverlay || !hamBtn) return;
+  foOverlay.classList.add('open');
+  hamBtn.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeFO() {
+  if (!foOverlay || !hamBtn) return;
+  foOverlay.classList.remove('open');
+  hamBtn.classList.remove('open');
+  document.body.style.overflow = '';
+}
 
-// overlay menu handled below
+if (hamBtn) {
+  hamBtn.addEventListener('click', () => {
+    foOverlay && foOverlay.classList.contains('open') ? closeFO() : openFO();
+  });
+}
+
+document.querySelectorAll('.fo-link').forEach(link => {
+  link.addEventListener('click', () => setTimeout(closeFO, 250));
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeFO();
+});
 
 // ── DARK / LIGHT MODE ──
 const html = document.documentElement;
@@ -284,38 +309,3 @@ document.querySelectorAll('.service-card').forEach(card => {
 });
 
 console.log('%c✦ Sawon Portfolio Loaded ✦', 'color: #6C3EFF; font-size: 16px; font-weight: bold;');
-
-// ══════════════════════
-// FULLSCREEN OVERLAY MENU
-// ══════════════════════
-(function() {
-  const overlay = document.getElementById('fullOverlay');
-  const btn = document.getElementById('menuBtn');
-
-  if (!overlay || !btn) return;
-
-  function openMenu() {
-    overlay.classList.add('open');
-    btn.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeMenu() {
-    overlay.classList.remove('open');
-    btn.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  btn.addEventListener('click', () => {
-    overlay.classList.contains('open') ? closeMenu() : openMenu();
-  });
-
-  document.querySelectorAll('.overlay-link').forEach(link => {
-    link.addEventListener('click', () => {
-      setTimeout(closeMenu, 300);
-    });
-  });
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeMenu();
-  });
-})();
