@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Sawon's Creative Journal</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ── BLOG PAGE STYLES ── */
+    .blog-hero {
+      padding: 120px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px;
+    }
+    .blog-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .blog-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(108,62,255,0.15);
+    }
+    .blog-thumb {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(135deg, rgba(108,62,255,0.2), rgba(0,200,255,0.1));
+    }
+    .blog-thumb-placeholder {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+    .blog-content { padding: 24px; }
+    .blog-category {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .blog-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .blog-excerpt {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .blog-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .blog-read-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--violet);
+      text-decoration: none;
+      transition: gap 0.2s;
+    }
+    .blog-read-btn:hover { gap: 10px; }
+
+    /* ── WRITE PANEL ── */
+    .write-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(16px);
+      margin-bottom: 60px;
+    }
+    .write-panel h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+    .write-field {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .write-field:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px rgba(108,62,255,0.1);
+    }
+    .write-field::placeholder { color: var(--text-muted); }
+    textarea.write-field { resize: vertical; min-height: 180px; }
+
+    .img-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+    .img-upload-area:hover, .img-upload-area.drag-over {
+      border-color: var(--violet);
+      background: rgba(108,62,255,0.05);
+    }
+    .img-upload-area input { display: none; }
+    .img-preview-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .img-preview-item {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .img-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .img-preview-item button {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      color: white;
+      font-size: 10px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .category-select {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .tag-chip {
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-secondary);
+    }
+    .tag-chip.active, .tag-chip:hover {
+      border-color: var(--violet);
+      background: rgba(108,62,255,0.1);
+      color: var(--violet);
+    }
+    .publish-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #6C3EFF, #5025ee);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .publish-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(108,62,255,0.4);
+    }
+    .github-info {
+      background: rgba(108,62,255,0.08);
+      border: 1px solid rgba(108,62,255,0.2);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    .github-info i { color: var(--violet); margin-top: 2px; flex-shrink: 0; }
+
+    /* Filter tabs */
+    .filter-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+    .filter-tab {
+      padding: 8px 20px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-tab:hover { border-color: var(--violet); color: var(--violet); }
+    .filter-tab.active {
+      background: linear-gradient(135deg, #6C3EFF, #5025ee);
+      border-color: transparent;
+      color: white;
+    }
+
+    /* Search */
+    .blog-search {
+      position: relative;
+      max-width: 400px;
+    }
+    .blog-search input {
+      width: 100%;
+      padding: 12px 44px 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--glass-bg);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .blog-search input:focus { border-color: var(--violet); }
+    .blog-search i {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Success message */
+    .success-toast {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 30px rgba(16,185,129,0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      z-index: 9999;
+    }
+    .success-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="transition-colors duration-300">
+
+  <!-- NAVBAR -->
+  <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="logo font-display text-2xl font-extrabold tracking-tight">
+        <span class="logo-s">S</span><span class="logo-dot">.</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="index.html#about" class="nav-link hidden md:inline">About</a>
+        <a href="index.html#portfolio" class="nav-link hidden md:inline">Work</a>
+        <a href="index.html#courses" class="nav-link hidden md:inline">Courses</a>
+        <a href="index.html#contact" class="nav-link hidden md:inline">Contact</a>
+        <a href="blog.html" class="nav-link hidden md:inline" style="color:var(--violet)">Blog</a>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+          <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- BLOG HERO -->
+  <div class="blog-hero">
+    <div class="hero-bg-orb orb-1"></div>
+    <div class="hero-bg-orb orb-2"></div>
+    <div class="max-w-4xl mx-auto px-6">
+      <span class="section-eyebrow">Creative Journal</span>
+      <h1 class="section-title mt-2 mb-4">Sawon's <span class="gradient-text">Blog</span></h1>
+      <p style="color:var(--text-secondary);max-width:500px;margin:0 auto;">Design tips, marketing strategies, SEO guides এবং AI tools নিয়ে আমার অভিজ্ঞতা শেয়ার করি এখানে।</p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 pb-20">
+
+    <!-- ── WRITE NEW POST PANEL ── -->
+    <div class="write-panel" id="writePanel">
+      <div class="flex items-center justify-between mb-6">
+        <h3><i class="fas fa-pen-nib mr-2" style="color:var(--violet)"></i>নতুন Blog Post লিখুন</h3>
+        <button id="toggleWrite" class="theme-btn" title="Collapse">
+          <i class="fas fa-chevron-up" id="toggleIcon"></i>
+        </button>
+      </div>
+
+      <div id="writeForm">
+        <div class="github-info">
+          <i class="fab fa-github fa-lg"></i>
+          <div>
+            <strong style="color:var(--text-primary)">GitHub দিয়ে Blog করছেন?</strong><br>
+            Post লিখে "Copy for GitHub" বাটন চাপুন — তারপর আপনার GitHub repository-তে <code>posts/</code> folder-এ <code>post-title.md</code> নামে paste করুন।
+            অথবা সরাসরি <a href="https://github.com" target="_blank" style="color:var(--violet)">GitHub.com</a> → Add File → Create new file করুন।
+          </div>
+        </div>
+
+        <!-- Title -->
+        <input type="text" id="postTitle" class="write-field" placeholder="✍️ Blog post-এর title লিখুন..." />
+
+        <!-- Category -->
+        <select id="postCategory" class="write-field category-select">
+          <option value="">📂 Category বেছে নিন...</option>
+          <option value="Graphic Design">🎨 Graphic Design</option>
+          <option value="Digital Marketing">📢 Digital Marketing</option>
+          <option value="SEO">🔍 SEO & SEM</option>
+          <option value="AI Tools">🤖 AI Tools</option>
+          <option value="Tutorial">📚 Tutorial</option>
+          <option value="Tips & Tricks">💡 Tips & Tricks</option>
+        </select>
+
+        <!-- Tags -->
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;font-family:'JetBrains Mono',monospace;">TAGS (click to select)</p>
+        <div class="tag-row">
+          <span class="tag-chip" onclick="toggleTag(this)">Design</span>
+          <span class="tag-chip" onclick="toggleTag(this)">Photoshop</span>
+          <span class="tag-chip" onclick="toggleTag(this)">Figma</span>
+          <span class="tag-chip" onclick="toggleTag(this)">SEO</span>
+          <span class="tag-chip" onclick="toggleTag(this)">Marketing</span>
+          <span class="tag-chip" onclick="toggleTag(this)">AI</span>
+          <span class="tag-chip" onclick="toggleTag(this)">ChatGPT</span>
+          <span class="tag-chip" onclick="toggleTag(this)">Freelance</span>
+          <span class="tag-chip" onclick="toggleTag(this)">Branding</span>
+          <span class="tag-chip" onclick="toggleTag(this)">Tutorial</span>
+        </div>
+
+        <!-- Image Upload -->
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;font-family:'JetBrains Mono',monospace;">FEATURED IMAGE</p>
+        <div class="img-upload-area" id="dropZone" onclick="document.getElementById('imgInput').click()">
+          <input type="file" id="imgInput" accept="image/*" multiple onchange="handleImages(this.files)" />
+          <i class="fas fa-cloud-upload-alt text-3xl mb-3" style="color:var(--violet);display:block"></i>
+          <p style="color:var(--text-secondary);font-size:0.875rem;">Click করুন বা image drag & drop করুন</p>
+          <p style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;">JPG, PNG, WebP — max 5MB</p>
+        </div>
+        <div class="img-preview-wrap" id="imgPreview"></div>
+
+        <!-- Content -->
+        <textarea id="postContent" class="write-field" placeholder="📝 Blog post-এর content লিখুন...
+
+আপনি Markdown ব্যবহার করতে পারেন:
+## Heading
+**bold text**
+*italic*
+- list item
+[link text](https://url.com)"></textarea>
+
+        <!-- Excerpt -->
+        <input type="text" id="postExcerpt" class="write-field" placeholder="📋 Short description (optional — না দিলে auto হবে)..." />
+
+        <!-- Buttons -->
+        <div class="flex flex-wrap gap-3 mt-4">
+          <button class="publish-btn" onclick="publishPost()">
+            <i class="fas fa-paper-plane"></i> Post Save করুন
+          </button>
+          <button class="publish-btn" style="background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid var(--border)" onclick="copyForGithub()">
+            <i class="fab fa-github"></i> GitHub-এর জন্য Copy করুন
+          </button>
+          <button class="publish-btn" style="background:linear-gradient(135deg,#25D366,#128C7E)" onclick="shareWhatsApp()">
+            <i class="fab fa-whatsapp"></i> WhatsApp-এ Share করুন
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BLOG LIST ── -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-cat="all">All Posts</button>
+        <button class="filter-tab" data-cat="Graphic Design">🎨 Design</button>
+        <button class="filter-tab" data-cat="Digital Marketing">📢 Marketing</button>
+        <button class="filter-tab" data-cat="SEO">🔍 SEO</button>
+        <button class="filter-tab" data-cat="AI Tools">🤖 AI Tools</button>
+        <button class="filter-tab" data-cat="Tutorial">📚 Tutorial</button>
+      </div>
+      <div class="blog-search">
+        <input type="text" id="searchInput" placeholder="Search posts..." oninput="filterPosts()" />
+        <i class="fas fa-search"></i>
+      </div>
+    </div>
+
+    <div class="blog-grid" id="blogGrid">
+      <!-- Sample posts — আপনার posts এখানে দেখাবে -->
+      <div class="blog-card" data-cat="Graphic Design">
+        <div class="blog-thumb-placeholder" style="background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(124,58,237,0.05))">🎨</div>
+        <div class="blog-content">
+          <span class="blog-category">Graphic Design</span>
+          <h3 class="blog-title">Photoshop দিয়ে Professional Logo Design করার ৫টি Tips</h3>
+          <p class="blog-excerpt">Logo design করতে গেলে সবচেয়ে বড় চ্যালেঞ্জ হলো simplicity বজায় রাখা। এই পোস্টে আমি ৫টি pro tips শেয়ার করব...</p>
+          <div class="blog-meta">
+            <span><i class="fas fa-calendar mr-1"></i>June 2025</span>
+            <span><i class="fas fa-clock mr-1"></i>5 min read</span>
+          </div>
+        </div>
+      </div>
+      <div class="blog-card" data-cat="SEO">
+        <div class="blog-thumb-placeholder" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.05))">🔍</div>
+        <div class="blog-content">
+          <span class="blog-category">SEO</span>
+          <h3 class="blog-title">২০২৫ সালে Google Ranking-এর জন্য সেরা SEO Strategy</h3>
+          <p class="blog-excerpt">Google-এর নতুন algorithm update-এর পরে অনেকের ranking drop হয়েছে। আজকে জানবো কীভাবে আবার page 1-এ ফিরে আসবেন...</p>
+          <div class="blog-meta">
+            <span><i class="fas fa-calendar mr-1"></i>May 2025</span>
+            <span><i class="fas fa-clock mr-1"></i>8 min read</span>
+          </div>
+        </div>
+      </div>
+      <div class="blog-card" data-cat="AI Tools">
+        <div class="blog-thumb-placeholder" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(236,72,153,0.05))">🤖</div>
+        <div class="blog-content">
+          <span class="blog-category">AI Tools</span>
+          <h3 class="blog-title">ChatGPT দিয়ে ১ ঘণ্টায় ১০টি SEO Blog Post লেখার পদ্ধতি</h3>
+          <p class="blog-excerpt">AI দিয়ে content তৈরি করা এখন অনেক সহজ। কিন্তু quality বজায় রাখাটাই মূল challenge। এই guide-এ শিখবেন সঠিক prompt কীভাবে লিখতে হয়...</p>
+          <div class="blog-meta">
+            <span><i class="fas fa-calendar mr-1"></i>April 2025</span>
+            <span><i class="fas fa-clock mr-1"></i>6 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="noPosts" class="hidden text-center py-20" style="color:var(--text-muted)">
+      <i class="fas fa-search text-4xl mb-4 block opacity-30"></i>
+      <p>কোনো post পাওয়া যায়নি</p>
+    </div>
+
+  </div>
+
+  <!-- Success Toast -->
+  <div id="toast" class="success-toast"></div>
+
+  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <script src="script.js"></script>
+  <script>
+  // ── BLOG JAVASCRIPT ──
+
+  let uploadedImages = [];
+  let savedPosts = JSON.parse(localStorage.getItem('sawon_blog_posts') || '[]');
+
+  // Theme toggle
+  const html = document.documentElement;
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const savedTheme = localStorage.getItem('sawon-theme') || 'dark';
+  html.setAttribute('data-theme', savedTheme);
+  themeIcon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+  themeToggle.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('sawon-theme', next);
+    themeIcon.className = next === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+  });
+
+  // Navbar scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Back to top
+  const btt = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 400));
+  btt.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
+
+  // Collapse write panel
+  document.getElementById('toggleWrite').addEventListener('click', () => {
+    const form = document.getElementById('writeForm');
+    const icon = document.getElementById('toggleIcon');
+    const hidden = form.style.display === 'none';
+    form.style.display = hidden ? 'block' : 'none';
+    icon.className = hidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+  });
+
+  // Tag toggle
+  function toggleTag(el) { el.classList.toggle('active'); }
+
+  // Image upload
+  function handleImages(files) {
+    Array.from(files).forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        uploadedImages.push(e.target.result);
+        renderPreviews();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderPreviews() {
+    const wrap = document.getElementById('imgPreview');
+    wrap.innerHTML = uploadedImages.map((src, i) => `
+      <div class="img-preview-item">
+        <img src="${src}" alt="upload ${i+1}" />
+        <button onclick="removeImg(${i})"><i class="fas fa-times"></i></button>
+      </div>
+    `).join('');
+  }
+
+  function removeImg(i) {
+    uploadedImages.splice(i, 1);
+    renderPreviews();
+  }
+
+  // Drag & drop
+  const dropZone = document.getElementById('dropZone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    handleImages(e.dataTransfer.files);
+  });
+
+  // Get active tags
+  function getActiveTags() {
+    return [...document.querySelectorAll('.tag-chip.active')].map(el => el.textContent);
+  }
+
+  // Save post
+  function publishPost() {
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('postContent').value.trim();
+    if (!title || !content) { showToast('⚠️ Title ও Content দিন!', '#F59E0B'); return; }
+    const post = {
+      id: Date.now(),
+      title,
+      category: document.getElementById('postCategory').value || 'General',
+      excerpt: document.getElementById('postExcerpt').value.trim() || content.substring(0,120) + '...',
+      content,
+      tags: getActiveTags(),
+      image: uploadedImages[0] || null,
+      date: new Date().toLocaleDateString('en-BD', {day:'numeric',month:'long',year:'numeric'}),
+      readTime: Math.max(1, Math.ceil(content.split(' ').length / 200)) + ' min read'
+    };
+    savedPosts.unshift(post);
+    localStorage.setItem('sawon_blog_posts', JSON.stringify(savedPosts));
+    renderSavedPosts();
+    resetForm();
+    showToast('✅ Post successfully saved!');
+  }
+
+  // Render saved posts
+  function renderSavedPosts() {
+    const grid = document.getElementById('blogGrid');
+    const saved = savedPosts.map(p => `
+      <div class="blog-card" data-cat="${p.category}">
+        ${p.image
+          ? `<img src="${p.image}" class="blog-thumb" alt="${p.title}" />`
+          : `<div class="blog-thumb-placeholder" style="background:linear-gradient(135deg,rgba(108,62,255,0.2),rgba(0,200,255,0.1))">✍️</div>`}
+        <div class="blog-content">
+          <span class="blog-category">${p.category}</span>
+          <h3 class="blog-title">${p.title}</h3>
+          <p class="blog-excerpt">${p.excerpt}</p>
+          ${p.tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${p.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(108,62,255,0.1);border:1px solid rgba(108,62,255,0.2);color:var(--violet)">#${t}</span>`).join('')}</div>` : ''}
+          <div class="blog-meta">
+            <span><i class="fas fa-calendar mr-1"></i>${p.date}</span>
+            <span><i class="fas fa-clock mr-1"></i>${p.readTime}</span>
+            <button onclick="deletePost(${p.id})" style="margin-left:auto;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;"><i class="fas fa-trash mr-1"></i>Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Prepend saved posts before sample posts
+    const samples = grid.querySelectorAll('.blog-card');
+    samples.forEach(s => s.remove());
+    grid.insertAdjacentHTML('afterbegin', saved);
+    // Re-add samples
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="blog-card" data-cat="Graphic Design">
+        <div class="blog-thumb-placeholder" style="background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(124,58,237,0.05))">🎨</div>
+        <div class="blog-content">
+          <span class="blog-category">Graphic Design</span>
+          <h3 class="blog-title">Photoshop দিয়ে Professional Logo Design করার ৫টি Tips</h3>
+          <p class="blog-excerpt">Logo design করতে গেলে সবচেয়ে বড় চ্যালেঞ্জ হলো simplicity বজায় রাখা। এই পোস্টে আমি ৫টি pro tips শেয়ার করব...</p>
+          <div class="blog-meta"><span><i class="fas fa-calendar mr-1"></i>June 2025</span><span><i class="fas fa-clock mr-1"></i>5 min read</span></div>
+        </div>
+      </div>
+      <div class="blog-card" data-cat="SEO">
+        <div class="blog-thumb-placeholder" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.05))">🔍</div>
+        <div class="blog-content">
+          <span class="blog-category">SEO</span>
+          <h3 class="blog-title">২০২৫ সালে Google Ranking-এর জন্য সেরা SEO Strategy</h3>
+          <p class="blog-excerpt">Google-এর নতুন algorithm update-এর পরে অনেকের ranking drop হয়েছে। আজকে জানবো কীভাবে page 1-এ ফিরে আসবেন...</p>
+          <div class="blog-meta"><span><i class="fas fa-calendar mr-1"></i>May 2025</span><span><i class="fas fa-clock mr-1"></i>8 min read</span></div>
+        </div>
+      </div>
+      <div class="blog-card" data-cat="AI Tools">
+        <div class="blog-thumb-placeholder" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(236,72,153,0.05))">🤖</div>
+        <div class="blog-content">
+          <span class="blog-category">AI Tools</span>
+          <h3 class="blog-title">ChatGPT দিয়ে ১ ঘণ্টায় ১০টি SEO Blog Post লেখার পদ্ধতি</h3>
+          <p class="blog-excerpt">AI দিয়ে content তৈরি করা এখন অনেক সহজ। কিন্তু quality বজায় রাখাটাই মূল challenge...</p>
+          <div class="blog-meta"><span><i class="fas fa-calendar mr-1"></i>April 2025</span><span><i class="fas fa-clock mr-1"></i>6 min read</span></div>
+        </div>
+      </div>
+    `);
+  }
+
+  // Delete post
+  function deletePost(id) {
+    if (!confirm('এই post মুছে দেবেন?')) return;
+    savedPosts = savedPosts.filter(p => p.id !== id);
+    localStorage.setItem('sawon_blog_posts', JSON.stringify(savedPosts));
+    renderSavedPosts();
+    showToast('🗑️ Post deleted', '#EF4444');
+  }
+
+  // Reset form
+  function resetForm() {
+    document.getElementById('postTitle').value = '';
+    document.getElementById('postContent').value = '';
+    document.getElementById('postExcerpt').value = '';
+    document.getElementById('postCategory').value = '';
+    document.querySelectorAll('.tag-chip').forEach(t => t.classList.remove('active'));
+    uploadedImages = [];
+    renderPreviews();
+  }
+
+  // Copy for GitHub
+  function copyForGithub() {
+    const title = document.getElementById('postTitle').value.trim() || 'My Blog Post';
+    const content = document.getElementById('postContent').value.trim();
+    const category = document.getElementById('postCategory').value;
+    const tags = getActiveTags();
+    const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+    const md = `---
+title: "${title}"
+date: "${new Date().toISOString().split('T')[0]}"
+category: "${category}"
+tags: [${tags.map(t=>`"${t}"`).join(', ')}]
+author: "Md Sahadat Hossain (Sawon)"
+---
+
+${content}`;
+    navigator.clipboard.writeText(md).then(() => {
+      showToast(`✅ Copied! GitHub-এ "posts/${slug}.md" নামে save করুন`);
+    });
+  }
+
+  // WhatsApp share
+  function shareWhatsApp() {
+    const title = document.getElementById('postTitle').value.trim() || 'My new blog post';
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://wa.me/?text=${encodeURIComponent(title + ' - Check it out: ')}${url}`, '_blank');
+  }
+
+  // Filter posts
+  document.getElementById('filterTabs').addEventListener('click', e => {
+    if (!e.target.classList.contains('filter-tab')) return;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    filterPosts();
+  });
+
+  function filterPosts() {
+    const cat = document.querySelector('.filter-tab.active').dataset.cat;
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.blog-card').forEach(card => {
+      const cardCat = card.dataset.cat || '';
+      const cardText = card.textContent.toLowerCase();
+      const matchCat = cat === 'all' || cardCat === cat;
+      const matchSearch = !search || cardText.includes(search);
+      card.style.display = (matchCat && matchSearch) ? 'block' : 'none';
+      if (matchCat && matchSearch) visible++;
+    });
+    document.getElementById('noPosts').classList.toggle('hidden', visible > 0);
+  }
+
+  // Toast
+  function showToast(msg, color='#10B981') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = `linear-gradient(135deg, ${color}, ${color}cc)`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // Init
+  renderSavedPosts();
+  </script>
+</body>
+</html>
