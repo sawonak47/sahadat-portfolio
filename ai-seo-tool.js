@@ -1151,13 +1151,15 @@
 
     renderTagsCloud(entry);
 
-    if (r.longTailKeywords && r.longTailKeywords.length) {
-      longTailWrap.classList.remove('hidden');
-      longTailRow.innerHTML = r.longTailKeywords
-        .map(phrase => `<span class="longtail-chip" data-copy-phrase="${escapeHtml(phrase)}"><i class="fas fa-plus-circle mr-1" style="color:var(--cyan)"></i>${escapeHtml(phrase)}</span>`)
-        .join('');
-    } else {
-      longTailWrap.classList.add('hidden');
+    if (longTailWrap && longTailRow) {
+      if (r.longTailKeywords && r.longTailKeywords.length) {
+        longTailWrap.classList.remove('hidden');
+        longTailRow.innerHTML = r.longTailKeywords
+          .map(phrase => `<span class="longtail-chip" data-copy-phrase="${escapeHtml(phrase)}"><i class="fas fa-plus-circle mr-1" style="color:var(--cyan)"></i>${escapeHtml(phrase)}</span>`)
+          .join('');
+      } else {
+        longTailWrap.classList.add('hidden');
+      }
     }
   }
 
@@ -1463,11 +1465,13 @@
     }
   });
 
-  // Long-tail phrase copy
-  longTailRow.addEventListener('click', e => {
-    const chip = e.target.closest('[data-copy-phrase]');
-    if (chip) copyText(chip.dataset.copyPhrase, 'Copied SEO phrase!');
-  });
+  // Long-tail phrase copy (optional)
+  if (longTailRow) {
+    longTailRow.addEventListener('click', e => {
+      const chip = e.target.closest('[data-copy-phrase]');
+      if (chip) copyText(chip.dataset.copyPhrase, 'Copied SEO phrase!');
+    });
+  }
 
   // Bulk copy & export actions
   copyCommaBtn.addEventListener('click', () => {

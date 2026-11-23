@@ -153,7 +153,14 @@
       border: 1px solid rgba(0, 200, 255, 0.35);
       background: rgba(0, 200, 255, 0.08);
       color: var(--cyan);
-      cursor: default;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .engine-chip:hover {
+      border-color: var(--violet);
+      background: rgba(108, 62, 255, 0.14);
+      color: var(--violet);
+      transform: translateY(-1px);
     }
     .engine-chip .dot-ind {
       width: 7px;
@@ -1395,10 +1402,10 @@
       <aside class="seo-panel">
         <div class="panel-title-row">
           <h2 class="panel-title"><i class="fas fa-cloud-arrow-up"></i> Upload &amp; Settings</h2>
-          <span id="engineStatusChip" class="engine-chip">
-            <span class="dot-ind"></span>
-            <span id="engineStatusText">Sahadat AI Ready</span>
-          </span>
+          <button id="openAdminBtn" class="engine-chip" style="cursor:pointer;" type="button" title="Admin AI Model & Key Settings">
+            <i class="fas fa-lock"></i>
+            <span>Change AI Model</span>
+          </button>
         </div>
 
         <!-- Dropzone -->
@@ -1687,12 +1694,6 @@
               <button id="addCustomTagBtn" class="action-btn" type="button"><i class="fas fa-plus"></i> Add</button>
             </div>
 
-            <!-- Long-Tail Keyword Phrases -->
-            <div id="longTailWrap" class="mt-5 pt-4" style="border-top:1px solid var(--border)">
-              <span class="seo-result-label mb-2"><i class="fas fa-bolt"></i> Long-Tail SEO Phrases (click to copy)</span>
-              <div class="longtail-row" id="longTailRow"></div>
-            </div>
-
             <!-- Copy & Export Bar -->
             <div class="copy-actions-bar">
               <button id="copyCommaBtn" class="action-btn primary" type="button"><i class="fas fa-copy"></i> Copy Comma Tags</button>
@@ -1736,12 +1737,7 @@
           <a href="https://www.behance.net/Sawonhot1" class="social-icon-sm" aria-label="Behance" target="_blank"><i class="fab fa-behance"></i></a>
           <a href="https://x.com/ShSawonhot1" class="social-icon-sm" aria-label="X/Twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
         </div>
-        <div class="text-center md:text-right">
-          <p class="font-mono text-xs opacity-50">© Md Sahadat Hossain. All rights reserved.</p>
-          <button id="openAdminBtn" class="admin-change-btn" type="button" title="Admin AI Model & Key Settings">
-            <i class="fas fa-lock"></i> Change AI Model
-          </button>
-        </div>
+        <p class="font-mono text-xs opacity-50 text-center md:text-right">© Md Sahadat Hossain. All rights reserved.</p>
       </div>
     </div>
   </footer>
