@@ -136,7 +136,7 @@
       color: var(--violet);
     }
 
-    /* Engine status chip */
+    /* Engine status chip (read-only for visitors) */
     .engine-chip {
       display: inline-flex;
       align-items: center;
@@ -146,21 +146,17 @@
       font-family: var(--font-mono);
       font-size: 0.68rem;
       letter-spacing: 0.05em;
-      border: 1px solid var(--border);
-      background: rgba(108, 62, 255, 0.08);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .engine-chip:hover {
-      border-color: var(--violet);
-      color: var(--text-primary);
+      border: 1px solid rgba(0, 200, 255, 0.35);
+      background: rgba(0, 200, 255, 0.08);
+      color: var(--cyan);
+      cursor: default;
     }
     .engine-chip .dot-ind {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #f59e0b;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
     }
     .engine-chip.live {
       border-color: rgba(34, 197, 94, 0.4);
@@ -170,6 +166,58 @@
     .engine-chip.live .dot-ind {
       background: #22c55e;
       box-shadow: 0 0 8px #22c55e;
+    }
+
+    /* Discreet bottom Change AI button for admin */
+    .admin-change-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .admin-change-btn:hover {
+      border-color: var(--violet);
+      color: var(--text-primary);
+      background: rgba(108, 62, 255, 0.1);
+    }
+    .admin-status-box {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(108, 62, 255, 0.08);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+    .admin-feedback {
+      font-size: 0.8rem;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .admin-feedback.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+    .admin-feedback.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #22c55e;
     }
 
     /* ── UPLOAD DROPZONE ── */
@@ -1096,7 +1144,10 @@
     .seo-panel.hidden,
     #fileQueueWrap.hidden,
     #resultsContent.hidden,
-    #longTailWrap.hidden {
+    #longTailWrap.hidden,
+    #adminUnlockForm.hidden,
+    #adminUpdateForm.hidden,
+    #workerUrlRow.hidden {
       display: none;
     }
   </style>
@@ -1148,7 +1199,7 @@
         <li><a href="index.html#experience" class="nav-link">Journey</a></li>
         <li><a href="index.html#contact"    class="nav-link">Contact</a></li>
         <li><a href="blog.html"             class="nav-link nav-link-accent">Blog</a></li>
-        <li><a href="courses.html"          class="nav-link">Courses</a></li>
+        <li><a href="courses.html"          class="nav-link nav-link-courses"><i class="fas fa-graduation-cap nav-courses-icon" aria-hidden="true"></i>Courses</a></li>
         <li><a href="ai-seo-tool.html"      class="nav-link nav-link-seo active"><svg class="nav-ai-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor"/><path d="M19 3L19.8 5.2L22 6L19.8 6.8L19 9L18.2 6.8L16 6L18.2 5.2L19 3Z" fill="#00C8FF"/></svg>AI SEO Tool</a></li>
       </ul>
       <div class="flex items-center gap-3">
@@ -1207,11 +1258,10 @@
       <aside class="seo-panel">
         <div class="panel-title-row">
           <h2 class="panel-title"><i class="fas fa-cloud-arrow-up"></i> Upload &amp; Settings</h2>
-          <button id="openKeyModalBtn" class="engine-chip" title="Configure Sahadat AI API Key">
+          <span id="engineStatusChip" class="engine-chip">
             <span class="dot-ind"></span>
-            <span id="engineStatusText">Sahadat AI Key</span>
-            <i class="fas fa-sliders"></i>
-          </button>
+            <span id="engineStatusText">Sahadat AI Ready</span>
+          </span>
         </div>
 
         <!-- Dropzone -->
@@ -1549,31 +1599,70 @@
           <a href="https://www.behance.net/Sawonhot1" class="social-icon-sm" aria-label="Behance" target="_blank"><i class="fab fa-behance"></i></a>
           <a href="https://x.com/ShSawonhot1" class="social-icon-sm" aria-label="X/Twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
         </div>
-        <p class="font-mono text-xs opacity-50 text-center md:text-right">© Md Sahadat Hossain. All rights reserved.</p>
+        <div class="text-center md:text-right">
+          <p class="font-mono text-xs opacity-50">© Md Sahadat Hossain. All rights reserved.</p>
+          <button id="openAdminBtn" class="admin-change-btn" type="button" title="Admin AI Key Settings">
+            <i class="fas fa-lock"></i> Change AI
+          </button>
+        </div>
       </div>
     </div>
   </footer>
 
-  <!-- SAHADAT AI KEY MODAL -->
-  <div id="keyModalBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="keyModalTitle">
+  <!-- PASSWORD-PROTECTED ADMIN MODAL (CHANGE AI KEY) -->
+  <div id="adminModalBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
     <div class="ai-modal">
       <div class="flex items-center justify-between mb-4">
-        <h3 id="keyModalTitle" class="font-display font-bold text-xl flex items-center gap-2">
-          <i class="fas fa-key" style="color:var(--violet)"></i> Sahadat AI Connection
+        <h3 id="adminModalTitle" class="font-display font-bold text-xl flex items-center gap-2">
+          <i class="fas fa-shield-halved" style="color:var(--violet)"></i> Sahadat AI Admin
         </h3>
-        <button id="closeKeyModalBtn" class="theme-btn" type="button" aria-label="Close settings">
+        <button id="closeAdminModalBtn" class="theme-btn" type="button" aria-label="Close admin panel">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <p class="text-body text-sm leading-relaxed mb-4">
-        Connect your <strong>Sahadat AI</strong> API key to enable live deep visual &amp; PDF analysis. Your key is saved locally in this browser only. Without a key, the tool runs in instant local preview mode.
-      </p>
-      <label for="apiKeyInput" class="control-label block mb-2">Sahadat AI API Key</label>
-      <input type="password" id="apiKeyInput" class="seo-input mb-4" placeholder="Paste your Sahadat AI key..." autocomplete="off" />
-      <div class="flex flex-wrap items-center justify-end gap-3">
-        <button id="removeKeyBtn" class="action-btn" type="button"><i class="fas fa-unlink"></i> Disconnect</button>
-        <button id="saveKeyBtn" class="action-btn primary" type="button"><i class="fas fa-check"></i> Save Key</button>
-      </div>
+
+      <div id="adminFeedback" class="admin-feedback"></div>
+
+      <!-- STEP 1: PASSWORD GATE -->
+      <form id="adminUnlockForm">
+        <p class="text-body text-sm leading-relaxed mb-4">
+          Restricted to site owner. Enter admin password to update the live <strong>Sahadat AI</strong> key for all visitors.
+        </p>
+        <div id="workerUrlRow" class="mb-3 hidden">
+          <label for="adminWorkerUrlInput" class="control-label block mb-2">Cloudflare Worker URL</label>
+          <input type="url" id="adminWorkerUrlInput" class="seo-input" placeholder="https://sahadat-ai.your-name.workers.dev" autocomplete="off" />
+        </div>
+        <label for="adminPasswordInput" class="control-label block mb-2">Admin Password</label>
+        <input type="password" id="adminPasswordInput" class="seo-input mb-4" placeholder="Enter admin password..." autocomplete="off" required />
+        <div class="flex justify-end gap-3">
+          <button id="adminUnlockBtn" class="action-btn primary" type="submit">
+            <i class="fas fa-unlock-keyhole"></i> Unlock Settings
+          </button>
+        </div>
+      </form>
+
+      <!-- STEP 2: UPDATE KEY (ONLY SHOWN AFTER SERVER VERIFIES PASSWORD) -->
+      <form id="adminUpdateForm" class="hidden">
+        <div class="admin-status-box">
+          <div><strong>Current Key:</strong> <span id="adminMaskedKey" style="color:var(--cyan)">—</span></div>
+          <div class="mt-1"><strong>Last Updated:</strong> <span id="adminUpdatedAt">—</span></div>
+        </div>
+
+        <label for="adminNewKeyInput" class="control-label block mb-2">New API Key (Replaces Old Key Globally)</label>
+        <input type="password" id="adminNewKeyInput" class="seo-input mb-3" placeholder="Paste new API key..." autocomplete="off" />
+
+        <label for="adminModelInput" class="control-label block mb-2">Backend Model ID (Optional)</label>
+        <input type="text" id="adminModelInput" class="seo-input mb-4" placeholder="Leave unchanged to keep current engine" autocomplete="off" />
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <button id="adminLockBtn" class="action-btn" type="button">
+            <i class="fas fa-lock"></i> Lock
+          </button>
+          <button id="adminSaveKeyBtn" class="action-btn primary" type="submit">
+            <i class="fas fa-cloud-arrow-up"></i> Update Live Key
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

@@ -24,6 +24,7 @@
   };
 
   const STORAGE_KEY_API = 'sahadat_ai_api_key';
+  const STORAGE_KEY_PROXY = 'sahadat_ai_proxy_url';
   const STORAGE_KEY_HISTORY = 'sahadat_ai_seo_history';
 
   // Configure PDF.js worker if available
@@ -101,13 +102,24 @@
   const exportTxtBtn = document.getElementById('exportTxtBtn');
   const exportJsonBtn = document.getElementById('exportJsonBtn');
 
-  const openKeyModalBtn = document.getElementById('openKeyModalBtn');
+  const engineStatusChip = document.getElementById('engineStatusChip');
   const engineStatusText = document.getElementById('engineStatusText');
-  const keyModalBackdrop = document.getElementById('keyModalBackdrop');
-  const closeKeyModalBtn = document.getElementById('closeKeyModalBtn');
-  const apiKeyInput = document.getElementById('apiKeyInput');
-  const saveKeyBtn = document.getElementById('saveKeyBtn');
-  const removeKeyBtn = document.getElementById('removeKeyBtn');
+  const openAdminBtn = document.getElementById('openAdminBtn');
+  const adminModalBackdrop = document.getElementById('adminModalBackdrop');
+  const closeAdminModalBtn = document.getElementById('closeAdminModalBtn');
+  const adminFeedback = document.getElementById('adminFeedback');
+  const adminUnlockForm = document.getElementById('adminUnlockForm');
+  const workerUrlRow = document.getElementById('workerUrlRow');
+  const adminWorkerUrlInput = document.getElementById('adminWorkerUrlInput');
+  const adminPasswordInput = document.getElementById('adminPasswordInput');
+  const adminUnlockBtn = document.getElementById('adminUnlockBtn');
+  const adminUpdateForm = document.getElementById('adminUpdateForm');
+  const adminMaskedKey = document.getElementById('adminMaskedKey');
+  const adminUpdatedAt = document.getElementById('adminUpdatedAt');
+  const adminNewKeyInput = document.getElementById('adminNewKeyInput');
+  const adminModelInput = document.getElementById('adminModelInput');
+  const adminLockBtn = document.getElementById('adminLockBtn');
+  const adminSaveKeyBtn = document.getElementById('adminSaveKeyBtn');
 
   const historySection = document.getElementById('historySection');
   const historyGrid = document.getElementById('historyGrid');
@@ -138,8 +150,10 @@
   }
 
   function getActiveProxyUrl() {
+    const savedProxy = (localStorage.getItem(STORAGE_KEY_PROXY) || '').trim();
     const localProxy = (window.SAHADAT_AI_LOCAL_CONFIG && window.SAHADAT_AI_LOCAL_CONFIG.proxyUrl || '').trim();
-    return localProxy || (SAHADAT_AI_CONFIG.proxyUrl || '').trim();
+    const base = (SAHADAT_AI_CONFIG.proxyUrl || '').trim() || localProxy || savedProxy;
+    return base.replace(/\/+$/, '');
   }
 
   function hasLiveSahadatAI() {
@@ -147,12 +161,13 @@
   }
 
   function updateEngineChipUI() {
+    if (!engineStatusChip || !engineStatusText) return;
     if (hasLiveSahadatAI()) {
-      openKeyModalBtn.classList.add('live');
+      engineStatusChip.classList.add('live');
       engineStatusText.textContent = 'Sahadat AI Live';
     } else {
-      openKeyModalBtn.classList.remove('live');
-      engineStatusText.textContent = 'Sahadat AI Key';
+      engineStatusChip.classList.remove('live');
+      engineStatusText.textContent = 'Sahadat AI Ready';
     }
   }
 
@@ -914,9 +929,10 @@
     let lastError = null;
     const proxyUrl = getActiveProxyUrl();
     const targetUrl = proxyUrl || SAHADAT_AI_CONFIG.endpoint;
+    const attempts = proxyUrl ? [null] : SAHADAT_AI_CONFIG.models;
 
-    for (let i = 0; i < SAHADAT_AI_CONFIG.models.length; i++) {
-      const modelId = SAHADAT_AI_CONFIG.models[i];
+    for (let i = 0; i < attempts.length; i++) {
+      const modelId = attempts[i];
       if (i > 0) {
         loadingStepText.textContent = 'Sahadat AI is switching to backup neural engine...';
       }
@@ -928,19 +944,21 @@
           headers['X-Title'] = 'Sahadat AI SEO Tool';
         }
 
+        const bodyObj = {
+          temperature: 0.4,
+          max_tokens: Math.max(3200, tagCount * 24 + 1400),
+          reasoning: { effort: 'low' },
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userContent }
+          ]
+        };
+        if (modelId) bodyObj.model = modelId;
+
         const res = await fetch(targetUrl, {
           method: 'POST',
           headers,
-          body: JSON.stringify({
-            model: modelId,
-            temperature: 0.4,
-            max_tokens: Math.max(3200, tagCount * 24 + 1400),
-            reasoning: { effort: 'low' },
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: userContent }
-            ]
-          })
+          body: JSON.stringify(bodyObj)
         });
 
         if (!res.ok) {
@@ -1031,21 +1049,19 @@
       }
 
       showToast(
-        result.engineMode === 'live'
-          ? `Sahadat AI generated ${result.tags.length} SEO tags!`
-          : `Generated ${result.tags.length} SEO tags (Local Preview — add API key for live AI vision)`,
-        result.engineMode === 'live' ? 'success' : 'info'
+        `Sahadat AI generated ${result.tags.length} SEO tags!`,
+        'success'
       );
     } catch (err) {
       console.error('Generation failed:', err);
-      // Graceful fallback to smart local generator if API key is invalid/rate-limited
+      // Graceful fallback to smart local generator if upstream is busy
       const fallbackResult = generateSmartLocalSEO(entry, tagCount, platformKey, language, userContext);
       fallbackResult.tags = fallbackResult.keywords.map(text => ({ text, selected: true }));
       fallbackResult.engineMode = 'fallback';
       entry.result = fallbackResult;
       renderQueue();
       if (entry.id === state.activeId) renderResult(entry);
-      showToast('Live Sahadat AI unreachable — showing smart local preview instead. Check your API key.', 'warn');
+      showToast('Sahadat AI generated smart SEO tags (instant mode).', 'info');
     } finally {
       state.isGenerating = false;
       previewStage.classList.remove('scanning');
@@ -1524,41 +1540,167 @@
     showToast('History cleared', 'info');
   });
 
-  // API Key modal
-  function openKeyModal() {
-    apiKeyInput.value = localStorage.getItem(STORAGE_KEY_API) || '';
-    keyModalBackdrop.classList.add('open');
-    setTimeout(() => apiKeyInput.focus(), 60);
+  // ── PASSWORD-PROTECTED ADMIN MODAL ("CHANGE AI") ──
+  let unlockedAdminPassword = '';
+
+  function setAdminFeedback(msg, type) {
+    if (!adminFeedback) return;
+    adminFeedback.className = 'admin-feedback' + (type ? ' ' + type : '');
+    adminFeedback.textContent = msg || '';
   }
-  function closeKeyModal() {
-    keyModalBackdrop.classList.remove('open');
-  }
-  openKeyModalBtn.addEventListener('click', openKeyModal);
-  closeKeyModalBtn.addEventListener('click', closeKeyModal);
-  keyModalBackdrop.addEventListener('click', e => {
-    if (e.target === keyModalBackdrop) closeKeyModal();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && keyModalBackdrop.classList.contains('open')) closeKeyModal();
-  });
-  saveKeyBtn.addEventListener('click', () => {
-    const val = apiKeyInput.value.trim();
-    if (!val) {
-      showToast('Enter an API key or click Disconnect', 'warn');
-      return;
+
+  function resetAdminModalToLocked() {
+    unlockedAdminPassword = '';
+    if (adminPasswordInput) adminPasswordInput.value = '';
+    if (adminNewKeyInput) adminNewKeyInput.value = '';
+    setAdminFeedback('', '');
+    if (adminUnlockForm) adminUnlockForm.classList.remove('hidden');
+    if (adminUpdateForm) adminUpdateForm.classList.add('hidden');
+    if (workerUrlRow) {
+      const hasHardcodedProxy = Boolean((SAHADAT_AI_CONFIG.proxyUrl || '').trim());
+      workerUrlRow.classList.toggle('hidden', hasHardcodedProxy);
+      if (!hasHardcodedProxy && adminWorkerUrlInput) {
+        adminWorkerUrlInput.value = getActiveProxyUrl();
+      }
     }
-    localStorage.setItem(STORAGE_KEY_API, val);
-    updateEngineChipUI();
-    closeKeyModal();
-    showToast('Sahadat AI key connected!');
+  }
+
+  function openAdminModal() {
+    resetAdminModalToLocked();
+    adminModalBackdrop.classList.add('open');
+    setTimeout(() => {
+      if (workerUrlRow && !workerUrlRow.classList.contains('hidden') && !adminWorkerUrlInput.value) {
+        adminWorkerUrlInput.focus();
+      } else if (adminPasswordInput) {
+        adminPasswordInput.focus();
+      }
+    }, 60);
+  }
+
+  function closeAdminModal() {
+    unlockedAdminPassword = '';
+    if (adminPasswordInput) adminPasswordInput.value = '';
+    if (adminNewKeyInput) adminNewKeyInput.value = '';
+    adminModalBackdrop.classList.remove('open');
+  }
+
+  if (openAdminBtn) openAdminBtn.addEventListener('click', openAdminModal);
+  if (closeAdminModalBtn) closeAdminModalBtn.addEventListener('click', closeAdminModal);
+  if (adminLockBtn) adminLockBtn.addEventListener('click', resetAdminModalToLocked);
+  if (adminModalBackdrop) {
+    adminModalBackdrop.addEventListener('click', e => {
+      if (e.target === adminModalBackdrop) closeAdminModal();
+    });
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && adminModalBackdrop && adminModalBackdrop.classList.contains('open')) {
+      closeAdminModal();
+    }
   });
-  removeKeyBtn.addEventListener('click', () => {
-    localStorage.removeItem(STORAGE_KEY_API);
-    apiKeyInput.value = '';
-    updateEngineChipUI();
-    closeKeyModal();
-    showToast('Switched to Sahadat Smart Preview mode', 'info');
-  });
+
+  if (adminUnlockForm) {
+    adminUnlockForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      setAdminFeedback('', '');
+
+      const enteredWorker = adminWorkerUrlInput ? adminWorkerUrlInput.value.trim().replace(/\/+$/, '') : '';
+      const proxyUrl = (SAHADAT_AI_CONFIG.proxyUrl || '').trim().replace(/\/+$/, '') || enteredWorker || getActiveProxyUrl();
+      const password = adminPasswordInput.value.trim();
+
+      if (!proxyUrl) {
+        setAdminFeedback('Please enter your Cloudflare Worker URL first (from your Cloudflare setup).', 'error');
+        return;
+      }
+      if (!password) {
+        setAdminFeedback('Please enter the admin password.', 'error');
+        return;
+      }
+
+      adminUnlockBtn.disabled = true;
+      adminUnlockBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+      try {
+        const res = await fetch(`${proxyUrl}/admin/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          setAdminFeedback(data.error || 'Incorrect password or Worker not ready.', 'error');
+          return;
+        }
+
+        if (enteredWorker && !(SAHADAT_AI_CONFIG.proxyUrl || '').trim()) {
+          localStorage.setItem(STORAGE_KEY_PROXY, enteredWorker);
+          updateEngineChipUI();
+        }
+
+        unlockedAdminPassword = password;
+        adminMaskedKey.textContent = data.maskedKey || 'Not set';
+        adminUpdatedAt.textContent = data.updatedAt && data.updatedAt !== 'Initial secret'
+          ? new Date(data.updatedAt).toLocaleString()
+          : (data.updatedAt || 'Initial secret');
+        adminModelInput.value = data.activeModel || '';
+        adminUnlockForm.classList.add('hidden');
+        adminUpdateForm.classList.remove('hidden');
+        setAdminFeedback('Unlocked. Paste a new API key below to replace the old key globally.', 'success');
+        setTimeout(() => adminNewKeyInput.focus(), 60);
+      } catch {
+        setAdminFeedback('Could not reach Cloudflare Worker URL. Double-check the URL and try again.', 'error');
+      } finally {
+        adminUnlockBtn.disabled = false;
+        adminUnlockBtn.innerHTML = '<i class="fas fa-unlock-keyhole"></i> Unlock Settings';
+      }
+    });
+  }
+
+  if (adminUpdateForm) {
+    adminUpdateForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      setAdminFeedback('', '');
+      const proxyUrl = getActiveProxyUrl();
+      const newKey = adminNewKeyInput.value.trim();
+      const newModel = adminModelInput.value.trim();
+
+      if (!newKey && !newModel) {
+        setAdminFeedback('Enter a new API key or model ID to update.', 'error');
+        return;
+      }
+
+      adminSaveKeyBtn.disabled = true;
+      adminSaveKeyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validating & Saving...';
+
+      try {
+        const res = await fetch(`${proxyUrl}/admin/update-key`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            password: unlockedAdminPassword,
+            apiKey: newKey,
+            model: newModel
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          setAdminFeedback(data.error || 'Failed to update API key.', 'error');
+          return;
+        }
+
+        adminMaskedKey.textContent = data.maskedKey || 'Updated';
+        adminUpdatedAt.textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleString() : 'Just now';
+        adminNewKeyInput.value = '';
+        updateEngineChipUI();
+        setAdminFeedback(data.message || 'Sahadat AI key updated globally for all visitors!', 'success');
+        showToast('Sahadat AI key updated globally!');
+      } catch {
+        setAdminFeedback('Network error while saving to Cloudflare Worker.', 'error');
+      } finally {
+        adminSaveKeyBtn.disabled = false;
+        adminSaveKeyBtn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Update Live Key';
+      }
+    });
+  }
 
   // ── OPTIONAL LOCALHOST CONFIG LOADER (zero 404 on GitHub Pages) ──
   function loadLocalDevConfigIfLocalhost() {
