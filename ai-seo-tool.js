@@ -122,6 +122,8 @@
   const adminCustomEndpointRow = document.getElementById('adminCustomEndpointRow');
   const adminEndpointInput = document.getElementById('adminEndpointInput');
   const adminNewKeyInput = document.getElementById('adminNewKeyInput');
+  const adminModelSelect = document.getElementById('adminModelSelect');
+  const adminFetchModelsBtn = document.getElementById('adminFetchModelsBtn');
   const adminModelInput = document.getElementById('adminModelInput');
   const adminLockBtn = document.getElementById('adminLockBtn');
   const adminSaveKeyBtn = document.getElementById('adminSaveKeyBtn');
@@ -1573,10 +1575,160 @@
     }
   }
 
+  // Curated quick-pick vision models per provider (admin modal only)
+  const ADMIN_MODEL_PRESETS = {
+    openrouter: [
+      { id: 'nvidia/nemotron-3.5-super-vl:free', label: 'Nemotron 3.5 Super VL (Free)' },
+      { id: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', label: 'Nemotron 3 Nano Omni (Free)' },
+      { id: 'google/gemini-2.5-flash', label: 'Google Gemini 2.5 Flash (via OpenRouter)' },
+      { id: 'openai/gpt-4o-mini', label: 'OpenAI GPT-4o Mini (via OpenRouter)' },
+      { id: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4 (via OpenRouter)' }
+    ],
+    openai: [
+      { id: 'gpt-4o-mini', label: 'GPT-4o Mini (Fast & Vision)' },
+      { id: 'gpt-4o', label: 'GPT-4o (Flagship Vision)' },
+      { id: 'gpt-4.1-mini', label: 'GPT-4.1 Mini' },
+      { id: 'gpt-4.1', label: 'GPT-4.1' }
+    ],
+    gemini: [
+      { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (Fast Vision)' },
+      { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
+      { id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' }
+    ],
+    anthropic: [
+      { id: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (Vision)' },
+      { id: 'claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet' },
+      { id: 'claude-3-5-haiku-latest', label: 'Claude 3.5 Haiku' }
+    ],
+    groq: [
+      { id: 'meta-llama/llama-4-scout-17b-16e-instruct', label: 'Llama 4 Scout 17B (Vision)' },
+      { id: 'meta-llama/llama-4-maverick-17b-128e-instruct', label: 'Llama 4 Maverick 17B (Vision)' }
+    ],
+    xai: [
+      { id: 'grok-2-vision-latest', label: 'Grok 2 Vision Latest' }
+    ],
+    custom: []
+  };
+
+  function detectAdminProviderGuess(fallbackProvider) {
+    const sel = adminProviderSelect ? adminProviderSelect.value : 'auto';
+    if (sel !== 'auto') return sel;
+    const key = adminNewKeyInput ? adminNewKeyInput.value.trim() : '';
+    if (key.startsWith('sk-or-')) return 'openrouter';
+    if (key.startsWith('sk-ant-')) return 'anthropic';
+    if (key.startsWith('AIza')) return 'gemini';
+    if (key.startsWith('gsk_')) return 'groq';
+    if (key.startsWith('xai-')) return 'xai';
+    if (key.startsWith('sk-')) return 'openai';
+    return fallbackProvider || 'openrouter';
+  }
+
+  let lastServerActiveProvider = 'openrouter';
+
+  function populateAdminModelDropdown(modelsList, currentModelId) {
+    if (!adminModelSelect) return;
+    const items = Array.isArray(modelsList) ? modelsList : [];
+    const options = [
+      '<option value="">✨ Auto Default (Best vision model for provider)</option>',
+      ...items.map(m => `<option value="${escapeHtml(m.id)}">${escapeHtml(m.label || m.id)}</option>`),
+      '<option value="__custom__">✏️ Custom Model ID (Type in box below)</option>'
+    ];
+    adminModelSelect.innerHTML = options.join('');
+    if (currentModelId && items.some(m => m.id === currentModelId)) {
+      adminModelSelect.value = currentModelId;
+    } else if (currentModelId) {
+      adminModelSelect.value = '__custom__';
+    } else {
+      adminModelSelect.value = '';
+    }
+  }
+
+  function refreshAdminPresetModels(selectCurrent = false) {
+    const prov = detectAdminProviderGuess(lastServerActiveProvider);
+    const presets = ADMIN_MODEL_PRESETS[prov] || ADMIN_MODEL_PRESETS.openrouter;
+    populateAdminModelDropdown(presets, selectCurrent ? adminModelInput.value.trim() : '');
+  }
+
   if (adminProviderSelect) {
     adminProviderSelect.addEventListener('change', () => {
       if (adminCustomEndpointRow) {
         adminCustomEndpointRow.classList.toggle('hidden', adminProviderSelect.value !== 'custom');
+      }
+      refreshAdminPresetModels(false);
+      // Clear model box when switching provider so auto-default or fresh pick applies cleanly
+      if (adminModelInput) adminModelInput.value = '';
+    });
+  }
+
+  let lastDetectedAdminProvider = 'openrouter';
+
+  if (adminNewKeyInput) {
+    adminNewKeyInput.addEventListener('input', () => {
+      if (adminProviderSelect && adminProviderSelect.value === 'auto') {
+        const guessed = detectAdminProviderGuess(lastServerActiveProvider);
+        if (guessed !== lastDetectedAdminProvider) {
+          lastDetectedAdminProvider = guessed;
+          const presets = ADMIN_MODEL_PRESETS[guessed] || [];
+          const autoDef = presets[0] ? presets[0].id : '';
+          if (adminModelInput) adminModelInput.value = autoDef;
+          populateAdminModelDropdown(presets, autoDef);
+        }
+      }
+    });
+  }
+
+  if (adminModelSelect) {
+    adminModelSelect.addEventListener('change', () => {
+      if (!adminModelInput) return;
+      const val = adminModelSelect.value;
+      if (val === '__custom__') {
+        adminModelInput.focus();
+      } else {
+        adminModelInput.value = val;
+      }
+    });
+  }
+
+  if (adminModelInput) {
+    adminModelInput.addEventListener('input', () => {
+      if (!adminModelSelect) return;
+      const typed = adminModelInput.value.trim();
+      const match = Array.from(adminModelSelect.options).find(opt => opt.value === typed);
+      adminModelSelect.value = match ? typed : (typed ? '__custom__' : '');
+    });
+  }
+
+  if (adminFetchModelsBtn) {
+    adminFetchModelsBtn.addEventListener('click', async () => {
+      const proxyUrl = getActiveProxyUrl();
+      if (!proxyUrl || !unlockedAdminPassword) return;
+      setAdminFeedback('', '');
+      adminFetchModelsBtn.disabled = true;
+      adminFetchModelsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+      try {
+        const res = await fetch(`${proxyUrl}/admin/models`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            password: unlockedAdminPassword,
+            provider: adminProviderSelect ? adminProviderSelect.value : 'auto',
+            apiKey: adminNewKeyInput ? adminNewKeyInput.value.trim() : ''
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok && Array.isArray(data.models) && data.models.length) {
+          populateAdminModelDropdown(data.models, adminModelInput.value.trim());
+          setAdminFeedback(`Loaded ${data.models.length} live models from ${data.providerLabel}. Pick one or type any Model ID below.`, 'success');
+        } else {
+          refreshAdminPresetModels(true);
+          setAdminFeedback('Showing recommended presets (update Cloudflare Worker code for live model fetching).', 'error');
+        }
+      } catch {
+        refreshAdminPresetModels(true);
+        setAdminFeedback('Could not load live list — showing built-in presets.', 'error');
+      } finally {
+        adminFetchModelsBtn.disabled = false;
+        adminFetchModelsBtn.innerHTML = '<i class="fas fa-rotate"></i> Load Live Models';
       }
     });
   }
@@ -1653,6 +1805,8 @@
         }
 
         unlockedAdminPassword = password;
+        lastServerActiveProvider = data.activeProvider || 'openrouter';
+        lastDetectedAdminProvider = lastServerActiveProvider;
         if (adminActiveProvider) adminActiveProvider.textContent = data.providerLabel || 'OpenRouter';
         if (adminActiveModel) adminActiveModel.textContent = data.activeModel || 'Auto default';
         adminMaskedKey.textContent = data.maskedKey || 'Not set';
@@ -1662,10 +1816,11 @@
         if (adminProviderSelect) adminProviderSelect.value = 'auto';
         if (adminCustomEndpointRow) adminCustomEndpointRow.classList.add('hidden');
         if (adminEndpointInput) adminEndpointInput.value = data.activeEndpoint || '';
-        adminModelInput.value = '';
+        adminModelInput.value = data.activeModel || '';
+        refreshAdminPresetModels(true);
         adminUnlockForm.classList.add('hidden');
         adminUpdateForm.classList.remove('hidden');
-        setAdminFeedback('Unlocked. Paste any provider API key below — it auto-detects and updates globally.', 'success');
+        setAdminFeedback('Unlocked. Paste any API key and choose or type any Model ID below.', 'success');
         setTimeout(() => adminNewKeyInput.focus(), 60);
       } catch {
         setAdminFeedback('Could not reach Cloudflare Worker URL. Double-check the URL and try again.', 'error');
@@ -1729,7 +1884,7 @@
         setAdminFeedback('Network error while saving to Cloudflare Worker.', 'error');
       } finally {
         adminSaveKeyBtn.disabled = false;
-        adminSaveKeyBtn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Update Live Key';
+        adminSaveKeyBtn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Update Live AI';
       }
     });
   }

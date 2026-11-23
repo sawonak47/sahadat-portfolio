@@ -201,6 +201,78 @@ async function validateProviderKey(provider, apiKey, customEndpoint) {
   }
 }
 
+async function fetchLiveModelsForProvider(provider, apiKey) {
+  try {
+    if (provider === 'openrouter') {
+      const r = await fetch('https://openrouter.ai/api/v1/models');
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.data || [])
+        .filter(m => {
+          const mods = (m.architecture && m.architecture.input_modalities) || [];
+          return mods.includes('image') || /vl|vision|gpt-4o|gemini|claude/i.test(m.id || '');
+        })
+        .sort((a, b) => {
+          const aFree = String(a.id || '').includes(':free') ? 0 : 1;
+          const bFree = String(b.id || '').includes(':free') ? 0 : 1;
+          return aFree - bFree;
+        })
+        .slice(0, 60)
+        .map(m => ({ id: m.id, label: m.id.includes(':free') ? `${m.id} (Free)` : m.id }));
+    }
+    if (provider === 'openai') {
+      const r = await fetch('https://api.openai.com/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.data || [])
+        .filter(m => /gpt-4|gpt-5|o1|o3|o4|chatgpt/i.test(m.id || ''))
+        .sort((a, b) => (b.created || 0) - (a.created || 0))
+        .slice(0, 40)
+        .map(m => ({ id: m.id, label: m.id }));
+    }
+    if (provider === 'gemini') {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.models || [])
+        .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+        .map(m => String(m.name || '').replace(/^models\//, ''))
+        .filter(id => /gemini/i.test(id))
+        .slice(0, 30)
+        .map(id => ({ id, label: id }));
+    }
+    if (provider === 'anthropic') {
+      const r = await fetch('https://api.anthropic.com/v1/models', {
+        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' }
+      });
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.data || []).slice(0, 30).map(m => ({ id: m.id, label: m.display_name ? `${m.display_name} (${m.id})` : m.id }));
+    }
+    if (provider === 'groq') {
+      const r = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.data || []).slice(0, 30).map(m => ({ id: m.id, label: m.id }));
+    }
+    if (provider === 'xai') {
+      const r = await fetch('https://api.x.ai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.data || []).slice(0, 30).map(m => ({ id: m.id, label: m.id }));
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
 // Convert OpenAI-style multimodal messages to Anthropic Messages API format
 function buildAnthropicBody(messages, model, temperature, maxTokens) {
   let systemText = '';
@@ -352,6 +424,27 @@ export default {
         activeModel: cfg.model,
         activeEndpoint: cfg.provider === 'custom' ? cfg.endpoint : '',
         updatedAt: cfg.updatedAt
+      }, 200, origin);
+    }
+
+    // ── ADMIN: FETCH LIVE MODELS FOR SELECTED / DETECTED PROVIDER ──
+    if (path === '/admin/models') {
+      const auth = checkAdminPassword(payload.password, env);
+      if (!auth.ok) return jsonResponse({ ok: false, error: auth.error }, auth.status, origin);
+
+      const currentCfg = await getActiveConfig(env);
+      const testKey = String(payload.apiKey || '').trim() || currentCfg.apiKey;
+      const reqProvider = String(payload.provider || 'auto').trim().toLowerCase();
+      const targetProvider = (reqProvider !== 'auto' && PROVIDERS[reqProvider])
+        ? reqProvider
+        : (testKey ? detectProviderFromKey(testKey) : currentCfg.provider);
+
+      const models = await fetchLiveModelsForProvider(targetProvider, testKey);
+      return jsonResponse({
+        ok: true,
+        provider: targetProvider,
+        providerLabel: (PROVIDERS[targetProvider] || PROVIDERS.openrouter).label,
+        models
       }, 200, origin);
     }
 

@@ -1114,11 +1114,13 @@
     }
     .ai-modal {
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
       background: var(--bg-card-solid);
       border: 1px solid var(--border-hover);
       border-radius: 22px;
-      padding: 28px;
+      padding: 26px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
     }
 
@@ -1685,15 +1687,23 @@
         <label for="adminNewKeyInput" class="control-label block mb-2">New API Key (Replaces Old Key Globally)</label>
         <input type="password" id="adminNewKeyInput" class="seo-input mb-3" placeholder="Paste any API key (OpenRouter, OpenAI, Gemini, Claude...)" autocomplete="off" />
 
-        <label for="adminModelInput" class="control-label block mb-2">Model ID (Optional — Leave Blank for Auto Default)</label>
-        <input type="text" id="adminModelInput" class="seo-input mb-4" placeholder="Auto-selected for provider (e.g. gpt-4o-mini, gemini-2.5-flash)" autocomplete="off" />
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <label for="adminModelSelect" class="control-label">Choose Model (Quick Picker)</label>
+          <button id="adminFetchModelsBtn" class="mini-copy-btn" type="button" title="Fetch live models from provider">
+            <i class="fas fa-rotate"></i> Load Live Models
+          </button>
+        </div>
+        <select id="adminModelSelect" class="seo-select mb-3"></select>
+
+        <label for="adminModelInput" class="control-label block mb-2">Model ID Box (Edit or Type Any Exact Model ID)</label>
+        <input type="text" id="adminModelInput" class="seo-input mb-4" style="font-family:var(--font-mono);font-size:0.82rem;" placeholder="e.g. nvidia/nemotron-3.5-super-vl:free, gpt-4o-mini, gemini-2.5-flash" autocomplete="off" />
 
         <div class="flex flex-wrap items-center justify-between gap-3">
           <button id="adminLockBtn" class="action-btn" type="button">
             <i class="fas fa-lock"></i> Lock
           </button>
           <button id="adminSaveKeyBtn" class="action-btn primary" type="submit">
-            <i class="fas fa-cloud-arrow-up"></i> Update Live Key
+            <i class="fas fa-cloud-arrow-up"></i> Update Live AI
           </button>
         </div>
       </form>
