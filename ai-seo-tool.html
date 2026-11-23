@@ -172,27 +172,35 @@
       box-shadow: 0 0 8px #22c55e;
     }
 
-    /* Discreet bottom Change AI button for admin */
+    /* Bottom Change AI Model button for admin */
     .admin-change-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       margin-top: 8px;
-      padding: 5px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-muted);
+      padding: 7px 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 200, 255, 0.45);
+      background: rgba(0, 200, 255, 0.1);
+      color: #38bdf8;
       font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 0.72rem;
+      font-weight: 600;
       letter-spacing: 0.06em;
+      box-shadow: 0 2px 14px rgba(0, 200, 255, 0.16);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.22s ease;
+    }
+    [data-theme="light"] .admin-change-btn {
+      color: #0284c7;
+      background: rgba(0, 200, 255, 0.12);
     }
     .admin-change-btn:hover {
-      border-color: var(--violet);
-      color: var(--text-primary);
-      background: rgba(108, 62, 255, 0.1);
+      background: linear-gradient(135deg, #00C8FF, #6C3EFF);
+      border-color: transparent;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 200, 255, 0.35);
     }
     .admin-status-box {
       padding: 12px 14px;
