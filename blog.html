@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog — Sawon's Creative Journal</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" />
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
@@ -23,11 +23,11 @@
       align-items: stretch;
     }
     .blog-card {
-      background: var(--glass-bg);
+      background: var(--surface-card);
       border: 1px solid var(--glass-border);
       border-radius: 20px;
       overflow: hidden;
-      backdrop-filter: blur(16px);
+      isolation: isolate;
       transition: transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
       display: flex;
@@ -109,11 +109,11 @@
 
     /* ── WRITE PANEL ── */
     .write-panel {
-      background: var(--glass-bg);
+      background: var(--surface-card);
       border: 1px solid var(--glass-border);
       border-radius: 24px;
       padding: 24px;
-      backdrop-filter: blur(16px);
+      isolation: isolate;
       margin-bottom: 52px;
     }
     @media (min-width: 640px) {

@@ -32,10 +32,12 @@
   --violet-glow: rgba(108, 62, 255, 0.3);
   --cyan-glow: rgba(0, 200, 255, 0.2);
 
-  --nav-bg: rgba(13, 13, 26, 0.88);
-  --nav-bg-scrolled: rgba(10, 10, 26, 0.96);
+  --nav-bg: rgba(13, 13, 26, 0.96);
+  --nav-bg-scrolled: #0a0a1a;
   --glass-bg: rgba(26, 26, 50, 0.55);
   --glass-border: rgba(108, 62, 255, 0.22);
+  --surface-card: linear-gradient(180deg, #16162e 0%, #121226 100%);
+  --surface-elevated: #191934;
 }
 
 [data-theme="light"] {
@@ -48,10 +50,12 @@
   --text-muted: rgba(13, 13, 46, 0.5);
   --border: rgba(108, 62, 255, 0.2);
   --border-hover: rgba(108, 62, 255, 0.5);
-  --nav-bg: rgba(240, 244, 255, 0.9);
-  --nav-bg-scrolled: rgba(240, 244, 255, 0.97);
+  --nav-bg: rgba(240, 244, 255, 0.97);
+  --nav-bg-scrolled: #eef2ff;
   --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(108, 62, 255, 0.2);
+  --surface-card: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+  --surface-elevated: #ffffff;
 }
 
 /* ── BASE ── */
@@ -130,8 +134,6 @@ body {
   width: 100%;
   z-index: 10000;
   background: var(--nav-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(108, 62, 255, 0.14);
   transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -141,7 +143,7 @@ body {
   box-shadow: 0 4px 28px rgba(0, 0, 0, 0.22);
 }
 body.menu-open #navbar {
-  background: rgba(9, 9, 26, 0.96);
+  background: rgba(9, 9, 26, 0.98);
   border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 body.menu-open .logo-s {
@@ -150,7 +152,6 @@ body.menu-open .logo-s {
 
 .glass-nav {
   background: var(--nav-bg);
-  backdrop-filter: blur(20px);
 }
 
 .logo {
@@ -364,23 +365,22 @@ body.menu-open .logo-s {
 .hero-bg-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
   pointer-events: none;
 }
 .orb-1 {
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(108, 62, 255, 0.2) 0%, transparent 70%);
-  top: -100px; right: -100px;
+  width: 660px; height: 660px;
+  background: radial-gradient(circle, rgba(108, 62, 255, 0.2) 0%, rgba(108, 62, 255, 0.08) 38%, transparent 70%);
+  top: -160px; right: -160px;
 }
 .orb-2 {
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(0, 200, 255, 0.15) 0%, transparent 70%);
-  bottom: 0; left: 0;
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(0, 200, 255, 0.15) 0%, rgba(0, 200, 255, 0.05) 40%, transparent 70%);
+  bottom: -80px; left: -80px;
 }
 .orb-3 {
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(255, 107, 157, 0.1) 0%, transparent 70%);
-  top: 40%; left: 40%;
+  width: 440px; height: 440px;
+  background: radial-gradient(circle, rgba(255, 107, 157, 0.1) 0%, rgba(255, 107, 157, 0.03) 40%, transparent 70%);
+  top: 35%; left: 36%;
 }
 
 .grid-overlay {
@@ -574,9 +574,7 @@ body.menu-open .logo-s {
 
 .float-badge {
   position: absolute;
-  background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--surface-elevated);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 8px 14px;
@@ -711,11 +709,10 @@ body.menu-open .logo-s {
 
 /* ── GLASS CARD ── */
 .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--surface-card);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
+  isolation: isolate;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 .glass-card:hover {
@@ -761,12 +758,10 @@ body.menu-open .logo-s {
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  background: var(--bg-card);
+  background: var(--surface-elevated);
   border: 1px solid var(--border);
   padding: 12px 22px;
   border-radius: 14px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   white-space: nowrap;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
 }
@@ -852,14 +847,14 @@ body.menu-open .logo-s {
    SERVICES
 ══════════════════════════ */
 .service-card {
-  background: var(--glass-bg);
+  background: var(--surface-card);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   padding: 28px 24px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -995,8 +990,7 @@ body.menu-open .logo-s {
 .portfolio-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(13, 13, 26, 0.9);
-  backdrop-filter: blur(4px);
+  background: rgba(13, 13, 26, 0.94);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   opacity: 0;
@@ -1255,7 +1249,7 @@ body.menu-open .logo-s {
 
 /* Course Card */
 .course-card {
-  background: var(--glass-bg);
+  background: var(--surface-card);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   padding: 24px 20px;
@@ -1263,8 +1257,7 @@ body.menu-open .logo-s {
   flex-direction: column;
   gap: 14px;
   height: 100%;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  isolation: isolate;
   transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
   position: relative;
   overflow: hidden;
@@ -1397,7 +1390,7 @@ body.menu-open .logo-s {
 
 /* ── BUNDLE CARD ── */
 .bundle-card {
-  background: linear-gradient(135deg, rgba(108, 62, 255, 0.12), rgba(0, 200, 255, 0.08));
+  background: linear-gradient(135deg, #1b183a 0%, #131c33 100%);
   border: 1px solid rgba(108, 62, 255, 0.35);
   border-radius: 24px;
   padding: 36px;
@@ -1406,9 +1399,12 @@ body.menu-open .logo-s {
   gap: 32px;
   align-items: center;
   justify-content: space-between;
-  backdrop-filter: blur(16px);
+  isolation: isolate;
   position: relative;
   overflow: hidden;
+}
+[data-theme="light"] .bundle-card {
+  background: linear-gradient(135deg, #eef0ff 0%, #eaf8ff 100%);
 }
 .bundle-card::before {
   content: '';
@@ -1468,12 +1464,11 @@ body.menu-open .logo-s {
   flex: 0 1 280px;
 }
 .bundle-price-box {
-  background: var(--glass-bg);
+  background: var(--surface-card);
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 28px 28px;
   text-align: center;
-  backdrop-filter: blur(12px);
   width: 100%;
 }
 .bundle-was {
@@ -1630,9 +1625,7 @@ textarea.form-input { resize: vertical; min-height: 110px; }
   width: 44px; height: 44px;
   border-radius: 10px;
   border: 1px solid var(--border);
-  background: var(--bg-card);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--surface-elevated);
   color: var(--text-secondary);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -1661,9 +1654,7 @@ textarea.form-input { resize: vertical; min-height: 110px; }
   inset: 0;
   width: 100%;
   height: 100%;
-  background: rgba(9, 9, 26, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(9, 9, 26, 0.98);
   z-index: 9500;
   display: flex;
   align-items: flex-start;
