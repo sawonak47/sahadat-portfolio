@@ -1457,13 +1457,15 @@
       showToast(`Added ${added} custom tag${added > 1 ? 's' : ''}`);
     }
   }
-  addCustomTagBtn.addEventListener('click', addCustomTags);
-  customTagInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addCustomTags();
-    }
-  });
+  if (addCustomTagBtn) addCustomTagBtn.addEventListener('click', addCustomTags);
+  if (customTagInput) {
+    customTagInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addCustomTags();
+      }
+    });
+  }
 
   // Long-tail phrase copy (optional)
   if (longTailRow) {
