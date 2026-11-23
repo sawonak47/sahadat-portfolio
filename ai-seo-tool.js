@@ -87,8 +87,8 @@
 
   const tagsCloud = document.getElementById('tagsCloud');
   const selectedTagsCounter = document.getElementById('selectedTagsCounter');
-  const selectAllTagsBtn = document.getElementById('selectAllTagsBtn');
-  const deselectAllTagsBtn = document.getElementById('deselectAllTagsBtn');
+  const copyAllTagsBtn = document.getElementById('copyAllTagsBtn');
+  const toggleAllTagsBtn = document.getElementById('toggleAllTagsBtn');
   const customTagInput = document.getElementById('customTagInput');
   const addCustomTagBtn = document.getElementById('addCustomTagBtn');
   const longTailWrap = document.getElementById('longTailWrap');
@@ -1087,6 +1087,9 @@
     const tags = (entry && entry.result && entry.result.tags) || [];
     const selectedCount = tags.filter(t => t.selected).length;
     selectedTagsCounter.textContent = `${selectedCount} / ${tags.length} selected`;
+    if (toggleAllTagsBtn) {
+      toggleAllTagsBtn.textContent = selectedCount === 0 ? 'Select All' : 'Clear Selection';
+    }
 
     tagsCloud.innerHTML = tags
       .map((tag, idx) => `
@@ -1406,19 +1409,29 @@
     }
   });
 
-  selectAllTagsBtn.addEventListener('click', () => {
-    const entry = getActiveEntry();
-    if (!entry || !entry.result) return;
-    entry.result.tags.forEach(t => { t.selected = true; });
-    renderTagsCloud(entry);
-  });
+  if (copyAllTagsBtn) {
+    copyAllTagsBtn.addEventListener('click', () => {
+      const entry = getActiveEntry();
+      if (!entry || !entry.result || !entry.result.tags.length) return;
+      let tags = getSelectedTagTexts();
+      if (!tags.length) {
+        entry.result.tags.forEach(t => { t.selected = true; });
+        renderTagsCloud(entry);
+        tags = getSelectedTagTexts();
+      }
+      copyText(tags.join(', '), `Copied all ${tags.length} SEO tags!`);
+    });
+  }
 
-  deselectAllTagsBtn.addEventListener('click', () => {
-    const entry = getActiveEntry();
-    if (!entry || !entry.result) return;
-    entry.result.tags.forEach(t => { t.selected = false; });
-    renderTagsCloud(entry);
-  });
+  if (toggleAllTagsBtn) {
+    toggleAllTagsBtn.addEventListener('click', () => {
+      const entry = getActiveEntry();
+      if (!entry || !entry.result) return;
+      const anySelected = entry.result.tags.some(t => t.selected);
+      entry.result.tags.forEach(t => { t.selected = !anySelected; });
+      renderTagsCloud(entry);
+    });
+  }
 
   // Add custom tag
   function addCustomTags() {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" data-theme="dark">
+<html lang="en" class="scroll-smooth" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -314,6 +314,42 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+    }
+
+    /* Light Theme Polish for Courses */
+    [data-theme="light"] .trust-card,
+    [data-theme="light"] .perk-card,
+    [data-theme="light"] .faq-item,
+    [data-theme="light"] .pay-chip {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.14);
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+    }
+    [data-theme="light"] .batch-pill {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(99, 54, 245, 0.08));
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #065F46;
+    }
+    [data-theme="light"] .discount-pill {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.32);
+      color: #047857;
+    }
+    [data-theme="light"] .syllabus-toggle {
+      background: #F5F3FF;
+      border-color: rgba(99, 54, 245, 0.2);
+      color: #1E1B4B;
+    }
+    [data-theme="light"] .syllabus-toggle:hover {
+      background: #EDE9FE;
+    }
+    [data-theme="light"] .syllabus-body {
+      background: #FAFBFD;
+      border-color: rgba(99, 54, 245, 0.15);
+    }
+    [data-theme="light"] .perk-icon {
+      background: linear-gradient(135deg, rgba(99, 54, 245, 0.12), rgba(2, 132, 199, 0.1));
+      color: var(--violet);
     }
   </style>
 </head>

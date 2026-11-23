@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" data-theme="dark">
+<html lang="en" class="scroll-smooth" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -316,6 +316,44 @@
     .success-toast.show {
       transform: translateY(0);
       opacity: 1;
+    }
+
+    /* Light Theme Polish for Blog */
+    [data-theme="light"] .write-panel,
+    [data-theme="light"] .blog-card {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.14);
+      box-shadow: 0 6px 26px rgba(15, 23, 42, 0.05);
+    }
+    [data-theme="light"] .blog-card:hover {
+      box-shadow: 0 18px 40px rgba(99, 54, 245, 0.12);
+    }
+    [data-theme="light"] .write-field,
+    [data-theme="light"] .blog-search input {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.2);
+      color: #0F172A;
+    }
+    [data-theme="light"] .github-info {
+      background: #F5F3FF;
+      border-color: rgba(99, 54, 245, 0.22);
+    }
+    [data-theme="light"] .img-upload-area {
+      background: #FAF8FF;
+      border-color: rgba(99, 54, 245, 0.28);
+    }
+    [data-theme="light"] .filter-tab,
+    [data-theme="light"] .tag-chip {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.18);
+      color: #475569;
+    }
+    [data-theme="light"] .filter-tab:hover,
+    [data-theme="light"] .tag-chip:hover,
+    [data-theme="light"] .tag-chip.active {
+      background: #F5F3FF;
+      border-color: var(--violet);
+      color: var(--violet);
     }
   </style>
 </head>

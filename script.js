@@ -89,12 +89,13 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeFO();
 });
 
-// ── DARK / LIGHT MODE ──
+// ── DARK / LIGHT MODE (Light Theme Default) ──
+const THEME_KEY = 'sawon-theme-v2';
 const html = document.documentElement;
 const themeToggle = document.getElementById('theme-toggle');
 const themeIcon = document.getElementById('theme-icon');
 
-const savedTheme = localStorage.getItem('sawon-theme') || 'dark';
+const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
 html.setAttribute('data-theme', savedTheme);
 updateThemeIcon(savedTheme);
 
@@ -103,14 +104,14 @@ if (themeToggle) {
     const current = html.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
-    localStorage.setItem('sawon-theme', next);
+    localStorage.setItem(THEME_KEY, next);
     updateThemeIcon(next);
   });
 }
 
 function updateThemeIcon(theme) {
   if (!themeIcon) return;
-  themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+  themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 }
 
 // ── SCROLL REVEAL ──

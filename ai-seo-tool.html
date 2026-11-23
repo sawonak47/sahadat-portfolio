@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" data-theme="dark">
+<html lang="en" class="scroll-smooth" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -913,19 +913,32 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px;
+      padding: 5px 11px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      background: var(--glass-bg);
-      color: var(--text-secondary);
+      background: rgba(26, 26, 50, 0.75);
+      color: var(--text-primary);
       font-family: var(--font-mono);
       font-size: 0.68rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
     .mini-copy-btn:hover {
-      border-color: var(--cyan);
-      color: var(--cyan);
+      border-color: var(--violet);
+      color: var(--violet);
+      background: rgba(108, 62, 255, 0.08);
+    }
+    .mini-copy-btn.copy-all-accent {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(108, 62, 255, 0.28);
+    }
+    .mini-copy-btn.copy-all-accent:hover {
+      transform: translateY(-1px);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(108, 62, 255, 0.38);
     }
     .seo-editable {
       width: 100%;
@@ -1148,6 +1161,114 @@
     .seo-toast.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
+    }
+
+    /* ── LIGHT THEME ELEVATION FOR AI SEO TOOL ── */
+    [data-theme="light"] .seo-panel {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.14);
+      box-shadow: 0 6px 28px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(99, 54, 245, 0.05);
+    }
+    [data-theme="light"] .ai-brand-pill {
+      background: linear-gradient(135deg, #F5F3FF, #EFF6FF);
+      border-color: rgba(99, 54, 245, 0.28);
+      box-shadow: 0 4px 18px rgba(99, 54, 245, 0.1);
+      color: #1E1B4B;
+    }
+    [data-theme="light"] .format-badge {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.18);
+      color: #334155;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+    [data-theme="light"] .engine-chip.live {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #047857;
+    }
+    [data-theme="light"] .seo-dropzone {
+      background: linear-gradient(135deg, #FAF8FF, #F0F9FF);
+      border-color: rgba(99, 54, 245, 0.32);
+    }
+    [data-theme="light"] .seo-dropzone:hover,
+    [data-theme="light"] .seo-dropzone.drag-over {
+      background: linear-gradient(135deg, #F3EEFF, #E0F2FE);
+      border-color: var(--violet);
+      box-shadow: 0 10px 28px rgba(99, 54, 245, 0.14);
+    }
+    [data-theme="light"] .dropzone-icon {
+      background: linear-gradient(135deg, #6336F5, #0284C7);
+      border-color: transparent;
+      box-shadow: 0 10px 26px rgba(99, 54, 245, 0.3);
+    }
+    [data-theme="light"] .dropzone-icon path:first-of-type {
+      stroke: rgba(255, 255, 255, 0.9);
+    }
+    [data-theme="light"] .preview-canvas-wrap {
+      background-color: #F8FAFF;
+    }
+    [data-theme="light"] .preset-pill {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.18);
+      color: #475569;
+    }
+    [data-theme="light"] .preset-pill:hover {
+      background: #F5F3FF;
+      color: var(--violet);
+      border-color: var(--violet);
+    }
+    [data-theme="light"] .seo-score-banner {
+      background: linear-gradient(135deg, #F5F3FF, #F0F9FF);
+      border-color: rgba(99, 54, 245, 0.22);
+    }
+    [data-theme="light"] .seo-result-card,
+    [data-theme="light"] .tags-section {
+      background: #FAFBFD;
+      border-color: rgba(99, 54, 245, 0.14);
+    }
+    [data-theme="light"] .seo-tag-chip {
+      background: #F5F3FF;
+      border-color: rgba(99, 54, 245, 0.24);
+      color: #1E1B4B;
+    }
+    [data-theme="light"] .seo-tag-chip:hover {
+      background: #EDE9FE;
+      border-color: var(--violet);
+    }
+    [data-theme="light"] .longtail-chip {
+      background: #EFF6FF;
+      border-color: rgba(2, 132, 199, 0.25);
+      color: #0C4A6E;
+    }
+    [data-theme="light"] .mini-copy-btn,
+    [data-theme="light"] .action-btn {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.2);
+      color: #334155;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+    }
+    [data-theme="light"] .mini-copy-btn:hover,
+    [data-theme="light"] .action-btn:hover {
+      background: #F5F3FF;
+      border-color: var(--violet);
+      color: var(--violet);
+    }
+    [data-theme="light"] .action-btn.primary,
+    [data-theme="light"] .mini-copy-btn.copy-all-accent {
+      background: linear-gradient(135deg, #6336F5, #4F46E5);
+      border-color: transparent;
+      color: #FFFFFF;
+    }
+    [data-theme="light"] .ai-modal-backdrop {
+      background: rgba(15, 23, 42, 0.48);
+    }
+    [data-theme="light"] .ai-modal {
+      background: #FFFFFF;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    }
+    [data-theme="light"] .admin-status-box {
+      background: #F5F3FF;
+      border-color: rgba(99, 54, 245, 0.2);
     }
 
     /* Ensure .hidden overrides local flex/inline-flex components */
@@ -1549,8 +1670,8 @@
                 <span class="tag-count-badge" id="selectedTagsCounter">50 / 50</span>
               </div>
               <div class="flex items-center gap-2">
-                <button id="selectAllTagsBtn" class="mini-copy-btn" type="button">Select All</button>
-                <button id="deselectAllTagsBtn" class="mini-copy-btn" type="button">Clear Selection</button>
+                <button id="copyAllTagsBtn" class="mini-copy-btn copy-all-accent" type="button"><i class="fas fa-copy"></i> Copy All</button>
+                <button id="toggleAllTagsBtn" class="mini-copy-btn" type="button">Clear Selection</button>
               </div>
             </div>
 
