@@ -213,6 +213,40 @@ body.menu-open .logo-s {
 .nav-link-accent:hover {
   color: var(--cyan);
 }
+.nav-link-seo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(108, 62, 255, 0.18), rgba(0, 200, 255, 0.14));
+  border: 1px solid rgba(108, 62, 255, 0.4);
+  color: var(--text-primary);
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+.nav-link-seo .nav-ai-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--violet);
+  flex-shrink: 0;
+  transition: transform 0.3s ease, color 0.25s ease;
+}
+.nav-link-seo::after {
+  display: none;
+}
+.nav-link-seo:hover,
+.nav-link-seo.active {
+  background: linear-gradient(135deg, var(--violet), #00A8E8);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(108, 62, 255, 0.38);
+}
+.nav-link-seo:hover .nav-ai-icon,
+.nav-link-seo.active .nav-ai-icon {
+  color: #ffffff;
+  transform: rotate(20deg) scale(1.12);
+}
 
 .theme-btn {
   width: 38px;
@@ -252,7 +286,7 @@ body.menu-open .logo-s {
   flex-shrink: 0;
   transition: border-color 0.2s, background 0.2s;
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .ham-btn {
     display: none;
   }
@@ -1616,10 +1650,10 @@ textarea.form-input { resize: vertical; min-height: 110px; }
 .fo-link {
   display: flex;
   align-items: center;
-  padding: 13px 0;
+  padding: 11px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-family: 'Syne', 'Space Grotesk', sans-serif;
-  font-size: clamp(22px, 5vw, 34px);
+  font-size: clamp(20px, 4.6vw, 32px);
   font-weight: 800;
   color: rgba(240, 244, 255, 0.78);
   text-decoration: none;
@@ -1665,6 +1699,7 @@ textarea.form-input { resize: vertical; min-height: 110px; }
 .fo-overlay.open .fo-link:nth-child(6) { transition: opacity .35s .24s ease, transform .35s .24s ease, color .25s; }
 .fo-overlay.open .fo-link:nth-child(7) { transition: opacity .35s .28s ease, transform .35s .28s ease, color .25s; }
 .fo-overlay.open .fo-link:nth-child(8) { transition: opacity .35s .32s ease, transform .35s .32s ease, color .25s; }
+.fo-overlay.open .fo-link:nth-child(9) { transition: opacity .35s .36s ease, transform .35s .36s ease, color .25s; }
 
 .fo-divider {
   width: 100%;

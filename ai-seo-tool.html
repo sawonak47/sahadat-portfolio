@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI SEO Tool — Sahadat AI | Image, SVG & PDF SEO Tag Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    /* ═══════════════════════════════════════════
+       AI SEO TOOL — SAHADAT AI PAGE STYLES
+    ═══════════════════════════════════════════ */
+    .seo-hero {
+      padding: 132px 0 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.2), rgba(0, 200, 255, 0.14));
+      border: 1px solid rgba(108, 62, 255, 0.42);
+      box-shadow: 0 6px 26px rgba(108, 62, 255, 0.22);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 18px;
+    }
+    .ai-brand-svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 8px rgba(0, 200, 255, 0.6));
+      animation: star-breathe 3s ease-in-out infinite;
+    }
+    @keyframes star-breathe {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.12) rotate(12deg); }
+    }
+    .ai-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+      animation: ai-pulse 2s ease-in-out infinite;
+    }
+    @keyframes ai-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.55; }
+    }
+    .seo-hero-sub {
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 14px auto 0;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    .format-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 22px;
+    }
+    .format-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    /* ── WORKSPACE GRID ── */
+    .seo-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+      width: 100%;
+    }
+    @media (min-width: 1024px) {
+      .seo-workspace {
+        grid-template-columns: 440px minmax(0, 1fr);
+      }
+    }
+
+    .seo-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 22px;
+      padding: 20px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    @media (min-width: 640px) {
+      .seo-panel { padding: 28px; }
+    }
+
+    .panel-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+    .panel-title i {
+      color: var(--violet);
+    }
+
+    /* Engine status chip */
+    .engine-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      border: 1px solid var(--border);
+      background: rgba(108, 62, 255, 0.08);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .engine-chip:hover {
+      border-color: var(--violet);
+      color: var(--text-primary);
+    }
+    .engine-chip .dot-ind {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f59e0b;
+    }
+    .engine-chip.live {
+      border-color: rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+    .engine-chip.live .dot-ind {
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    /* ── UPLOAD DROPZONE ── */
+    .seo-dropzone {
+      position: relative;
+      border: 2px dashed rgba(108, 62, 255, 0.35);
+      border-radius: 18px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.06), rgba(0, 200, 255, 0.04));
+      transition: all 0.25s ease;
+      overflow: hidden;
+    }
+    .seo-dropzone:hover,
+    .seo-dropzone.drag-over {
+      border-color: var(--cyan);
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.13), rgba(0, 200, 255, 0.1));
+      box-shadow: 0 0 30px rgba(108, 62, 255, 0.18);
+      transform: translateY(-2px);
+    }
+    .seo-dropzone input[type="file"] {
+      display: none;
+    }
+    .dropzone-icon {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.24), rgba(0, 200, 255, 0.18));
+      border: 1.5px solid rgba(108, 62, 255, 0.45);
+      box-shadow: 0 10px 30px rgba(108, 62, 255, 0.28), inset 0 0 20px rgba(0, 200, 255, 0.14);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .dropzone-icon svg {
+      width: 38px;
+      height: 38px;
+      filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.45));
+    }
+    .seo-dropzone:hover .dropzone-icon {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: 0 14px 36px rgba(108, 62, 255, 0.4), inset 0 0 24px rgba(0, 200, 255, 0.22);
+    }
+    .dropzone-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .dropzone-sub {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .dropzone-hint {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+
+    /* ── FILE QUEUE STRIP ── */
+    .file-queue {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 4px 2px 6px;
+      margin-top: 14px;
+    }
+    .file-queue-item {
+      position: relative;
+      flex: 0 0 74px;
+      height: 74px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      background: var(--bg-card-solid);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .file-queue-item.active {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(0, 200, 255, 0.25);
+    }
+    .file-queue-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .file-queue-badge {
+      position: absolute;
+      bottom: 3px;
+      left: 3px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(13, 13, 26, 0.82);
+      color: #F0F4FF;
+      text-transform: uppercase;
+    }
+    .file-queue-done {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #22c55e;
+      color: white;
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .file-queue-remove {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(13, 13, 26, 0.8);
+      color: #fff;
+      font-size: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .file-queue-remove:hover {
+      background: #ef4444;
+    }
+
+    /* ── ACTIVE FILE PREVIEW CARD ── */
+    .preview-stage {
+      margin-top: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.45);
+      overflow: hidden;
+    }
+    [data-theme="light"] .preview-stage {
+      background: rgba(255, 255, 255, 0.72);
+    }
+    .preview-canvas-wrap {
+      position: relative;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      background-image:
+        linear-gradient(45deg, rgba(108, 62, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(108, 62, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(108, 62, 255, 0.06) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(108, 62, 255, 0.06) 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+    .preview-canvas-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+    .scan-laser {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--violet), transparent);
+      box-shadow: 0 0 16px var(--cyan);
+      top: 0;
+      display: none;
+      animation: laser-scan 1.6s ease-in-out infinite;
+    }
+    .preview-stage.scanning .scan-laser {
+      display: block;
+    }
+    @keyframes laser-scan {
+      0% { top: 6%; opacity: 0.9; }
+      50% { top: 92%; opacity: 1; }
+      100% { top: 6%; opacity: 0.9; }
+    }
+    .preview-meta-bar {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+    .preview-filename {
+      font-weight: 600;
+      color: var(--text-primary);
+      max-width: 210px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── CONTROLS & TAG SLIDER ── */
+    .control-block {
+      margin-top: 18px;
+    }
+    .control-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .tag-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.2), rgba(0, 200, 255, 0.14));
+      border: 1px solid rgba(108, 62, 255, 0.35);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .tag-count-input {
+      width: 58px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.55);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+    [data-theme="light"] .tag-count-input {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    .tag-count-input:focus {
+      border-color: var(--cyan);
+    }
+
+    /* Custom Range Slider */
+    .seo-range {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
+      outline: none;
+      cursor: pointer;
+    }
+    .seo-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--violet);
+      box-shadow: 0 0 12px rgba(108, 62, 255, 0.55);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .seo-range::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .seo-range::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--violet);
+      box-shadow: 0 0 12px rgba(108, 62, 255, 0.55);
+      cursor: pointer;
+    }
+
+    .preset-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .preset-pill {
+      padding: 5px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .preset-pill:hover {
+      border-color: var(--violet);
+      color: var(--text-primary);
+    }
+    .preset-pill.active {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(108, 62, 255, 0.35);
+    }
+
+    .seo-select,
+    .seo-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.45);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    [data-theme="light"] .seo-select,
+    [data-theme="light"] .seo-input {
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .seo-select:focus,
+    .seo-input:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px rgba(108, 62, 255, 0.14);
+    }
+    .seo-select option {
+      background: var(--bg-card-solid);
+      color: var(--text-primary);
+    }
+
+    .generate-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--violet) 0%, #5025ee 50%, #00A8E8 100%);
+      background-size: 200% auto;
+      color: #ffffff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.94rem;
+      line-height: 1.35;
+      text-align: center;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 28px rgba(108, 62, 255, 0.35);
+      transition: all 0.3s ease;
+    }
+    .generate-btn:hover:not(:disabled) {
+      background-position: right center;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 34px rgba(108, 62, 255, 0.45);
+    }
+    .generate-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── RESULTS PANEL ── */
+    .empty-results {
+      min-height: 460px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .empty-orb {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ai-orbit-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(108, 62, 255, 0.45);
+      animation: spin-smooth 18s linear infinite;
+    }
+    .ai-orbit-ring.inner {
+      inset: 11px;
+      border-style: solid;
+      border-color: rgba(0, 200, 255, 0.28);
+      border-top-color: var(--cyan);
+      animation-duration: 11s;
+      animation-direction: reverse;
+    }
+    .ai-orb-core {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.25), rgba(0, 200, 255, 0.16));
+      border: 1.5px solid rgba(108, 62, 255, 0.45);
+      box-shadow: 0 0 32px rgba(108, 62, 255, 0.3), inset 0 0 18px rgba(0, 200, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ai-orb-core svg {
+      width: 36px;
+      height: 36px;
+      animation: star-breathe 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.5));
+    }
+    .feature-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 540px;
+      margin-top: 26px;
+    }
+    .feature-mini {
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(108, 62, 255, 0.05);
+      text-align: left;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feature-mini:hover {
+      border-color: var(--violet);
+      transform: translateY(-2px);
+    }
+    .feature-mini i {
+      color: var(--cyan);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .feature-mini strong {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .feature-mini span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Loading skeleton */
+    .ai-loading-box {
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .ai-loader-emblem {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+    .ai-spinner-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(108, 62, 255, 0.14);
+      border-top-color: var(--violet);
+      border-right-color: var(--cyan);
+      animation: spin-smooth 1.05s linear infinite;
+    }
+    .ai-spinner-ring.inner {
+      inset: 10px;
+      border-width: 2px;
+      border-top-color: var(--coral);
+      border-left-color: var(--cyan);
+      border-right-color: transparent;
+      animation: spin-smooth 1.7s linear infinite reverse;
+    }
+    .ai-loader-star {
+      width: 34px;
+      height: 34px;
+      animation: star-breathe 1.6s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(108, 62, 255, 0.65));
+    }
+    .ai-progress-bar {
+      width: 220px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(108, 62, 255, 0.16);
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    .ai-progress-fill {
+      width: 45%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--violet), var(--cyan), var(--coral));
+      animation: progress-slide 1.4s ease-in-out infinite;
+    }
+    @keyframes progress-slide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(300%); }
+    }
+    @keyframes spin-smooth {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Audit Score Banner */
+    .seo-score-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.12), rgba(0, 200, 255, 0.07));
+      border: 1px solid rgba(108, 62, 255, 0.3);
+      margin-bottom: 20px;
+    }
+    .score-ring {
+      position: relative;
+      width: 74px;
+      height: 74px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .score-ring svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .score-track {
+      fill: none;
+      stroke: rgba(108, 62, 255, 0.16);
+      stroke-width: 6;
+    }
+    .score-arc {
+      fill: none;
+      stroke: url(#sahadatScoreGrad);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 213.6;
+      stroke-dashoffset: 213.6;
+      transition: stroke-dashoffset 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .score-ring .num {
+      position: relative;
+      z-index: 1;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text-primary);
+    }
+    .score-ring .lbl {
+      position: relative;
+      z-index: 1;
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .score-tips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .score-tip-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(13, 13, 26, 0.35);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    [data-theme="light"] .score-tip-pill {
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    /* Copyable SEO Text Fields */
+    .seo-fields-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    @media (min-width: 768px) {
+      .seo-fields-grid.two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    .seo-result-card {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+      padding: 14px 16px;
+      min-width: 0;
+      max-width: 100%;
+      transition: border-color 0.2s;
+    }
+    [data-theme="light"] .seo-result-card {
+      background: rgba(255, 255, 255, 0.78);
+    }
+    .seo-result-card:focus-within {
+      border-color: var(--violet);
+    }
+    .seo-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .seo-result-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--violet);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .char-pill {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+    .mini-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--glass-bg);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mini-copy-btn:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .seo-editable {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      outline: none;
+      resize: vertical;
+    }
+    .seo-editable.mono {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--cyan);
+    }
+    [data-theme="light"] .seo-editable.mono {
+      color: #0284c7;
+    }
+
+    /* ── SEO TAGS CLOUD ── */
+    .tags-section {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+      padding: 18px;
+    }
+    [data-theme="light"] .tags-section {
+      background: rgba(255, 255, 255, 0.78);
+    }
+    .tags-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .tags-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 4px 2px;
+    }
+    .seo-tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      border: 1px solid rgba(108, 62, 255, 0.32);
+      background: rgba(108, 62, 255, 0.1);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+    .seo-tag-chip:hover {
+      border-color: var(--cyan);
+      background: rgba(0, 200, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    .seo-tag-chip.deselected {
+      opacity: 0.38;
+      border-style: dashed;
+      background: transparent;
+      text-decoration: line-through;
+    }
+    .seo-tag-chip .tag-idx {
+      font-size: 0.62rem;
+      color: var(--cyan);
+      opacity: 0.75;
+    }
+    [data-theme="light"] .seo-tag-chip .tag-idx {
+      color: var(--violet);
+    }
+    .seo-tag-chip .tag-x {
+      font-size: 0.65rem;
+      opacity: 0.55;
+    }
+    .seo-tag-chip:hover .tag-x {
+      opacity: 1;
+      color: var(--coral);
+    }
+
+    .add-tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .add-tag-row .seo-input {
+      flex: 1 1 180px;
+      min-width: 0;
+    }
+    .tags-section {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .preview-stage {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .seo-result-header {
+      flex-wrap: wrap;
+    }
+
+    .copy-actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--glass-bg);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .action-btn:hover {
+      border-color: var(--violet);
+      background: rgba(108, 62, 255, 0.14);
+      transform: translateY(-1px);
+    }
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      border-color: transparent;
+      color: #ffffff;
+    }
+    .action-btn.primary:hover {
+      box-shadow: 0 6px 20px rgba(108, 62, 255, 0.35);
+    }
+
+    /* Long-tail chips */
+    .longtail-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .longtail-chip {
+      font-size: 0.76rem;
+      padding: 5px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 200, 255, 0.25);
+      background: rgba(0, 200, 255, 0.08);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .longtail-chip:hover {
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    /* ── MODAL FOR SAHADAT AI KEY ── */
+    .ai-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 26, 0.78);
+      backdrop-filter: blur(8px);
+      z-index: 10100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .ai-modal-backdrop.open {
+      display: flex;
+    }
+    .ai-modal {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-hover);
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Toast */
+    .seo-toast {
+      position: fixed;
+      bottom: 1.75rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(90px);
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.86rem;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10200;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .seo-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Ensure .hidden overrides local flex/inline-flex components */
+    .empty-results.hidden,
+    .ai-loading-box.hidden,
+    .preview-stage.hidden,
+    .action-btn.hidden,
+    .format-badge.hidden,
+    .seo-panel.hidden,
+    #fileQueueWrap.hidden,
+    #resultsContent.hidden,
+    #longTailWrap.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body class="transition-colors duration-300">
+
+  <div id="cursor" class="cursor"></div>
+  <div id="cursor-follower" class="cursor-follower"></div>
+
+  <!-- FULLSCREEN OVERLAY MENU -->
+  <div id="fullOverlay" class="fo-overlay">
+    <div class="fo-inner">
+      <nav class="fo-links">
+        <a href="index.html#about"      class="fo-link" data-num="01">About</a>
+        <a href="index.html#skills"     class="fo-link" data-num="02">Skills</a>
+        <a href="index.html#services"   class="fo-link" data-num="03">Services</a>
+        <a href="index.html#portfolio"  class="fo-link" data-num="04">Work</a>
+        <a href="index.html#experience" class="fo-link" data-num="05">Journey</a>
+        <a href="index.html#courses"    class="fo-link" data-num="06">Courses</a>
+        <a href="index.html#contact"    class="fo-link" data-num="07">Contact</a>
+        <a href="blog.html"             class="fo-link" data-num="08" style="color:var(--violet)">Blog ✍️</a>
+        <a href="ai-seo-tool.html"      class="fo-link" data-num="09" style="color:var(--cyan)">AI SEO Tool ✨</a>
+      </nav>
+      <div class="fo-divider"></div>
+      <div class="fo-bottom">
+        <div class="fo-socials">
+          <a href="https://www.facebook.com/sawonak47"    target="_blank" class="fo-soc" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/sawonak47"   target="_blank" class="fo-soc" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/sawonhot1/" target="_blank" class="fo-soc" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.behance.net/Sawonhot1"     target="_blank" class="fo-soc" aria-label="Behance"><i class="fab fa-behance"></i></a>
+          <a href="https://x.com/ShSawonhot1"             target="_blank" class="fo-soc" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+        </div>
+        <p class="fo-email">sawonhot1@gmail.com</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="logo font-display text-2xl font-extrabold tracking-tight">
+        <span class="logo-s">S</span><span class="logo-dot">.</span>
+      </a>
+      <ul class="hidden lg:flex items-center gap-5 xl:gap-6 font-mono text-xs tracking-widest uppercase">
+        <li><a href="index.html#about"      class="nav-link">About</a></li>
+        <li><a href="index.html#skills"     class="nav-link">Skills</a></li>
+        <li><a href="index.html#services"   class="nav-link">Services</a></li>
+        <li><a href="index.html#portfolio"  class="nav-link">Work</a></li>
+        <li><a href="index.html#experience" class="nav-link">Journey</a></li>
+        <li><a href="index.html#courses"    class="nav-link">Courses</a></li>
+        <li><a href="index.html#contact"    class="nav-link">Contact</a></li>
+        <li><a href="blog.html"             class="nav-link nav-link-accent">Blog</a></li>
+        <li><a href="ai-seo-tool.html"      class="nav-link nav-link-seo active"><svg class="nav-ai-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor"/><path d="M19 3L19.8 5.2L22 6L19.8 6.8L19 9L18.2 6.8L16 6L18.2 5.2L19 3Z" fill="#00C8FF"/></svg>AI SEO Tool</a></li>
+      </ul>
+      <div class="flex items-center gap-3">
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+          <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+        <button id="hamBtn" class="ham-btn" aria-label="Toggle menu">
+          <span class="hb"></span>
+          <span class="hb"></span>
+          <span class="hb"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="seo-hero">
+    <div class="hero-bg-orb orb-1"></div>
+    <div class="hero-bg-orb orb-2"></div>
+    <div class="grid-overlay"></div>
+    <div class="max-w-4xl mx-auto px-6 relative z-10">
+      <div class="ai-brand-pill">
+        <svg class="ai-brand-svg" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="sahadatHeroGrad" x1="2" y1="2" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#6C3EFF"/>
+              <stop offset="55%" stop-color="#00C8FF"/>
+              <stop offset="100%" stop-color="#FF6B9D"/>
+            </linearGradient>
+          </defs>
+          <path d="M14 2L16.9 11.1L26 14L16.9 16.9L14 26L11.1 16.9L2 14L11.1 11.1L14 2Z" fill="url(#sahadatHeroGrad)"/>
+          <path d="M22.5 2.5L23.4 5.1L26 6L23.4 6.9L22.5 9.5L21.6 6.9L19 6L21.6 5.1L22.5 2.5Z" fill="#00C8FF"/>
+        </svg>
+        <span class="ai-pulse-dot"></span>
+        <span>Powered by <strong>Sahadat AI</strong></span>
+      </div>
+      <h1 class="section-title">AI SEO <span class="gradient-text">Tool</span></h1>
+      <p class="seo-hero-sub">
+        Upload any image, vector, or PDF — <strong>Sahadat AI</strong> instantly analyzes your visual &amp; document content to generate high-ranking SEO titles, descriptions, alt texts, slugs, and customizable SEO tags.
+      </p>
+      <div class="format-badges">
+        <span class="format-badge"><i class="fas fa-image mr-1" style="color:var(--violet)"></i>PNG</span>
+        <span class="format-badge"><i class="fas fa-camera mr-1" style="color:var(--cyan)"></i>JPG / JPEG</span>
+        <span class="format-badge"><i class="fas fa-bolt mr-1" style="color:var(--coral)"></i>WEBP</span>
+        <span class="format-badge"><i class="fas fa-bezier-curve mr-1" style="color:#22c55e"></i>SVG</span>
+        <span class="format-badge"><i class="fas fa-file-pdf mr-1" style="color:#f59e0b"></i>PDF</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="max-w-7xl mx-auto px-6 pb-20">
+    <div class="seo-workspace">
+
+      <!-- LEFT COLUMN: UPLOAD & CONTROLS -->
+      <aside class="seo-panel">
+        <div class="panel-title-row">
+          <h2 class="panel-title"><i class="fas fa-cloud-arrow-up"></i> Upload &amp; Settings</h2>
+          <button id="openKeyModalBtn" class="engine-chip" title="Configure Sahadat AI API Key">
+            <span class="dot-ind"></span>
+            <span id="engineStatusText">Sahadat AI Key</span>
+            <i class="fas fa-sliders"></i>
+          </button>
+        </div>
+
+        <!-- Dropzone -->
+        <div class="seo-dropzone" id="seoDropZone" role="button" tabindex="0" aria-label="Upload files for SEO analysis">
+          <input type="file" id="seoFileInput" multiple accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg,.png,.jpg,.jpeg,.webp,application/pdf,.pdf" />
+          <div class="dropzone-icon">
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sahadatDropGrad" x1="6" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#6C3EFF"/>
+                  <stop offset="55%" stop-color="#00C8FF"/>
+                  <stop offset="100%" stop-color="#FF6B9D"/>
+                </linearGradient>
+              </defs>
+              <path d="M16 34H34C38.4 34 42 30.4 42 26C42 22 39 18.7 35.1 18.1C33.8 12.9 29.1 9 23.5 9C16.9 9 11.5 14.4 11.5 21C11.5 21.4 11.5 21.8 11.6 22.1C8.4 23.1 6 26.1 6 29.6C6 33.9 9.5 34 16 34Z" stroke="url(#sahadatDropGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M24 38V22M24 22L18.5 27.5M24 22L29.5 27.5" stroke="#F0F4FF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M38 6L39.4 10.1L43.5 11.5L39.4 12.9L38 17L36.6 12.9L32.5 11.5L36.6 10.1L38 6Z" fill="#00C8FF"/>
+            </svg>
+          </div>
+          <p class="dropzone-title">Drop files or click to browse</p>
+          <p class="dropzone-sub">Upload single or multiple files — or paste with Ctrl+V</p>
+          <p class="dropzone-hint">PNG · JPG · WEBP · SVG · PDF &nbsp;|&nbsp; Max 25MB each</p>
+        </div>
+
+        <!-- Uploaded File Queue -->
+        <div id="fileQueueWrap" class="hidden">
+          <div class="flex items-center justify-between mt-4 mb-1">
+            <span class="control-label">Uploaded Files (<span id="fileCountNum">0</span>)</span>
+            <button id="clearFilesBtn" class="mini-copy-btn" type="button"><i class="fas fa-trash-alt"></i> Clear</button>
+          </div>
+          <div class="file-queue" id="fileQueue"></div>
+        </div>
+
+        <!-- Active File Preview -->
+        <div id="previewStage" class="preview-stage hidden">
+          <div class="preview-canvas-wrap">
+            <div class="scan-laser"></div>
+            <img id="activePreviewImg" src="" alt="Uploaded preview" />
+          </div>
+          <div class="preview-meta-bar">
+            <span class="preview-filename" id="previewFileName">file.png</span>
+            <span id="previewFileSpecs">0 × 0 · 0 KB</span>
+          </div>
+        </div>
+
+        <!-- Tag Count Control (Default: 50) -->
+        <div class="control-block">
+          <div class="control-label-row">
+            <label for="tagCountRange" class="control-label">Number of SEO Tags</label>
+            <div class="tag-count-badge">
+              <input type="number" id="tagCountInput" class="tag-count-input" min="5" max="150" value="50" aria-label="Number of SEO tags" />
+              <span>Tags</span>
+            </div>
+          </div>
+          <input type="range" id="tagCountRange" class="seo-range" min="5" max="100" step="1" value="50" />
+          <div class="preset-pills" id="tagPresets">
+            <button type="button" class="preset-pill" data-count="15">15</button>
+            <button type="button" class="preset-pill" data-count="25">25</button>
+            <button type="button" class="preset-pill" data-count="30">30</button>
+            <button type="button" class="preset-pill active" data-count="50">50</button>
+            <button type="button" class="preset-pill" data-count="75">75</button>
+            <button type="button" class="preset-pill" data-count="100">100</button>
+          </div>
+        </div>
+
+        <!-- Platform & Language -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 control-block">
+          <div>
+            <label for="platformSelect" class="control-label block mb-2">Target Platform</label>
+            <select id="platformSelect" class="seo-select">
+              <option value="google">Google / Website SEO</option>
+              <option value="stock">Stock (Freepik / Adobe / Shutter)</option>
+              <option value="ecommerce">E-Commerce / Product</option>
+              <option value="social">Social Media &amp; YouTube</option>
+              <option value="blog">Blog &amp; Pinterest</option>
+            </select>
+          </div>
+          <div>
+            <label for="languageSelect" class="control-label block mb-2">Output Language</label>
+            <select id="languageSelect" class="seo-select">
+              <option value="English">English</option>
+              <option value="English + Bengali">English + বাংলা</option>
+              <option value="Bengali">বাংলা (Bengali)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Optional Context -->
+        <div class="control-block">
+          <label for="contextInput" class="control-label block mb-2">Optional Niche / Topic Hint</label>
+          <input type="text" id="contextInput" class="seo-input" placeholder="e.g. Minimalist agency logo, skincare bottle, SEO ebook..." />
+        </div>
+
+        <!-- Generate Buttons -->
+        <button id="generateBtn" class="generate-btn" type="button" disabled>
+          <svg style="width:18px;height:18px;flex-shrink:0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#FFFFFF"/>
+            <path d="M19.5 2.5L20.3 4.7L22.5 5.5L20.3 6.3L19.5 8.5L18.7 6.3L16.5 5.5L18.7 4.7L19.5 2.5Z" fill="#A5F3FC"/>
+          </svg>
+          <span id="generateBtnLabel">Generate 50 SEO Tags with Sahadat AI</span>
+        </button>
+
+        <button id="generateAllBtn" class="action-btn w-full justify-center mt-3 hidden" type="button">
+          <i class="fas fa-layer-group"></i>
+          <span>Batch Generate All Uploaded Files</span>
+        </button>
+      </aside>
+
+      <!-- RIGHT COLUMN: RESULTS WORKSPACE -->
+      <section class="seo-panel" aria-live="polite">
+        <div class="panel-title-row">
+          <h2 class="panel-title"><i class="fas fa-tags"></i> Sahadat AI SEO Output</h2>
+          <span id="resultSourceBadge" class="format-badge hidden"></span>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyResults" class="empty-results">
+          <div class="empty-orb">
+            <div class="ai-orbit-ring"></div>
+            <div class="ai-orbit-ring inner"></div>
+            <div class="ai-orb-core">
+              <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sahadatOrbGrad" x1="4" y1="4" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#6C3EFF"/>
+                    <stop offset="52%" stop-color="#00C8FF"/>
+                    <stop offset="100%" stop-color="#FF6B9D"/>
+                  </linearGradient>
+                </defs>
+                <path d="M18 3L21.7 14.3L33 18L21.7 21.7L18 33L14.3 21.7L3 18L14.3 14.3L18 3Z" fill="url(#sahadatOrbGrad)"/>
+                <path d="M29 4L30.2 7.3L33.5 8.5L30.2 9.7L29 13L27.8 9.7L24.5 8.5L27.8 7.3L29 4Z" fill="#00C8FF"/>
+                <circle cx="8" cy="28" r="2" fill="#FF6B9D"/>
+              </svg>
+            </div>
+          </div>
+          <h3 class="font-display font-bold text-2xl mb-2">Sahadat AI is ready</h3>
+          <p class="text-body max-w-md text-sm leading-relaxed">
+            Upload a <strong>PNG, JPG, WebP, SVG, or PDF</strong> on the left, pick how many SEO tags you want (default <strong>50</strong>), and let <strong>Sahadat AI</strong> craft your full SEO metadata kit.
+          </p>
+          <div class="feature-mini-grid">
+            <div class="feature-mini">
+              <i class="fas fa-hashtag"></i>
+              <strong>50+ Smart Tags</strong>
+              <span>Pick any count from 5 to 150</span>
+            </div>
+            <div class="feature-mini">
+              <i class="fas fa-file-lines"></i>
+              <strong>Full SEO Texts</strong>
+              <span>Title, meta desc, alt text &amp; slug</span>
+            </div>
+            <div class="feature-mini">
+              <i class="fas fa-copy"></i>
+              <strong>1-Click Exports</strong>
+              <span>CSV, TXT, JSON, HTML &amp; #tags</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingResults" class="ai-loading-box hidden">
+          <div class="ai-loader-emblem">
+            <div class="ai-spinner-ring"></div>
+            <div class="ai-spinner-ring inner"></div>
+            <svg class="ai-loader-star" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sahadatLoaderGrad" x1="4" y1="4" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#6C3EFF"/>
+                  <stop offset="52%" stop-color="#00C8FF"/>
+                  <stop offset="100%" stop-color="#FF6B9D"/>
+                </linearGradient>
+              </defs>
+              <path d="M18 3L21.7 14.3L33 18L21.7 21.7L18 33L14.3 21.7L3 18L14.3 14.3L18 3Z" fill="url(#sahadatLoaderGrad)"/>
+            </svg>
+          </div>
+          <h3 class="font-display font-bold text-xl mb-2">Sahadat AI is analyzing your file...</h3>
+          <p id="loadingStepText" class="font-mono text-xs" style="color:var(--cyan)">Inspecting visual composition, text &amp; metadata</p>
+          <div class="ai-progress-bar"><div class="ai-progress-fill"></div></div>
+        </div>
+
+        <!-- Generated Output Content -->
+        <div id="resultsContent" class="hidden">
+
+          <!-- SEO Score & Quick File Audit -->
+          <div class="seo-score-banner">
+            <div class="score-ring" id="scoreRing">
+              <svg viewBox="0 0 80 80" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sahadatScoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#6C3EFF"/>
+                    <stop offset="60%" stop-color="#00C8FF"/>
+                    <stop offset="100%" stop-color="#22c55e"/>
+                  </linearGradient>
+                </defs>
+                <circle class="score-track" cx="40" cy="40" r="34"></circle>
+                <circle class="score-arc" id="scoreArc" cx="40" cy="40" r="34"></circle>
+              </svg>
+              <span class="num" id="seoScoreNum">92</span>
+              <span class="lbl">SEO</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <strong class="font-display text-base" id="seoGradeTitle">Strong SEO Readiness</strong>
+                <span class="format-badge" id="resultFileBadge">PNG</span>
+              </div>
+              <div class="score-tips" id="seoTipsWrap"></div>
+            </div>
+          </div>
+
+          <!-- SEO Title & Slug -->
+          <div class="seo-fields-grid two-col">
+            <div class="seo-result-card">
+              <div class="seo-result-header">
+                <span class="seo-result-label"><i class="fas fa-heading"></i> SEO Title</span>
+                <div class="flex items-center gap-2">
+                  <span class="char-pill" id="titleCharCount">0 chars</span>
+                  <button class="mini-copy-btn" type="button" data-copy-target="outSeoTitle"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+              </div>
+              <textarea id="outSeoTitle" class="seo-editable" rows="2"></textarea>
+            </div>
+
+            <div class="seo-result-card">
+              <div class="seo-result-header">
+                <span class="seo-result-label"><i class="fas fa-link"></i> SEO Filename / Slug</span>
+                <button class="mini-copy-btn" type="button" data-copy-target="outSeoSlug"><i class="fas fa-copy"></i> Copy</button>
+              </div>
+              <textarea id="outSeoSlug" class="seo-editable mono" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Meta Description & Alt Text -->
+          <div class="seo-fields-grid two-col">
+            <div class="seo-result-card">
+              <div class="seo-result-header">
+                <span class="seo-result-label"><i class="fas fa-align-left"></i> Meta Description</span>
+                <div class="flex items-center gap-2">
+                  <span class="char-pill" id="descCharCount">0 chars</span>
+                  <button class="mini-copy-btn" type="button" data-copy-target="outMetaDesc"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+              </div>
+              <textarea id="outMetaDesc" class="seo-editable" rows="3"></textarea>
+            </div>
+
+            <div class="seo-result-card">
+              <div class="seo-result-header">
+                <span class="seo-result-label"><i class="fas fa-universal-access"></i> Image / Asset Alt Text</span>
+                <button class="mini-copy-btn" type="button" data-copy-target="outAltText"><i class="fas fa-copy"></i> Copy</button>
+              </div>
+              <textarea id="outAltText" class="seo-editable" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- SEO Caption / Summary -->
+          <div class="seo-fields-grid">
+            <div class="seo-result-card">
+              <div class="seo-result-header">
+                <span class="seo-result-label"><i class="fas fa-quote-left"></i> SEO Caption / Post Copy</span>
+                <button class="mini-copy-btn" type="button" data-copy-target="outCaption"><i class="fas fa-copy"></i> Copy</button>
+              </div>
+              <textarea id="outCaption" class="seo-editable" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- SEO Tags & Keywords Cloud -->
+          <div class="tags-section">
+            <div class="tags-toolbar">
+              <div class="flex items-center gap-3">
+                <span class="seo-result-label"><i class="fas fa-tags"></i> SEO Tags &amp; Keywords</span>
+                <span class="tag-count-badge" id="selectedTagsCounter">50 / 50</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="selectAllTagsBtn" class="mini-copy-btn" type="button">Select All</button>
+                <button id="deselectAllTagsBtn" class="mini-copy-btn" type="button">Clear Selection</button>
+              </div>
+            </div>
+
+            <p class="font-mono text-xs mb-3" style="color:var(--text-muted)">
+              Click any tag to toggle inclusion, or add your own custom tags below.
+            </p>
+
+            <div class="tags-cloud" id="tagsCloud"></div>
+
+            <!-- Add Custom Tag -->
+            <div class="add-tag-row">
+              <input type="text" id="customTagInput" class="seo-input" placeholder="Add custom SEO tag and press Enter..." />
+              <button id="addCustomTagBtn" class="action-btn" type="button"><i class="fas fa-plus"></i> Add</button>
+            </div>
+
+            <!-- Long-Tail Keyword Phrases -->
+            <div id="longTailWrap" class="mt-5 pt-4" style="border-top:1px solid var(--border)">
+              <span class="seo-result-label mb-2"><i class="fas fa-bolt"></i> Long-Tail SEO Phrases (click to copy)</span>
+              <div class="longtail-row" id="longTailRow"></div>
+            </div>
+
+            <!-- Copy & Export Bar -->
+            <div class="copy-actions-bar">
+              <button id="copyCommaBtn" class="action-btn primary" type="button"><i class="fas fa-copy"></i> Copy Comma Tags</button>
+              <button id="copyHashtagsBtn" class="action-btn" type="button"><i class="fas fa-hashtag"></i> Copy #Hashtags</button>
+              <button id="copyLinesBtn" class="action-btn" type="button"><i class="fas fa-list"></i> Copy Lines</button>
+              <button id="copyHtmlBtn" class="action-btn" type="button"><i class="fas fa-code"></i> Copy HTML Meta</button>
+              <button id="exportCsvBtn" class="action-btn" type="button"><i class="fas fa-file-csv"></i> CSV</button>
+              <button id="exportTxtBtn" class="action-btn" type="button"><i class="fas fa-file-alt"></i> TXT</button>
+              <button id="exportJsonBtn" class="action-btn" type="button"><i class="fas fa-file-code"></i> JSON</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RECENT HISTORY -->
+    <section id="historySection" class="seo-panel mt-8 hidden">
+      <div class="panel-title-row">
+        <h2 class="panel-title"><i class="fas fa-clock-rotate-left"></i> Recent Sahadat AI Generations</h2>
+        <button id="clearHistoryBtn" class="mini-copy-btn" type="button"><i class="fas fa-trash"></i> Clear History</button>
+      </div>
+      <div id="historyGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="max-w-7xl mx-auto px-6 pt-10 pb-20 md:py-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
+        <div class="text-center md:text-left">
+          <div class="font-display font-extrabold text-2xl mb-1"><span class="gradient-text">Sawon</span></div>
+          <p class="font-mono text-xs opacity-50">Graphic Designer · Digital Marketer · SEO Specialist · AI Content Creator</p>
+          <p class="font-mono text-xs opacity-40 mt-1">Bhola, Bangladesh · sawonhot1@gmail.com</p>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <a href="https://www.facebook.com/sawonak47" class="social-icon-sm" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/sawonak47" class="social-icon-sm" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/sawonhot1/" class="social-icon-sm" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.behance.net/Sawonhot1" class="social-icon-sm" aria-label="Behance" target="_blank"><i class="fab fa-behance"></i></a>
+          <a href="https://x.com/ShSawonhot1" class="social-icon-sm" aria-label="X/Twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
+        </div>
+        <p class="font-mono text-xs opacity-50 text-center md:text-right">© 2025 Md Sahadat Hossain. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SAHADAT AI KEY MODAL -->
+  <div id="keyModalBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="keyModalTitle">
+    <div class="ai-modal">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="keyModalTitle" class="font-display font-bold text-xl flex items-center gap-2">
+          <i class="fas fa-key" style="color:var(--violet)"></i> Sahadat AI Connection
+        </h3>
+        <button id="closeKeyModalBtn" class="theme-btn" type="button" aria-label="Close settings">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <p class="text-body text-sm leading-relaxed mb-4">
+        Connect your <strong>Sahadat AI</strong> API key to enable live deep visual &amp; PDF analysis. Your key is saved locally in this browser only. Without a key, the tool runs in instant local preview mode.
+      </p>
+      <label for="apiKeyInput" class="control-label block mb-2">Sahadat AI API Key</label>
+      <input type="password" id="apiKeyInput" class="seo-input mb-4" placeholder="Paste your Sahadat AI key..." autocomplete="off" />
+      <div class="flex flex-wrap items-center justify-end gap-3">
+        <button id="removeKeyBtn" class="action-btn" type="button"><i class="fas fa-unlink"></i> Disconnect</button>
+        <button id="saveKeyBtn" class="action-btn primary" type="button"><i class="fas fa-check"></i> Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="seoToast" class="seo-toast"></div>
+
+  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <script src="script.js"></script>
+  <script src="ai-seo-tool.js"></script>
+</body>
+</html>

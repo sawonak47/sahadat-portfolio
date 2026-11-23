@@ -1,0 +1,5 @@
+# Local-only API key config (never commit to public repo)
+ai-seo-config.local.js
+.env
+.env.local
+.DS_Store
