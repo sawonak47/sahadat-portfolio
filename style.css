@@ -515,10 +515,10 @@ body.menu-open .logo-s {
 .profile-img-wrapper img,
 .profile-img-wrapper .profile-photo {
   position: absolute;
-  top: 12%;
+  top: 1%;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;
+  width: 87%;
   height: auto;
   max-width: none;
   object-fit: contain;
