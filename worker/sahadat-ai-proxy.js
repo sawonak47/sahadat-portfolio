@@ -1,15 +1,21 @@
 /**
- * Sahadat AI — Cloudflare Worker Backend Proxy (Free Tier)
- * --------------------------------------------------------
- * Features:
- * - Public visitors use Sahadat AI with ZERO API key exposed in the browser.
- * - Admin can update the OpenRouter API key (or model) directly from the website
- *   using the password-protected "Change AI" modal; updates persist globally via Cloudflare KV.
+ * Sahadat AI — Universal Multi-Provider Cloudflare Worker Proxy (Free Tier)
+ * -------------------------------------------------------------------------
+ * Supports ANY AI API key automatically (auto-detected by key prefix or selected in Admin):
+ *   • OpenRouter       (sk-or-...)   -> default: nvidia/nemotron-3.5-super-vl:free
+ *   • OpenAI           (sk-...)      -> default: gpt-4o-mini
+ *   • Google Gemini    (AIza...)     -> default: gemini-2.5-flash
+ *   • Anthropic Claude (sk-ant-...)  -> default: claude-sonnet-4-20250514
+ *   • Groq             (gsk_...)     -> default: meta-llama/llama-4-scout-17b-16e-instruct
+ *   • xAI (Grok)       (xai-...)     -> default: grok-2-vision-latest
+ *   • Custom OpenAI-Compatible Endpoint (Mistral, Together, Fireworks, DeepSeek, etc.)
  *
- * Cloudflare Dashboard Setup (100% Free):
- * 1. KV Namespace binding name: SAHADAT_KV
- * 2. Encrypted Secret 1:        OPENROUTER_API_KEY  (your initial OpenRouter key)
- * 3. Encrypted Secret 2:        ADMIN_PASSWORD      (e.g. sawonak47)
+ * Public visitors NEVER see the provider, model, or API key — only "Sahadat AI".
+ * Admin updates persist globally via Cloudflare KV (binding: SAHADAT_KV).
+ *
+ * Required Cloudflare Secrets:
+ *   • OPENROUTER_API_KEY  (initial default key)
+ *   • ADMIN_PASSWORD      (e.g. sawonak47)
  */
 
 const ALLOWED_ORIGINS = [
@@ -18,8 +24,68 @@ const ALLOWED_ORIGINS = [
   'http://127.0.0.1:8765'
 ];
 
-const DEFAULT_PRIMARY_MODEL = 'nvidia/nemotron-3.5-super-vl:free';
-const DEFAULT_FALLBACK_MODEL = 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free';
+const PROVIDERS = {
+  openrouter: {
+    label: 'OpenRouter',
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    defaultModel: 'nvidia/nemotron-3.5-super-vl:free',
+    fallbackModel: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+    style: 'openai'
+  },
+  openai: {
+    label: 'OpenAI',
+    endpoint: 'https://api.openai.com/v1/chat/completions',
+    defaultModel: 'gpt-4o-mini',
+    fallbackModel: 'gpt-4o',
+    style: 'openai'
+  },
+  gemini: {
+    label: 'Google Gemini',
+    endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+    defaultModel: 'gemini-2.5-flash',
+    fallbackModel: 'gemini-2.0-flash',
+    style: 'openai'
+  },
+  anthropic: {
+    label: 'Anthropic Claude',
+    endpoint: 'https://api.anthropic.com/v1/messages',
+    defaultModel: 'claude-sonnet-4-20250514',
+    fallbackModel: 'claude-3-5-sonnet-latest',
+    style: 'anthropic'
+  },
+  groq: {
+    label: 'Groq',
+    endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+    defaultModel: 'meta-llama/llama-4-scout-17b-16e-instruct',
+    fallbackModel: 'llama-3.2-90b-vision-preview',
+    style: 'openai'
+  },
+  xai: {
+    label: 'xAI (Grok)',
+    endpoint: 'https://api.x.ai/v1/chat/completions',
+    defaultModel: 'grok-2-vision-latest',
+    fallbackModel: 'grok-2-vision-1212',
+    style: 'openai'
+  },
+  custom: {
+    label: 'Custom OpenAI-Compatible',
+    endpoint: '',
+    defaultModel: 'gpt-4o-mini',
+    fallbackModel: '',
+    style: 'openai'
+  }
+};
+
+function detectProviderFromKey(key) {
+  const k = String(key || '').trim();
+  if (k.startsWith('sk-or-')) return 'openrouter';
+  if (k.startsWith('sk-ant-')) return 'anthropic';
+  if (k.startsWith('AIza')) return 'gemini';
+  if (k.startsWith('gsk_')) return 'groq';
+  if (k.startsWith('xai-')) return 'xai';
+  if (k.startsWith('sk-')) return 'openai';
+  return 'openrouter';
+}
 
 function corsHeaders(origin) {
   const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
@@ -40,31 +106,36 @@ function jsonResponse(data, status, origin) {
 
 function maskKey(key) {
   if (!key || key.length < 14) return key ? '••••••' : 'Not set';
-  return `${key.slice(0, 12)}•••${key.slice(-4)}`;
+  return `${key.slice(0, 10)}•••${key.slice(-4)}`;
 }
 
-async function getActiveApiKey(env) {
-  if (env.SAHADAT_KV) {
-    try {
-      const kvKey = await env.SAHADAT_KV.get('active_api_key');
-      if (kvKey && kvKey.trim()) return kvKey.trim();
-    } catch {
-      // Fallback to env secret
-    }
+async function kvGet(env, key) {
+  if (!env.SAHADAT_KV) return null;
+  try {
+    const val = await env.SAHADAT_KV.get(key);
+    return val ? val.trim() : null;
+  } catch {
+    return null;
   }
-  return (env.OPENROUTER_API_KEY || '').trim();
 }
 
-async function getActiveModel(env) {
-  if (env.SAHADAT_KV) {
-    try {
-      const kvModel = await env.SAHADAT_KV.get('active_model');
-      if (kvModel && kvModel.trim()) return kvModel.trim();
-    } catch {
-      // Fallback to default
-    }
-  }
-  return DEFAULT_PRIMARY_MODEL;
+async function getActiveConfig(env) {
+  const kvKey = await kvGet(env, 'active_api_key');
+  const apiKey = kvKey || (env.OPENROUTER_API_KEY || '').trim();
+
+  const kvProvider = await kvGet(env, 'active_provider');
+  const provider = (kvProvider && PROVIDERS[kvProvider]) ? kvProvider : detectProviderFromKey(apiKey);
+  const spec = PROVIDERS[provider] || PROVIDERS.openrouter;
+
+  const kvModel = await kvGet(env, 'active_model');
+  const model = kvModel || spec.defaultModel;
+
+  const kvEndpoint = await kvGet(env, 'active_endpoint');
+  const endpoint = provider === 'custom' ? (kvEndpoint || '') : spec.endpoint;
+
+  const updatedAt = (await kvGet(env, 'updated_at')) || 'Initial secret';
+
+  return { apiKey, provider, providerLabel: spec.label, model, endpoint, updatedAt, spec };
 }
 
 function checkAdminPassword(provided, env) {
@@ -82,6 +153,157 @@ function checkAdminPassword(provided, env) {
   return { ok: true };
 }
 
+async function validateProviderKey(provider, apiKey, customEndpoint) {
+  try {
+    if (provider === 'openrouter') {
+      const r = await fetch('https://openrouter.ai/api/v1/auth/key', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      return r.ok;
+    }
+    if (provider === 'openai') {
+      const r = await fetch('https://api.openai.com/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      return r.ok;
+    }
+    if (provider === 'gemini') {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
+      return r.ok;
+    }
+    if (provider === 'anthropic') {
+      const r = await fetch('https://api.anthropic.com/v1/models', {
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        }
+      });
+      return r.ok;
+    }
+    if (provider === 'groq') {
+      const r = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      return r.ok;
+    }
+    if (provider === 'xai') {
+      const r = await fetch('https://api.x.ai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      return r.ok;
+    }
+    if (provider === 'custom') {
+      return Boolean(customEndpoint && /^https:\/\//i.test(customEndpoint) && apiKey.length >= 6);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Convert OpenAI-style multimodal messages to Anthropic Messages API format
+function buildAnthropicBody(messages, model, temperature, maxTokens) {
+  let systemText = '';
+  const anthMessages = [];
+
+  for (const msg of (messages || [])) {
+    if (msg.role === 'system') {
+      systemText += (systemText ? '\n' : '') + (typeof msg.content === 'string' ? msg.content : '');
+      continue;
+    }
+    if (typeof msg.content === 'string') {
+      anthMessages.push({ role: msg.role, content: msg.content });
+      continue;
+    }
+    if (Array.isArray(msg.content)) {
+      const blocks = [];
+      for (const part of msg.content) {
+        if (part.type === 'text') {
+          blocks.push({ type: 'text', text: part.text || '' });
+        } else if (part.type === 'image_url' && part.image_url && part.image_url.url) {
+          const m = String(part.image_url.url).match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+          if (m) {
+            blocks.push({
+              type: 'image',
+              source: { type: 'base64', media_type: m[1], data: m[2] }
+            });
+          }
+        }
+      }
+      anthMessages.push({ role: msg.role, content: blocks });
+    }
+  }
+
+  return {
+    model,
+    max_tokens: Math.min(Number(maxTokens) || 4096, 4096),
+    temperature: typeof temperature === 'number' ? temperature : 0.4,
+    system: systemText || undefined,
+    messages: anthMessages
+  };
+}
+
+async function callUpstreamModel(cfg, model, payload) {
+  // Anthropic Messages API adapter
+  if (cfg.spec.style === 'anthropic') {
+    const res = await fetch(cfg.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': cfg.apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify(buildAnthropicBody(payload.messages, model, payload.temperature, payload.max_tokens))
+    });
+    const raw = await res.text();
+    if (!res.ok) return { ok: false, status: res.status, text: raw };
+
+    // Normalize Anthropic response into OpenAI chat.completion shape for frontend compatibility
+    const parsed = JSON.parse(raw);
+    const textContent = (parsed.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('\n');
+    return {
+      ok: true,
+      status: 200,
+      text: JSON.stringify({
+        choices: [{ message: { role: 'assistant', content: textContent } }]
+      })
+    };
+  }
+
+  // OpenAI-compatible providers (OpenRouter, OpenAI, Gemini, Groq, xAI, Custom)
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${cfg.apiKey}`
+  };
+  if (cfg.provider === 'openrouter') {
+    headers['HTTP-Referer'] = 'https://sawonak47.github.io/sahadat-portfolio/';
+    headers['X-Title'] = 'Sahadat AI SEO Tool';
+  }
+
+  const reqBody = {
+    model,
+    temperature: typeof payload.temperature === 'number' ? payload.temperature : 0.4,
+    max_tokens: Math.min(Number(payload.max_tokens) || 4096, 4096),
+    messages: payload.messages || []
+  };
+
+  // Pass reasoning hint only for OpenRouter Nemotron reasoning models
+  if (cfg.provider === 'openrouter' && /nemotron/i.test(model)) {
+    reqBody.reasoning = payload.reasoning || { effort: 'low' };
+  }
+
+  const res = await fetch(cfg.endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(reqBody)
+  });
+  const text = await res.text();
+  return { ok: res.ok, status: res.status, text };
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -92,13 +314,13 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
 
-    // ── HEALTH CHECK ──
+    // ── HEALTH CHECK (never leaks key/provider details publicly) ──
     if (request.method === 'GET' && (path === '/' || path === '/health')) {
-      const key = await getActiveApiKey(env);
+      const cfg = await getActiveConfig(env);
       return jsonResponse({
         ok: true,
         engine: 'Sahadat AI',
-        live: Boolean(key),
+        live: Boolean(cfg.apiKey && cfg.endpoint),
         kvEnabled: Boolean(env.SAHADAT_KV)
       }, 200, origin);
     }
@@ -114,26 +336,26 @@ export default {
       return jsonResponse({ error: 'Invalid JSON body' }, 400, origin);
     }
 
-    // ── ADMIN: VERIFY PASSWORD & GET MASKED STATUS ──
+    // ── ADMIN: VERIFY PASSWORD & RETURN MASKED STATUS ──
     if (path === '/admin/verify') {
       const auth = checkAdminPassword(payload.password, env);
       if (!auth.ok) return jsonResponse({ ok: false, error: auth.error }, auth.status, origin);
 
-      const activeKey = await getActiveApiKey(env);
-      const activeModel = await getActiveModel(env);
-      const updatedAt = env.SAHADAT_KV ? await env.SAHADAT_KV.get('updated_at') : null;
-
+      const cfg = await getActiveConfig(env);
       return jsonResponse({
         ok: true,
-        maskedKey: maskKey(activeKey),
-        hasKey: Boolean(activeKey),
+        maskedKey: maskKey(cfg.apiKey),
+        hasKey: Boolean(cfg.apiKey),
         kvEnabled: Boolean(env.SAHADAT_KV),
-        activeModel,
-        updatedAt: updatedAt || 'Initial secret'
+        activeProvider: cfg.provider,
+        providerLabel: cfg.providerLabel,
+        activeModel: cfg.model,
+        activeEndpoint: cfg.provider === 'custom' ? cfg.endpoint : '',
+        updatedAt: cfg.updatedAt
       }, 200, origin);
     }
 
-    // ── ADMIN: UPDATE API KEY (AND OPTIONAL MODEL) IN CLOUDFLARE KV ──
+    // ── ADMIN: UPDATE ANY PROVIDER API KEY / MODEL IN CLOUDFLARE KV ──
     if (path === '/admin/update-key') {
       const auth = checkAdminPassword(payload.password, env);
       if (!auth.ok) return jsonResponse({ ok: false, error: auth.error }, auth.status, origin);
@@ -141,102 +363,108 @@ export default {
       if (!env.SAHADAT_KV) {
         return jsonResponse({
           ok: false,
-          error: 'Cloudflare KV binding "SAHADAT_KV" is not attached to this Worker yet.'
+          error: 'Cloudflare KV binding "SAHADAT_KV" is not attached to this Worker.'
         }, 500, origin);
       }
 
+      const currentCfg = await getActiveConfig(env);
       const newKey = String(payload.apiKey || '').trim();
+      const requestedProvider = String(payload.provider || 'auto').trim().toLowerCase();
       const newModel = String(payload.model || '').trim();
+      const customEndpoint = String(payload.endpoint || '').trim();
 
-      if (!newKey && !newModel) {
-        return jsonResponse({ ok: false, error: 'Please enter a new API key or model.' }, 400, origin);
+      if (!newKey && !newModel && requestedProvider === 'auto' && !customEndpoint) {
+        return jsonResponse({ ok: false, error: 'Enter a new API key or model to update.' }, 400, origin);
       }
 
-      // Live-validate the new API key before replacing the old one
+      // Resolve target provider (auto-detect from key prefix if provider === 'auto')
+      let targetProvider;
+      if (requestedProvider !== 'auto' && PROVIDERS[requestedProvider]) {
+        targetProvider = requestedProvider;
+      } else if (newKey) {
+        targetProvider = detectProviderFromKey(newKey);
+      } else {
+        targetProvider = currentCfg.provider;
+      }
+
+      const targetSpec = PROVIDERS[targetProvider] || PROVIDERS.openrouter;
+      const targetEndpoint = targetProvider === 'custom'
+        ? (customEndpoint || currentCfg.endpoint)
+        : targetSpec.endpoint;
+
+      if (targetProvider === 'custom' && !/^https:\/\//i.test(targetEndpoint)) {
+        return jsonResponse({ ok: false, error: 'Custom provider requires a valid https:// chat completions URL.' }, 400, origin);
+      }
+
+      // Live-validate any newly supplied key before replacing the old one
       if (newKey) {
-        try {
-          const checkRes = await fetch('https://openrouter.ai/api/v1/auth/key', {
-            headers: { 'Authorization': `Bearer ${newKey}` }
-          });
-          if (!checkRes.ok) {
-            return jsonResponse({
-              ok: false,
-              error: 'That API key was rejected (invalid or revoked). Old key was kept safe.'
-            }, 400, origin);
-          }
-        } catch {
+        const valid = await validateProviderKey(targetProvider, newKey, targetEndpoint);
+        if (!valid) {
           return jsonResponse({
             ok: false,
-            error: 'Could not verify the new API key right now. Please try again.'
-          }, 502, origin);
+            error: `That ${targetSpec.label} API key could not be verified (invalid key or wrong provider). Your old key was kept safe.`
+          }, 400, origin);
         }
-
         await env.SAHADAT_KV.put('active_api_key', newKey);
       }
 
+      // Save provider + reset model to the new provider's default if switching providers without specifying a model
+      const providerChanged = targetProvider !== currentCfg.provider;
+      await env.SAHADAT_KV.put('active_provider', targetProvider);
+
       if (newModel) {
         await env.SAHADAT_KV.put('active_model', newModel);
+      } else if (providerChanged) {
+        await env.SAHADAT_KV.put('active_model', targetSpec.defaultModel);
+      }
+
+      if (targetProvider === 'custom' && targetEndpoint) {
+        await env.SAHADAT_KV.put('active_endpoint', targetEndpoint);
+      } else {
+        await env.SAHADAT_KV.delete('active_endpoint');
       }
 
       const nowIso = new Date().toISOString();
       await env.SAHADAT_KV.put('updated_at', nowIso);
 
-      const activeKey = await getActiveApiKey(env);
-      const activeModel = await getActiveModel(env);
-
+      const updatedCfg = await getActiveConfig(env);
       return jsonResponse({
         ok: true,
-        message: 'Sahadat AI updated globally for all visitors!',
-        maskedKey: maskKey(activeKey),
-        activeModel,
+        message: `Connected to ${updatedCfg.providerLabel} (${updatedCfg.model}) globally for all visitors!`,
+        maskedKey: maskKey(updatedCfg.apiKey),
+        activeProvider: updatedCfg.provider,
+        providerLabel: updatedCfg.providerLabel,
+        activeModel: updatedCfg.model,
+        activeEndpoint: updatedCfg.provider === 'custom' ? updatedCfg.endpoint : '',
         updatedAt: nowIso
       }, 200, origin);
     }
 
     // ── PUBLIC: SAHADAT AI SEO GENERATION ──
-    const apiKey = await getActiveApiKey(env);
-    if (!apiKey) {
-      return jsonResponse({ error: 'Sahadat AI server key is not configured.' }, 500, origin);
+    const cfg = await getActiveConfig(env);
+    if (!cfg.apiKey || !cfg.endpoint) {
+      return jsonResponse({ error: 'Sahadat AI server is not configured.' }, 500, origin);
     }
 
-    const activeModel = await getActiveModel(env);
-    const modelsToTry = payload.model
-      ? [payload.model]
-      : activeModel === DEFAULT_FALLBACK_MODEL
-        ? [activeModel, DEFAULT_PRIMARY_MODEL]
-        : [activeModel, DEFAULT_FALLBACK_MODEL];
+    const modelsToTry = [cfg.model];
+    if (cfg.spec.fallbackModel && cfg.spec.fallbackModel !== cfg.model) {
+      modelsToTry.push(cfg.spec.fallbackModel);
+    }
 
     let lastStatus = 502;
     let lastBody = JSON.stringify({ error: 'Sahadat AI service busy' });
 
     for (const model of modelsToTry) {
       try {
-        const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': 'https://sawonak47.github.io/sahadat-portfolio/',
-            'X-Title': 'Sahadat AI SEO Tool'
-          },
-          body: JSON.stringify({
-            model,
-            temperature: typeof payload.temperature === 'number' ? payload.temperature : 0.4,
-            max_tokens: Math.min(Number(payload.max_tokens) || 4096, 4096),
-            reasoning: payload.reasoning || { effort: 'low' },
-            messages: payload.messages || []
-          })
-        });
-
-        const text = await upstream.text();
-        if (upstream.ok) {
-          return new Response(text, {
+        const result = await callUpstreamModel(cfg, model, payload);
+        if (result.ok) {
+          return new Response(result.text, {
             status: 200,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) }
           });
         }
-        lastStatus = upstream.status;
-        lastBody = text;
+        lastStatus = result.status;
+        lastBody = result.text;
       } catch {
         // Try fallback model
       }

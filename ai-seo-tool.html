@@ -1153,7 +1153,8 @@
     #longTailWrap.hidden,
     #adminUnlockForm.hidden,
     #adminUpdateForm.hidden,
-    #workerUrlRow.hidden {
+    #workerUrlRow.hidden,
+    #adminCustomEndpointRow.hidden {
       display: none;
     }
   </style>
@@ -1607,8 +1608,8 @@
         </div>
         <div class="text-center md:text-right">
           <p class="font-mono text-xs opacity-50">© Md Sahadat Hossain. All rights reserved.</p>
-          <button id="openAdminBtn" class="admin-change-btn" type="button" title="Admin AI Key Settings">
-            <i class="fas fa-lock"></i> Change AI
+          <button id="openAdminBtn" class="admin-change-btn" type="button" title="Admin AI Model & Key Settings">
+            <i class="fas fa-lock"></i> Change AI Model
           </button>
         </div>
       </div>
@@ -1650,15 +1651,34 @@
       <!-- STEP 2: UPDATE KEY (ONLY SHOWN AFTER SERVER VERIFIES PASSWORD) -->
       <form id="adminUpdateForm" class="hidden">
         <div class="admin-status-box">
-          <div><strong>Current Key:</strong> <span id="adminMaskedKey" style="color:var(--cyan)">—</span></div>
-          <div class="mt-1"><strong>Last Updated:</strong> <span id="adminUpdatedAt">—</span></div>
+          <div><strong>Provider:</strong> <span id="adminActiveProvider" style="color:var(--violet)">—</span></div>
+          <div class="mt-1"><strong>Model:</strong> <span id="adminActiveModel" style="color:var(--text-primary)">—</span></div>
+          <div class="mt-1"><strong>Current Key:</strong> <span id="adminMaskedKey" style="color:var(--cyan)">—</span></div>
+          <div class="mt-1"><strong>Updated:</strong> <span id="adminUpdatedAt">—</span></div>
+        </div>
+
+        <label for="adminProviderSelect" class="control-label block mb-2">AI Provider</label>
+        <select id="adminProviderSelect" class="seo-select mb-3">
+          <option value="auto">Auto-Detect from Key (Recommended)</option>
+          <option value="openrouter">OpenRouter (sk-or-...)</option>
+          <option value="openai">OpenAI (sk-...)</option>
+          <option value="gemini">Google Gemini (AIza...)</option>
+          <option value="anthropic">Anthropic Claude (sk-ant-...)</option>
+          <option value="groq">Groq (gsk_...)</option>
+          <option value="xai">xAI Grok (xai-...)</option>
+          <option value="custom">Custom OpenAI-Compatible URL</option>
+        </select>
+
+        <div id="adminCustomEndpointRow" class="mb-3 hidden">
+          <label for="adminEndpointInput" class="control-label block mb-2">Custom Chat Completions URL</label>
+          <input type="url" id="adminEndpointInput" class="seo-input" placeholder="https://api.example.com/v1/chat/completions" autocomplete="off" />
         </div>
 
         <label for="adminNewKeyInput" class="control-label block mb-2">New API Key (Replaces Old Key Globally)</label>
-        <input type="password" id="adminNewKeyInput" class="seo-input mb-3" placeholder="Paste new API key..." autocomplete="off" />
+        <input type="password" id="adminNewKeyInput" class="seo-input mb-3" placeholder="Paste any API key (OpenRouter, OpenAI, Gemini, Claude...)" autocomplete="off" />
 
-        <label for="adminModelInput" class="control-label block mb-2">Backend Model ID (Optional)</label>
-        <input type="text" id="adminModelInput" class="seo-input mb-4" placeholder="Leave unchanged to keep current engine" autocomplete="off" />
+        <label for="adminModelInput" class="control-label block mb-2">Model ID (Optional — Leave Blank for Auto Default)</label>
+        <input type="text" id="adminModelInput" class="seo-input mb-4" placeholder="Auto-selected for provider (e.g. gpt-4o-mini, gemini-2.5-flash)" autocomplete="off" />
 
         <div class="flex flex-wrap items-center justify-between gap-3">
           <button id="adminLockBtn" class="action-btn" type="button">

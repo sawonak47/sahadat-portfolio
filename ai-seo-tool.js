@@ -114,8 +114,13 @@
   const adminPasswordInput = document.getElementById('adminPasswordInput');
   const adminUnlockBtn = document.getElementById('adminUnlockBtn');
   const adminUpdateForm = document.getElementById('adminUpdateForm');
+  const adminActiveProvider = document.getElementById('adminActiveProvider');
+  const adminActiveModel = document.getElementById('adminActiveModel');
   const adminMaskedKey = document.getElementById('adminMaskedKey');
   const adminUpdatedAt = document.getElementById('adminUpdatedAt');
+  const adminProviderSelect = document.getElementById('adminProviderSelect');
+  const adminCustomEndpointRow = document.getElementById('adminCustomEndpointRow');
+  const adminEndpointInput = document.getElementById('adminEndpointInput');
   const adminNewKeyInput = document.getElementById('adminNewKeyInput');
   const adminModelInput = document.getElementById('adminModelInput');
   const adminLockBtn = document.getElementById('adminLockBtn');
@@ -1553,6 +1558,9 @@
     unlockedAdminPassword = '';
     if (adminPasswordInput) adminPasswordInput.value = '';
     if (adminNewKeyInput) adminNewKeyInput.value = '';
+    if (adminModelInput) adminModelInput.value = '';
+    if (adminProviderSelect) adminProviderSelect.value = 'auto';
+    if (adminCustomEndpointRow) adminCustomEndpointRow.classList.add('hidden');
     setAdminFeedback('', '');
     if (adminUnlockForm) adminUnlockForm.classList.remove('hidden');
     if (adminUpdateForm) adminUpdateForm.classList.add('hidden');
@@ -1563,6 +1571,14 @@
         adminWorkerUrlInput.value = getActiveProxyUrl();
       }
     }
+  }
+
+  if (adminProviderSelect) {
+    adminProviderSelect.addEventListener('change', () => {
+      if (adminCustomEndpointRow) {
+        adminCustomEndpointRow.classList.toggle('hidden', adminProviderSelect.value !== 'custom');
+      }
+    });
   }
 
   function openAdminModal() {
@@ -1637,14 +1653,19 @@
         }
 
         unlockedAdminPassword = password;
+        if (adminActiveProvider) adminActiveProvider.textContent = data.providerLabel || 'OpenRouter';
+        if (adminActiveModel) adminActiveModel.textContent = data.activeModel || 'Auto default';
         adminMaskedKey.textContent = data.maskedKey || 'Not set';
         adminUpdatedAt.textContent = data.updatedAt && data.updatedAt !== 'Initial secret'
           ? new Date(data.updatedAt).toLocaleString()
           : (data.updatedAt || 'Initial secret');
-        adminModelInput.value = data.activeModel || '';
+        if (adminProviderSelect) adminProviderSelect.value = 'auto';
+        if (adminCustomEndpointRow) adminCustomEndpointRow.classList.add('hidden');
+        if (adminEndpointInput) adminEndpointInput.value = data.activeEndpoint || '';
+        adminModelInput.value = '';
         adminUnlockForm.classList.add('hidden');
         adminUpdateForm.classList.remove('hidden');
-        setAdminFeedback('Unlocked. Paste a new API key below to replace the old key globally.', 'success');
+        setAdminFeedback('Unlocked. Paste any provider API key below — it auto-detects and updates globally.', 'success');
         setTimeout(() => adminNewKeyInput.focus(), 60);
       } catch {
         setAdminFeedback('Could not reach Cloudflare Worker URL. Double-check the URL and try again.', 'error');
@@ -1660,11 +1681,17 @@
       e.preventDefault();
       setAdminFeedback('', '');
       const proxyUrl = getActiveProxyUrl();
+      const provider = adminProviderSelect ? adminProviderSelect.value : 'auto';
+      const endpoint = adminEndpointInput ? adminEndpointInput.value.trim() : '';
       const newKey = adminNewKeyInput.value.trim();
       const newModel = adminModelInput.value.trim();
 
-      if (!newKey && !newModel) {
+      if (!newKey && !newModel && provider === 'auto' && !endpoint) {
         setAdminFeedback('Enter a new API key or model ID to update.', 'error');
+        return;
+      }
+      if (provider === 'custom' && !/^https:\/\//i.test(endpoint)) {
+        setAdminFeedback('Please enter a valid https:// custom chat completions URL.', 'error');
         return;
       }
 
@@ -1677,6 +1704,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             password: unlockedAdminPassword,
+            provider,
+            endpoint,
             apiKey: newKey,
             model: newModel
           })
@@ -1687,12 +1716,15 @@
           return;
         }
 
+        if (adminActiveProvider) adminActiveProvider.textContent = data.providerLabel || provider;
+        if (adminActiveModel) adminActiveModel.textContent = data.activeModel || 'Auto default';
         adminMaskedKey.textContent = data.maskedKey || 'Updated';
         adminUpdatedAt.textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleString() : 'Just now';
         adminNewKeyInput.value = '';
+        adminModelInput.value = '';
         updateEngineChipUI();
-        setAdminFeedback(data.message || 'Sahadat AI key updated globally for all visitors!', 'success');
-        showToast('Sahadat AI key updated globally!');
+        setAdminFeedback(data.message || 'Sahadat AI updated globally for all visitors!', 'success');
+        showToast('Sahadat AI updated globally!');
       } catch {
         setAdminFeedback('Network error while saving to Cloudflare Worker.', 'error');
       } finally {
