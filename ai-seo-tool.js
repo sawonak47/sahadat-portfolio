@@ -11,7 +11,7 @@
   // For public GitHub Pages deployment, set proxyUrl to your deployed worker/sahadat-ai-proxy.js URL
   // OR connect your API key locally via the in-page "Sahadat AI Key" modal (saved in browser localStorage).
   const SAHADAT_AI_CONFIG = {
-    proxyUrl: '',
+    proxyUrl: 'https://sahadat-ai.mohammedabdulmalek19781.workers.dev',
     apiKey: '',
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
     models: [
@@ -1702,8 +1702,9 @@
     });
   }
 
-  // ── OPTIONAL LOCALHOST CONFIG LOADER (zero 404 on GitHub Pages) ──
+  // ── OPTIONAL LOCALHOST CONFIG LOADER (only when no Worker proxy is set) ──
   function loadLocalDevConfigIfLocalhost() {
+    if ((SAHADAT_AI_CONFIG.proxyUrl || '').trim()) return;
     const host = window.location.hostname;
     if (host !== 'localhost' && host !== '127.0.0.1') return;
     const s = document.createElement('script');
