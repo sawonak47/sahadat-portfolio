@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="74" viewBox="0 0 480 74" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="480" y2="74" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D0D1A"/>
+      <stop offset="50%" stop-color="#141432"/>
+      <stop offset="100%" stop-color="#0D0D1A"/>
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0" y1="0" x2="480" y2="74" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6C3EFF"/>
+      <stop offset="55%" stop-color="#00C8FF"/>
+      <stop offset="100%" stop-color="#FF6B9D"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="18" y1="18" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6C3EFF"/>
+      <stop offset="100%" stop-color="#00C8FF"/>
+    </linearGradient>
+    <radialGradient id="glowLeft" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(55 37) scale(110 42)">
+      <stop offset="0%" stop-color="#6C3EFF" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#6C3EFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowRight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(430 37) scale(100 42)">
+      <stop offset="0%" stop-color="#00C8FF" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#00C8FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Main Card -->
+  <rect x="1.5" y="1.5" width="477" height="71" rx="16" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="2"/>
+  <rect x="2" y="2" width="476" height="70" rx="15" fill="url(#glowLeft)"/>
+  <rect x="2" y="2" width="476" height="70" rx="15" fill="url(#glowRight)"/>
+
+  <!-- Play / Launch Pill Icon -->
+  <rect x="22" y="17" width="40" height="40" rx="11" fill="url(#iconGrad)"/>
+  <path d="M38 29.5L49 37L38 44.5V29.5Z" fill="#FFFFFF"/>
+
+  <!-- Title Text -->
+  <text x="80" y="43" fill="#F0F4FF" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="2.2">
+    SAHADAT HOSSAIN PORTFOLIO
+  </text>
+
+  <!-- Right Sparkle Accent -->
+  <path d="M446 25L448.2 31.8L455 34L448.2 36.2L446 43L443.8 36.2L437 34L443.8 31.8L446 25Z" fill="#00C8FF"/>
+  <path d="M457 18L457.9 20.6L460.5 21.5L457.9 22.4L457 25L456.1 22.4L453.5 21.5L456.1 20.6L457 18Z" fill="#FF6B9D"/>
+</svg>
