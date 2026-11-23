@@ -33,6 +33,7 @@ animateCursorFollower();
 // ── NAVBAR SCROLL ──
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
+  if (!navbar) return;
   if (window.scrollY > 40) {
     navbar.classList.add('scrolled');
   } else {
@@ -48,12 +49,14 @@ function openFO() {
   if (!foOverlay || !hamBtn) return;
   foOverlay.classList.add('open');
   hamBtn.classList.add('open');
+  document.body.classList.add('menu-open');
   document.body.style.overflow = 'hidden';
 }
 function closeFO() {
   if (!foOverlay || !hamBtn) return;
   foOverlay.classList.remove('open');
   hamBtn.classList.remove('open');
+  document.body.classList.remove('menu-open');
   document.body.style.overflow = '';
 }
 
@@ -270,12 +273,11 @@ const navObserver = new IntersectionObserver((entries) => {
     if (entry.isIntersecting) {
       const id = entry.target.getAttribute('id');
       navLinks.forEach(link => {
-        link.style.color = '';
-        if (link.getAttribute('href') === '#' + id) link.style.color = 'var(--violet)';
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
       });
     }
   });
-}, { threshold: 0.4, rootMargin: '-80px 0px 0px 0px' });
+}, { threshold: 0.35, rootMargin: '-80px 0px 0px 0px' });
 
 sections.forEach(s => navObserver.observe(s));
 

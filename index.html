@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Md Sahadat Hossain (Sawon) — Designer & Digital Strategist</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" />
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -49,14 +49,15 @@
       <a href="#home" class="logo font-display text-2xl font-extrabold tracking-tight">
         <span class="logo-s">S</span><span class="logo-dot">.</span>
       </a>
-      <ul class="hidden md:flex items-center gap-6 font-mono text-xs tracking-widest uppercase">
+      <ul class="hidden md:flex items-center gap-5 lg:gap-6 font-mono text-xs tracking-widest uppercase">
         <li><a href="#about"      class="nav-link">About</a></li>
         <li><a href="#skills"     class="nav-link">Skills</a></li>
         <li><a href="#services"   class="nav-link">Services</a></li>
         <li><a href="#portfolio"  class="nav-link">Work</a></li>
         <li><a href="#experience" class="nav-link">Journey</a></li>
+        <li><a href="#courses"    class="nav-link">Courses</a></li>
         <li><a href="#contact"    class="nav-link">Contact</a></li>
-        <li><a href="blog.html" class="nav-link" style="color:var(--violet)">Blog</a></li>
+        <li><a href="blog.html"   class="nav-link nav-link-accent">Blog</a></li>
       </ul>
       <div class="flex items-center gap-3">
         <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
@@ -79,8 +80,8 @@
     <div class="hero-bg-orb orb-3"></div>
     <div class="grid-overlay"></div>
 
-    <div class="max-w-7xl mx-auto px-6 w-full pt-24 pb-12">
-      <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
+    <div class="max-w-7xl mx-auto px-6 w-full pt-28 pb-28 lg:pt-32 lg:pb-28">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
         <div class="flex-1 text-center lg:text-left">
           <div class="hero-eyebrow font-mono text-sm tracking-widest mb-6 flex items-center justify-center lg:justify-start gap-3">
             <span class="status-dot"></span>
@@ -98,7 +99,7 @@
             <a href="#portfolio" class="btn-primary">View My Work <i class="fas fa-arrow-right ml-2"></i></a>
             <a href="resume.pdf" download class="btn-secondary"><i class="fas fa-download mr-2"></i> Download CV</a>
           </div>
-          <div class="flex items-center gap-5 mt-10 justify-center lg:justify-start reveal-text delay-4">
+          <div class="flex flex-wrap items-center gap-4 sm:gap-5 mt-10 justify-center lg:justify-start reveal-text delay-4">
             <span class="font-mono text-xs tracking-widest opacity-50">Follow</span>
             <div class="social-divider"></div>
             <a href="https://www.facebook.com/sawonak47" class="social-icon-sm" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
@@ -163,7 +164,7 @@
         <span class="section-eyebrow">Who I Am</span>
         <h2 class="section-title">About <span class="gradient-text">Me</span></h2>
       </div>
-      <div class="grid md:grid-cols-2 gap-16 items-start mt-16">
+      <div class="grid md:grid-cols-2 gap-12 lg:gap-16 items-start mt-16">
         <div class="about-visual">
           <div class="glass-card p-8 relative">
             <div class="about-img-grid">
@@ -187,7 +188,7 @@
           </p>
 
           <!-- Personal Info Grid -->
-          <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
             <div class="info-chip"><span class="info-label">Full Name</span><span>Md. Sahadat Hossain</span></div>
             <div class="info-chip"><span class="info-label">Alias</span><span>Sawon</span></div>
             <div class="info-chip"><span class="info-label">Date of Birth</span><span>01 December 1995</span></div>
@@ -220,7 +221,7 @@
 
   <!-- EDUCATION -->
   <section id="education" class="section-pad bg-alt">
-    <div class="max-w-4xl mx-auto px-6">
+    <div class="max-w-5xl mx-auto px-6">
       <div class="section-header">
         <span class="section-eyebrow">Academic Background</span>
         <h2 class="section-title">Educational <span class="gradient-text">Qualification</span></h2>
@@ -288,14 +289,17 @@
         <span class="section-eyebrow">What I Know</span>
         <h2 class="section-title">My <span class="gradient-text">Skills</span></h2>
       </div>
-      <div class="grid md:grid-cols-2 gap-16 mt-16">
-        <div class="space-y-8">
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Graphic Design</span><span class="font-mono text-sm">92%</span></div><div class="skill-track"><div class="skill-bar" style="--target:92%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Digital Marketing</span><span class="font-mono text-sm">85%</span></div><div class="skill-track"><div class="skill-bar" style="--target:85%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">SEO / SEM</span><span class="font-mono text-sm">88%</span></div><div class="skill-track"><div class="skill-bar" style="--target:88%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">AI Content Creation</span><span class="font-mono text-sm">80%</span></div><div class="skill-track"><div class="skill-bar" style="--target:80%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Social Media Strategy</span><span class="font-mono text-sm">78%</span></div><div class="skill-track"><div class="skill-bar" style="--target:78%"></div></div></div>
-          <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Technical Support</span><span class="font-mono text-sm">82%</span></div><div class="skill-track"><div class="skill-bar" style="--target:82%"></div></div></div>
+      <div class="grid md:grid-cols-2 gap-12 lg:gap-16 items-start mt-16">
+        <div>
+          <h3 class="font-display font-bold text-xl mb-6">Core Competencies</h3>
+          <div class="space-y-6">
+            <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Graphic Design</span><span class="font-mono text-sm">92%</span></div><div class="skill-track"><div class="skill-bar" style="--target:92%"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Digital Marketing</span><span class="font-mono text-sm">85%</span></div><div class="skill-track"><div class="skill-bar" style="--target:85%"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">SEO / SEM</span><span class="font-mono text-sm">88%</span></div><div class="skill-track"><div class="skill-bar" style="--target:88%"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">AI Content Creation</span><span class="font-mono text-sm">80%</span></div><div class="skill-track"><div class="skill-bar" style="--target:80%"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Social Media Strategy</span><span class="font-mono text-sm">78%</span></div><div class="skill-track"><div class="skill-bar" style="--target:78%"></div></div></div>
+            <div class="skill-item"><div class="flex justify-between mb-2"><span class="font-semibold">Technical Support</span><span class="font-mono text-sm">82%</span></div><div class="skill-track"><div class="skill-bar" style="--target:82%"></div></div></div>
+          </div>
         </div>
         <div>
           <h3 class="font-display font-bold text-xl mb-6">Tools & Platforms</h3>
@@ -423,7 +427,7 @@
 
   <!-- EXPERIENCE TIMELINE -->
   <section id="experience" class="section-pad bg-alt">
-    <div class="max-w-4xl mx-auto px-6">
+    <div class="max-w-5xl mx-auto px-6">
       <div class="section-header">
         <span class="section-eyebrow">My Path</span>
         <h2 class="section-title">Experience <span class="gradient-text">Timeline</span></h2>
@@ -759,13 +763,13 @@
   </section>
 
   <!-- CONTACT -->
-  <section id="contact" class="section-pad bg-alt">
+  <section id="contact" class="section-pad">
     <div class="max-w-6xl mx-auto px-6">
       <div class="section-header">
         <span class="section-eyebrow">Get In Touch</span>
         <h2 class="section-title">Let's <span class="gradient-text">Work Together</span></h2>
       </div>
-      <div class="grid md:grid-cols-2 gap-16 mt-16">
+      <div class="grid md:grid-cols-2 gap-12 lg:gap-16 items-start mt-16">
         <div>
           <p class="text-body text-lg leading-relaxed mb-8">Ready to elevate your brand, grow your traffic, or build something extraordinary? Drop me a message — I respond within 24 hours.</p>
           <div class="space-y-5">
@@ -800,7 +804,7 @@
           </div>
           <div class="mt-10">
             <p class="font-mono text-xs tracking-widest opacity-50 mb-4 uppercase">Connect On</p>
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
               <a href="https://www.facebook.com/sawonak47" class="social-icon" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
               <a href="https://www.instagram.com/sawonak47" class="social-icon" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
               <a href="https://www.linkedin.com/in/sawonhot1/" class="social-icon" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
@@ -836,10 +840,10 @@
               <label class="form-label">Your Message</label>
               <textarea class="form-input" rows="4" placeholder="Tell me about your project…" required></textarea>
             </div>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdjaOngibEWHydfUW91zw_dc6NRQCnJz79I3A1-YydKWDjM2w/viewform?usp=dialog" class="btn-primary w-full justify-center" id="submit-btn" style="text-align: center; display: inline-block; text-decoration: none;">
-<span id="btn-text"><i class="fas fa-paper-plane mr-2"></i> Send Message</span>
-<span id="btn-loading" class="hidden"><i class="fas fa-spinner fa-spin mr-2"></i> Opening Form</span>
-</a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdjaOngibEWHydfUW91zw_dc6NRQCnJz79I3A1-YydKWDjM2w/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" class="btn-primary w-full justify-center" id="submit-btn">
+              <span id="btn-text"><i class="fas fa-paper-plane mr-2"></i> Send Message</span>
+              <span id="btn-loading" class="hidden"><i class="fas fa-spinner fa-spin mr-2"></i> Opening Form</span>
+            </a>
             <p style="text-align:center; font-size:0.72rem; color:var(--text-muted); margin-top:6px;">
               <i class="fas fa-lock mr-1"></i> Google Form-এ নিয়ে যাওয়া হবে
             </p>
@@ -851,21 +855,21 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <div class="max-w-7xl mx-auto px-6 py-10">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="max-w-7xl mx-auto px-6 pt-10 pb-20 md:py-10">
+      <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
         <div class="text-center md:text-left">
           <div class="font-display font-extrabold text-2xl mb-1"><span class="gradient-text">Sawon</span></div>
-          <p class="font-mono text-xs opacity-40">Graphic Designer · Digital Marketer · SEO Specialist · AI Content Creator</p>
-          <p class="font-mono text-xs opacity-30 mt-1">Bhola, Bangladesh · sawonhot1@gmail.com</p>
+          <p class="font-mono text-xs opacity-50">Graphic Designer · Digital Marketer · SEO Specialist · AI Content Creator</p>
+          <p class="font-mono text-xs opacity-40 mt-1">Bhola, Bangladesh · sawonhot1@gmail.com</p>
         </div>
-        <div class="flex gap-5">
-          <a href="https://www.facebook.com/sawonak47" class="social-icon-sm" target="_blank"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://www.instagram.com/sawonak47" class="social-icon-sm" target="_blank"><i class="fab fa-instagram"></i></a>
-          <a href="https://www.linkedin.com/in/sawonhot1/" class="social-icon-sm" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-          <a href="https://www.behance.net/Sawonhot1" class="social-icon-sm" target="_blank"><i class="fab fa-behance"></i></a>
-          <a href="https://x.com/ShSawonhot1" class="social-icon-sm" target="_blank"><i class="fab fa-x-twitter"></i></a>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <a href="https://www.facebook.com/sawonak47" class="social-icon-sm" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/sawonak47" class="social-icon-sm" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/sawonhot1/" class="social-icon-sm" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.behance.net/Sawonhot1" class="social-icon-sm" aria-label="Behance" target="_blank"><i class="fab fa-behance"></i></a>
+          <a href="https://x.com/ShSawonhot1" class="social-icon-sm" aria-label="X/Twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
         </div>
-        <p class="font-mono text-xs opacity-40">© 2025 Md Sahadat Hossain. All rights reserved.</p>
+        <p class="font-mono text-xs opacity-50 text-center md:text-right">© 2025 Md Sahadat Hossain. All rights reserved.</p>
       </div>
     </div>
   </footer>
