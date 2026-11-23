@@ -9,6 +9,29 @@ const cursor = document.getElementById('cursor');
 const cursorFollower = document.getElementById('cursor-follower');
 let mouseX = 0, mouseY = 0;
 let followerX = 0, followerY = 0;
+let cursorRafId = null;
+
+function animateCursorFollower() {
+  const dx = mouseX - followerX;
+  const dy = mouseY - followerY;
+  if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+    followerX = mouseX;
+    followerY = mouseY;
+    if (cursorFollower) {
+      cursorFollower.style.left = followerX + 'px';
+      cursorFollower.style.top = followerY + 'px';
+    }
+    cursorRafId = null;
+    return;
+  }
+  followerX += dx * 0.14;
+  followerY += dy * 0.14;
+  if (cursorFollower) {
+    cursorFollower.style.left = followerX + 'px';
+    cursorFollower.style.top = followerY + 'px';
+  }
+  cursorRafId = requestAnimationFrame(animateCursorFollower);
+}
 
 document.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
@@ -17,18 +40,10 @@ document.addEventListener('mousemove', (e) => {
     cursor.style.left = mouseX + 'px';
     cursor.style.top = mouseY + 'px';
   }
-});
-
-function animateCursorFollower() {
-  followerX += (mouseX - followerX) * 0.12;
-  followerY += (mouseY - followerY) * 0.12;
-  if (cursorFollower) {
-    cursorFollower.style.left = followerX + 'px';
-    cursorFollower.style.top = followerY + 'px';
+  if (cursorFollower && !cursorRafId) {
+    cursorRafId = requestAnimationFrame(animateCursorFollower);
   }
-  requestAnimationFrame(animateCursorFollower);
-}
-animateCursorFollower();
+});
 
 // ── NAVBAR SCROLL ──
 const navbar = document.getElementById('navbar');
@@ -266,20 +281,24 @@ if (backToTop) {
 
 // ── ACTIVE NAV LINK ──
 const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-link');
+const hashNavLinks = Array.from(document.querySelectorAll('.nav-link')).filter(
+  link => (link.getAttribute('href') || '').startsWith('#')
+);
 
-const navObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.getAttribute('id');
-      navLinks.forEach(link => {
-        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
-      });
-    }
-  });
-}, { threshold: 0.35, rootMargin: '-80px 0px 0px 0px' });
+if (hashNavLinks.length) {
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        hashNavLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { threshold: 0.35, rootMargin: '-80px 0px 0px 0px' });
 
-sections.forEach(s => navObserver.observe(s));
+  sections.forEach(s => navObserver.observe(s));
+}
 
 // ── SMOOTH SCROLL ──
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
