@@ -1563,6 +1563,12 @@
       padding: 24px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
     }
+    .ai-modal.flush-modal {
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
     .ai-modal.wide-modal {
       max-width: 820px;
       padding: 0;
@@ -2057,6 +2063,8 @@
     #keywordsRawEditWrap.hidden,
     #tagsCloudWrap.hidden,
     #apiCustomModelWrap.hidden,
+    #apiSecretsLockGate.hidden,
+    #apiSecretsUnlockedBody.hidden,
     #adminUnlockForm.hidden,
     #adminUpdateForm.hidden,
     #workerUrlRow.hidden,
@@ -2173,25 +2181,20 @@
       <aside class="seo-panel">
         <div class="panel-title-row">
           <h2 class="panel-title"><i class="fas fa-sliders"></i> Configuration</h2>
-          <div class="flex items-center gap-2">
-            <button id="openApiSecretsBtn" class="engine-chip live" type="button" title="API Secrets & Model Selection">
-              <span class="dot-ind"></span>
-              <span id="engineChipLabel">API Keys</span>
-            </button>
-            <button id="openAdminBtn" class="icon-pill-btn" type="button" title="Site Owner Admin Settings">
-              <i class="fas fa-lock"></i>
-            </button>
-          </div>
+          <button id="openApiSecretsBtn" class="engine-chip live" type="button" title="Password-Protected API Secrets &amp; Model Selection">
+            <i class="fas fa-lock"></i>
+            <span id="engineChipLabel">API Keys</span>
+          </button>
         </div>
 
-        <!-- API KEY TOGGLE & QUICK MODEL SELECTION -->
+        <!-- API KEY TOGGLE (PASSWORD PROTECTED) -->
         <div class="api-toggle-card">
           <div class="api-toggle-top">
             <div class="api-toggle-info">
-              <strong><i class="fas fa-key" style="color:var(--violet);font-size:0.78rem"></i> Use Own API Key</strong>
+              <strong><i class="fas fa-lock" style="color:var(--violet);font-size:0.74rem"></i> Use Own API Key</strong>
               <span id="apiModeStatusSub" class="api-toggle-sub">OFF · Using Sahadat AI Server</span>
             </div>
-            <label class="seo-switch" title="Toggle between Sahadat AI Server and your own API key">
+            <label class="seo-switch" title="Admin password required to switch API key mode">
               <input type="checkbox" id="useOwnKeyToggle" />
               <span class="seo-switch-track"></span>
             </label>
@@ -2822,126 +2825,149 @@
     </div>
   </footer>
 
-  <!-- API SECRETS MANAGEMENT MODAL (MULTI-PROVIDER + MODEL SELECTION + KEY VAULT) -->
+  <!-- API SECRETS MANAGEMENT MODAL (PASSWORD-PROTECTED MULTI-PROVIDER + MODEL SELECTION + KEY VAULT) -->
   <div id="apiSecretsBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="apiSecretsTitle">
-    <div class="ai-modal wide-modal">
-      <div class="api-modal-header">
+    <div id="apiSecretsModalBox" class="ai-modal flush-modal">
+      <div class="api-modal-header" style="padding:20px 24px 16px;">
         <h3 id="apiSecretsTitle" class="font-display font-bold text-xl flex items-center gap-2.5">
-          <i class="fas fa-key" style="color:var(--violet)"></i> API Secrets Management
+          <i class="fas fa-shield-halved" style="color:var(--violet)"></i> API Secrets Management
         </h3>
         <button id="closeApiSecretsBtn" class="theme-btn" type="button" aria-label="Close API Secrets Management">
           <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <!-- 6 Provider Tabs -->
-      <div class="api-provider-bar">
-        <div class="api-provider-tabs" id="apiProviderTabs" role="tablist">
-          <button type="button" class="api-prov-tab active" data-prov="gemini">
-            <i class="fab fa-google"></i> <span>Gemini</span> <span class="api-prov-count" data-prov-count="gemini">0</span>
-          </button>
-          <button type="button" class="api-prov-tab" data-prov="openrouter">
-            <i class="fas fa-network-wired"></i> <span>OpenRouter</span> <span class="api-prov-count" data-prov-count="openrouter">0</span>
-          </button>
-          <button type="button" class="api-prov-tab" data-prov="mistral">
-            <i class="fas fa-wind"></i> <span>Mistral</span> <span class="api-prov-count" data-prov-count="mistral">0</span>
-          </button>
-          <button type="button" class="api-prov-tab" data-prov="groq">
-            <i class="fas fa-bolt"></i> <span>Groq</span> <span class="api-prov-count" data-prov-count="groq">0</span>
-          </button>
-          <button type="button" class="api-prov-tab" data-prov="openai">
-            <i class="fas fa-brain"></i> <span>OpenAI</span> <span class="api-prov-count" data-prov-count="openai">0</span>
-          </button>
-          <button type="button" class="api-prov-tab" data-prov="claude">
-            <i class="fas fa-robot"></i> <span>Claude</span> <span class="api-prov-count" data-prov-count="claude">0</span>
-          </button>
-        </div>
+      <!-- STEP 1: ADMIN PASSWORD GATE (ALWAYS SHOWN FIRST BEFORE SECRETS UI) -->
+      <div id="apiSecretsLockGate" style="padding:22px 24px 24px;">
+        <div id="apiSecretsFeedback" class="admin-feedback"></div>
+        <form id="apiSecretsUnlockForm">
+          <p class="text-body text-sm leading-relaxed mb-4">
+            Restricted to site owner. Enter your admin password to unlock <strong>API Secrets Management</strong>, model selection, and stored keys.
+          </p>
+          <label for="apiSecretsPasswordInput" class="control-label block mb-2">Admin Password</label>
+          <input type="password" id="apiSecretsPasswordInput" class="seo-input mb-4" placeholder="Enter admin password..." autocomplete="off" required />
+          <div class="flex justify-end gap-3">
+            <button id="apiSecretsUnlockBtn" class="action-btn primary" type="submit" style="padding:10px 20px;">
+              <i class="fas fa-unlock-keyhole"></i> Unlock API Secrets
+            </button>
+          </div>
+        </form>
       </div>
 
-      <!-- Two-Column Configuration + Stored Keys -->
-      <div class="api-modal-split">
-        <!-- LEFT: CONFIGURATION -->
-        <div class="api-modal-col left-col">
-          <h4 class="api-col-title">
-            <span>Configuration</span>
-            <span id="apiProvBadge" class="font-mono text-xs" style="color:var(--cyan)">Gemini</span>
-          </h4>
-
-          <div class="mb-4">
-            <label for="apiModalModelSelect" class="control-label block mb-2">Model Selection</label>
-            <select id="apiModalModelSelect" class="seo-select"></select>
-            <div id="apiCustomModelWrap" class="mt-2 hidden">
-              <input type="text" id="apiCustomModelInput" class="seo-input font-mono text-xs" placeholder="Enter exact custom model ID..." autocomplete="off" />
-            </div>
+      <!-- STEP 2: UNLOCKED API SECRETS MANAGEMENT (HIDDEN UNTIL SERVER VERIFIES PASSWORD) -->
+      <div id="apiSecretsUnlockedBody" class="hidden">
+        <!-- 6 Provider Tabs -->
+        <div class="api-provider-bar">
+          <div class="api-provider-tabs" id="apiProviderTabs" role="tablist">
+            <button type="button" class="api-prov-tab active" data-prov="gemini">
+              <i class="fab fa-google"></i> <span>Gemini</span> <span class="api-prov-count" data-prov-count="gemini">0</span>
+            </button>
+            <button type="button" class="api-prov-tab" data-prov="openrouter">
+              <i class="fas fa-network-wired"></i> <span>OpenRouter</span> <span class="api-prov-count" data-prov-count="openrouter">0</span>
+            </button>
+            <button type="button" class="api-prov-tab" data-prov="mistral">
+              <i class="fas fa-wind"></i> <span>Mistral</span> <span class="api-prov-count" data-prov-count="mistral">0</span>
+            </button>
+            <button type="button" class="api-prov-tab" data-prov="groq">
+              <i class="fas fa-bolt"></i> <span>Groq</span> <span class="api-prov-count" data-prov-count="groq">0</span>
+            </button>
+            <button type="button" class="api-prov-tab" data-prov="openai">
+              <i class="fas fa-brain"></i> <span>OpenAI</span> <span class="api-prov-count" data-prov-count="openai">0</span>
+            </button>
+            <button type="button" class="api-prov-tab" data-prov="claude">
+              <i class="fas fa-robot"></i> <span>Claude</span> <span class="api-prov-count" data-prov-count="claude">0</span>
+            </button>
           </div>
+        </div>
 
-          <div class="mb-3">
-            <label for="apiModalKeyInput" class="control-label block mb-2">Add New API Key</label>
-            <div class="api-input-row">
-              <div class="api-key-input-wrap">
-                <input type="password" id="apiModalKeyInput" class="seo-input" placeholder="AIza..." autocomplete="off" />
-                <button type="button" id="toggleNewKeyVisBtn" class="eye-toggle-btn" title="Show/Hide key">
-                  <i class="fas fa-eye"></i>
+        <!-- Two-Column Configuration + Stored Keys -->
+        <div class="api-modal-split">
+          <!-- LEFT: CONFIGURATION -->
+          <div class="api-modal-col left-col">
+            <h4 class="api-col-title">
+              <span>Configuration</span>
+              <span id="apiProvBadge" class="font-mono text-xs" style="color:var(--cyan)">Gemini</span>
+            </h4>
+
+            <div class="mb-4">
+              <label for="apiModalModelSelect" class="control-label block mb-2">Model Selection</label>
+              <select id="apiModalModelSelect" class="seo-select"></select>
+              <div id="apiCustomModelWrap" class="mt-2 hidden">
+                <input type="text" id="apiCustomModelInput" class="seo-input font-mono text-xs" placeholder="Enter exact custom model ID..." autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="apiModalKeyInput" class="control-label block mb-2">Add New API Key</label>
+              <div class="api-input-row">
+                <div class="api-key-input-wrap">
+                  <input type="password" id="apiModalKeyInput" class="seo-input" placeholder="AIza..." autocomplete="off" />
+                  <button type="button" id="toggleNewKeyVisBtn" class="eye-toggle-btn" title="Show/Hide key">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                <button type="button" id="saveProviderKeyBtn" class="action-btn primary" style="padding:0 18px;">
+                  Save
                 </button>
               </div>
-              <button type="button" id="saveProviderKeyBtn" class="action-btn primary" style="padding:0 18px;">
-                Save
-              </button>
+            </div>
+
+            <a id="getApiKeyLink" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="get-key-link-btn">
+              <i class="fas fa-key"></i>
+              <span id="getApiKeyLabel">Get API Key from Google</span>
+            </a>
+
+            <div class="flex items-center justify-between gap-3 mt-5 pt-4" style="border-top:1px solid var(--border)">
+              <div>
+                <span class="font-mono text-xs font-semibold block" style="color:var(--text-primary)">Auto-Rotate Keys</span>
+                <span class="font-mono" style="font-size:0.64rem;color:var(--text-muted)">Switch to next stored key on 429 rate limits</span>
+              </div>
+              <label class="seo-switch" title="Auto-rotate stored keys on rate limit">
+                <input type="checkbox" id="autoRotateKeysToggle" checked />
+                <span class="seo-switch-track"></span>
+              </label>
             </div>
           </div>
 
-          <a id="getApiKeyLink" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="get-key-link-btn">
-            <i class="fas fa-key"></i>
-            <span id="getApiKeyLabel">Get API Key from Google</span>
-          </a>
+          <!-- RIGHT: STORED KEYS -->
+          <div class="api-modal-col">
+            <h4 class="api-col-title">
+              <span>Stored Keys (<span id="storedKeysCountNum">0</span>)</span>
+              <div class="flex items-center gap-1.5" id="storedKeysGlobalActions">
+                <button type="button" id="copyAllKeysBtn" class="mini-copy-btn" title="Copy all keys for this provider">
+                  <i class="fas fa-copy"></i> Copy All
+                </button>
+                <button type="button" id="testAllKeysBtn" class="mini-copy-btn" title="Test all stored keys for this provider">
+                  <i class="fas fa-vial"></i> Test All
+                </button>
+              </div>
+            </h4>
 
-          <div class="flex items-center justify-between gap-3 mt-5 pt-4" style="border-top:1px solid var(--border)">
-            <div>
-              <span class="font-mono text-xs font-semibold block" style="color:var(--text-primary)">Auto-Rotate Keys</span>
-              <span class="font-mono" style="font-size:0.64rem;color:var(--text-muted)">Switch to next stored key on 429 rate limits</span>
-            </div>
-            <label class="seo-switch" title="Auto-rotate stored keys on rate limit">
-              <input type="checkbox" id="autoRotateKeysToggle" checked />
-              <span class="seo-switch-track"></span>
+            <div id="storedKeysList"></div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="api-modal-footer">
+          <div class="flex flex-wrap items-center gap-3">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <span class="seo-switch">
+                <input type="checkbox" id="modalOwnKeyToggle" />
+                <span class="seo-switch-track"></span>
+              </span>
+              <span class="font-mono text-xs font-semibold" style="color:var(--text-primary)">Use Own API Key</span>
             </label>
+            <button type="button" id="openAdminFromSecretsBtn" class="mini-copy-btn" title="Configure site-wide Sahadat AI Cloudflare Worker">
+              <i class="fas fa-shield-halved"></i> Site Admin
+            </button>
+            <button type="button" id="apiSecretsLockBtn" class="mini-copy-btn" title="Lock API Secrets Management">
+              <i class="fas fa-lock"></i> Lock
+            </button>
           </div>
-        </div>
-
-        <!-- RIGHT: STORED KEYS -->
-        <div class="api-modal-col">
-          <h4 class="api-col-title">
-            <span>Stored Keys (<span id="storedKeysCountNum">0</span>)</span>
-            <div class="flex items-center gap-1.5" id="storedKeysGlobalActions">
-              <button type="button" id="copyAllKeysBtn" class="mini-copy-btn" title="Copy all keys for this provider">
-                <i class="fas fa-copy"></i> Copy All
-              </button>
-              <button type="button" id="testAllKeysBtn" class="mini-copy-btn" title="Test all stored keys for this provider">
-                <i class="fas fa-vial"></i> Test All
-              </button>
-            </div>
-          </h4>
-
-          <div id="storedKeysList"></div>
-        </div>
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="api-modal-footer">
-        <div class="flex flex-wrap items-center gap-4">
-          <label class="flex items-center gap-2.5 cursor-pointer">
-            <span class="seo-switch">
-              <input type="checkbox" id="modalOwnKeyToggle" />
-              <span class="seo-switch-track"></span>
-            </span>
-            <span class="font-mono text-xs font-semibold" style="color:var(--text-primary)">Use Own API Key</span>
-          </label>
-          <button type="button" id="openAdminFromSecretsBtn" class="mini-copy-btn" title="Configure site-wide Sahadat AI Cloudflare Worker">
-            <i class="fas fa-shield-halved"></i> Site Admin
+          <button type="button" id="apiSecretsDoneBtn" class="action-btn primary" style="padding:10px 22px;">
+            <i class="fas fa-check"></i> Done
           </button>
         </div>
-        <button type="button" id="apiSecretsDoneBtn" class="action-btn primary" style="padding:10px 22px;">
-          <i class="fas fa-check"></i> Done
-        </button>
       </div>
     </div>
   </div>

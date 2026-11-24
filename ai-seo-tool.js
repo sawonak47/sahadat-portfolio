@@ -572,7 +572,15 @@
 
   // API Secrets Management Modal DOM
   const apiSecretsBackdrop = document.getElementById('apiSecretsBackdrop');
+  const apiSecretsModalBox = document.getElementById('apiSecretsModalBox');
   const closeApiSecretsBtn = document.getElementById('closeApiSecretsBtn');
+  const apiSecretsLockGate = document.getElementById('apiSecretsLockGate');
+  const apiSecretsFeedback = document.getElementById('apiSecretsFeedback');
+  const apiSecretsUnlockForm = document.getElementById('apiSecretsUnlockForm');
+  const apiSecretsPasswordInput = document.getElementById('apiSecretsPasswordInput');
+  const apiSecretsUnlockBtn = document.getElementById('apiSecretsUnlockBtn');
+  const apiSecretsUnlockedBody = document.getElementById('apiSecretsUnlockedBody');
+  const apiSecretsLockBtn = document.getElementById('apiSecretsLockBtn');
   const apiProviderTabs = document.getElementById('apiProviderTabs');
   const apiProvBadge = document.getElementById('apiProvBadge');
   const apiModalModelSelect = document.getElementById('apiModalModelSelect');
@@ -727,6 +735,30 @@
     }
   }
 
+  let unlockedAdminPassword = '';
+  let secretsUnlocked = false;
+  let lastVerifiedAdminData = null;
+  let pendingToggleAfterUnlock = null;
+
+  function setApiSecretsFeedback(msg, type) {
+    if (!apiSecretsFeedback) return;
+    apiSecretsFeedback.className = 'admin-feedback' + (type ? ' ' + type : '');
+    apiSecretsFeedback.textContent = msg || '';
+  }
+
+  function resetApiSecretsModalToLocked() {
+    secretsUnlocked = false;
+    pendingToggleAfterUnlock = null;
+    if (apiSecretsPasswordInput) apiSecretsPasswordInput.value = '';
+    if (apiModalKeyInput) apiModalKeyInput.value = '';
+    if (storedKeysList) storedKeysList.innerHTML = '';
+    setApiSecretsFeedback('', '');
+    if (apiSecretsModalBox) apiSecretsModalBox.classList.remove('wide-modal');
+    if (apiSecretsLockGate) apiSecretsLockGate.classList.remove('hidden');
+    if (apiSecretsUnlockedBody) apiSecretsUnlockedBody.classList.add('hidden');
+    syncApiToggleUI();
+  }
+
   function syncApiToggleUI() {
     const own = secretsVault.useOwnKey;
     const provId = secretsVault.activeProvider;
@@ -740,6 +772,19 @@
 
     if (quickProviderSelect) quickProviderSelect.value = provId;
     populateQuickModelSelect(provId);
+
+    // Keep provider/model/key details hidden in sidebar unless unlocked by admin password
+    if (!secretsUnlocked) {
+      if (apiQuickControls) apiQuickControls.classList.add('hidden');
+      if (apiKeyMissingWarn) apiKeyMissingWarn.classList.add('hidden');
+      apiModeStatusSub.textContent = own
+        ? 'ON · Custom API Key Active (Password Protected)'
+        : 'OFF · Using Sahadat AI Server';
+      engineChipLabel.textContent = 'API Keys';
+      openApiSecretsBtn.classList.toggle('live', hasLiveAI());
+      updateGenerateButtonLabels();
+      return;
+    }
 
     if (own) {
       apiQuickControls.classList.remove('hidden');
@@ -775,6 +820,7 @@
   }
 
   function renderApiSecretsModal() {
+    if (!secretsUnlocked) return;
     const provId = state.modalProviderTab;
     const spec = BYOK_PROVIDERS[provId] || BYOK_PROVIDERS.gemini;
     const provState = secretsVault.providers[provId];
@@ -922,16 +968,23 @@
     }
   }
 
-  function openApiSecretsModal(focusProvider) {
+  function openApiSecretsModal(focusProvider, toggleAfterUnlock = null) {
     state.modalProviderTab = BYOK_PROVIDERS[focusProvider] ? focusProvider : secretsVault.activeProvider;
-    renderApiSecretsModal();
+    resetApiSecretsModalToLocked();
+    pendingToggleAfterUnlock = toggleAfterUnlock;
     apiSecretsBackdrop.classList.add('open');
+    setTimeout(() => {
+      if (apiSecretsPasswordInput) apiSecretsPasswordInput.focus();
+    }, 60);
   }
 
-  function closeApiSecretsModal() {
-    // If user switched tabs in modal and has keys there, optionally keep activeProvider synced when BYOK is on
+  function closeApiSecretsModal(clearAdminSession = true) {
     apiSecretsBackdrop.classList.remove('open');
-    syncApiToggleUI();
+    if (clearAdminSession) {
+      unlockedAdminPassword = '';
+      lastVerifiedAdminData = null;
+    }
+    resetApiSecretsModalToLocked();
   }
 
   // ── PREFS SAVE / LOAD (CUSTOM PROMPT, SLIDERS, PLATFORM) ──
@@ -1058,7 +1111,7 @@
 
   function updateGenerateButtonLabels() {
     if (state.isGenerating || state.batchRunning) return;
-    const engineLabel = isUsingBYOK()
+    const engineLabel = (secretsUnlocked && isUsingBYOK())
       ? (BYOK_PROVIDERS[secretsVault.activeProvider]?.label || 'BYOK')
       : 'Sahadat AI';
     if (state.mode === 'prompt') {
@@ -2299,11 +2352,12 @@
 
     resultSourceBadge.classList.remove('hidden');
     if (r.engineMode === 'live') {
-      resultSourceBadge.innerHTML = `<i class="fas fa-wand-magic-sparkles" style="color:#22c55e"></i> ${escapeHtml(r.engineLabel || 'Sahadat AI Live')}`;
+      const publicLabel = secretsUnlocked ? (r.engineLabel || 'Sahadat AI Live') : 'Sahadat AI Live';
+      resultSourceBadge.innerHTML = `<i class="fas fa-wand-magic-sparkles" style="color:#22c55e"></i> ${escapeHtml(publicLabel)}`;
       resultSourceBadge.style.borderColor = 'rgba(34, 197, 94, 0.4)';
       resultSourceBadge.style.color = '#22c55e';
     } else {
-      resultSourceBadge.innerHTML = `<i class="fas fa-bolt" style="color:var(--cyan)"></i> ${escapeHtml(r.engineLabel || 'Sahadat Smart Preview')}`;
+      resultSourceBadge.innerHTML = `<i class="fas fa-bolt" style="color:var(--cyan)"></i> Sahadat Smart Preview`;
       resultSourceBadge.style.borderColor = 'rgba(0, 200, 255, 0.35)';
       resultSourceBadge.style.color = 'var(--cyan)';
     }
@@ -3149,21 +3203,85 @@ ${kwLis}
       .join('');
   }
 
-  // ── EVENT LISTENERS: API KEY TOGGLE & SECRETS MANAGEMENT ──
+  // ── EVENT LISTENERS: API KEY TOGGLE & PASSWORD-PROTECTED SECRETS MANAGEMENT ──
   openApiSecretsBtn.addEventListener('click', () => openApiSecretsModal());
-  closeApiSecretsBtn.addEventListener('click', closeApiSecretsModal);
+  closeApiSecretsBtn.addEventListener('click', () => closeApiSecretsModal(true));
+  if (apiSecretsLockBtn) {
+    apiSecretsLockBtn.addEventListener('click', () => {
+      unlockedAdminPassword = '';
+      lastVerifiedAdminData = null;
+      resetApiSecretsModalToLocked();
+      showToast('API Secrets locked.', 'info');
+      setTimeout(() => {
+        if (apiSecretsPasswordInput) apiSecretsPasswordInput.focus();
+      }, 60);
+    });
+  }
   apiSecretsDoneBtn.addEventListener('click', () => {
-    // Sync active provider to whichever tab user configured if it has keys
-    const tabProv = state.modalProviderTab;
-    if (secretsVault.providers[tabProv].keys.length > 0) {
-      secretsVault.activeProvider = tabProv;
-      saveSecretsVault();
+    if (secretsUnlocked) {
+      const tabProv = state.modalProviderTab;
+      if (secretsVault.providers[tabProv].keys.length > 0) {
+        secretsVault.activeProvider = tabProv;
+        saveSecretsVault();
+      }
     }
-    closeApiSecretsModal();
+    closeApiSecretsModal(true);
   });
   apiSecretsBackdrop.addEventListener('click', e => {
-    if (e.target === apiSecretsBackdrop) closeApiSecretsModal();
+    if (e.target === apiSecretsBackdrop) closeApiSecretsModal(true);
   });
+
+  if (apiSecretsUnlockForm) {
+    apiSecretsUnlockForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      setApiSecretsFeedback('', '');
+      const proxyUrl = getActiveProxyUrl();
+      const password = apiSecretsPasswordInput.value.trim();
+      if (!proxyUrl) {
+        setApiSecretsFeedback('Cloudflare Worker URL is not configured.', 'error');
+        return;
+      }
+      if (!password) {
+        setApiSecretsFeedback('Please enter the admin password.', 'error');
+        return;
+      }
+      apiSecretsUnlockBtn.disabled = true;
+      apiSecretsUnlockBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+      try {
+        const res = await fetch(`${proxyUrl}/admin/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          setApiSecretsFeedback(data.error || 'Incorrect password.', 'error');
+          apiSecretsPasswordInput.select();
+          return;
+        }
+        unlockedAdminPassword = password;
+        lastVerifiedAdminData = data;
+        secretsUnlocked = true;
+        apiSecretsPasswordInput.value = '';
+        if (pendingToggleAfterUnlock !== null) {
+          secretsVault.useOwnKey = pendingToggleAfterUnlock;
+          saveSecretsVault();
+          pendingToggleAfterUnlock = null;
+        }
+        if (apiSecretsModalBox) apiSecretsModalBox.classList.add('wide-modal');
+        if (apiSecretsLockGate) apiSecretsLockGate.classList.add('hidden');
+        if (apiSecretsUnlockedBody) apiSecretsUnlockedBody.classList.remove('hidden');
+        renderApiSecretsModal();
+        syncApiToggleUI();
+        showToast('API Secrets Management unlocked!', 'success');
+      } catch {
+        setApiSecretsFeedback('Could not reach verification server. Please try again.', 'error');
+      } finally {
+        apiSecretsUnlockBtn.disabled = false;
+        apiSecretsUnlockBtn.innerHTML = '<i class="fas fa-unlock-keyhole"></i> Unlock API Secrets';
+      }
+    });
+  }
 
   function handleOwnKeyToggleChange(checked) {
     secretsVault.useOwnKey = checked;
@@ -3181,8 +3299,26 @@ ${kwLis}
     }
   }
 
-  useOwnKeyToggle.addEventListener('change', e => handleOwnKeyToggleChange(e.target.checked));
-  modalOwnKeyToggle.addEventListener('change', e => handleOwnKeyToggleChange(e.target.checked));
+  useOwnKeyToggle.addEventListener('click', e => {
+    if (!secretsUnlocked) {
+      e.preventDefault();
+      openApiSecretsModal(secretsVault.activeProvider, !secretsVault.useOwnKey);
+    }
+  });
+  useOwnKeyToggle.addEventListener('change', e => {
+    if (!secretsUnlocked) {
+      e.target.checked = secretsVault.useOwnKey;
+      return;
+    }
+    handleOwnKeyToggleChange(e.target.checked);
+  });
+  modalOwnKeyToggle.addEventListener('change', e => {
+    if (!secretsUnlocked) {
+      e.target.checked = secretsVault.useOwnKey;
+      return;
+    }
+    handleOwnKeyToggleChange(e.target.checked);
+  });
 
   quickProviderSelect.addEventListener('change', e => {
     secretsVault.activeProvider = e.target.value;
@@ -3345,8 +3481,10 @@ ${kwLis}
   });
 
   openAdminFromSecretsBtn.addEventListener('click', () => {
-    closeApiSecretsModal();
-    openAdminModal();
+    const verifiedPwd = unlockedAdminPassword;
+    const verifiedData = lastVerifiedAdminData;
+    closeApiSecretsModal(false);
+    openAdminModal(verifiedPwd, verifiedData);
   });
 
   // ── EVENT LISTENERS: MODE, SLIDERS, PLATFORMS, PROMPT STYLES ──
@@ -3906,7 +4044,6 @@ ${kwLis}
   });
 
   // ── PASSWORD-PROTECTED SITE ADMIN MODAL (CLOUDFLARE WORKER) ──
-  let unlockedAdminPassword = '';
   let lastServerActiveProvider = 'openrouter';
   let lastDetectedAdminProvider = 'openrouter';
 
@@ -4073,12 +4210,36 @@ ${kwLis}
     });
   }
 
-  function openAdminModal() {
+  function openAdminModal(verifiedPwd = '', verifiedData = null) {
     resetAdminModalToLocked();
+    if (verifiedPwd && verifiedData) {
+      unlockedAdminPassword = verifiedPwd;
+      lastServerActiveProvider = verifiedData.activeProvider || 'openrouter';
+      lastDetectedAdminProvider = lastServerActiveProvider;
+      adminActiveProvider.textContent = verifiedData.providerLabel || 'OpenRouter';
+      adminActiveModel.textContent = verifiedData.activeModel || 'Auto default';
+      adminMaskedKey.textContent = verifiedData.maskedKey || 'Not set';
+      adminUpdatedAt.textContent = verifiedData.updatedAt && verifiedData.updatedAt !== 'Initial secret'
+        ? new Date(verifiedData.updatedAt).toLocaleString()
+        : (verifiedData.updatedAt || 'Initial secret');
+      adminProviderSelect.value = 'auto';
+      adminCustomEndpointRow.classList.add('hidden');
+      adminEndpointInput.value = verifiedData.activeEndpoint || '';
+      adminModelInput.value = verifiedData.activeModel || '';
+      refreshAdminPresetModels(true);
+      adminUnlockForm.classList.add('hidden');
+      adminUpdateForm.classList.remove('hidden');
+      setAdminFeedback('Unlocked. Paste any API key and choose or type any Model ID below.', 'success');
+    }
     adminModalBackdrop.classList.add('open');
     setTimeout(() => {
-      if (workerUrlRow && !workerUrlRow.classList.contains('hidden') && !adminWorkerUrlInput.value) adminWorkerUrlInput.focus();
-      else if (adminPasswordInput) adminPasswordInput.focus();
+      if (verifiedPwd && verifiedData) {
+        if (adminNewKeyInput) adminNewKeyInput.focus();
+      } else if (workerUrlRow && !workerUrlRow.classList.contains('hidden') && !adminWorkerUrlInput.value) {
+        adminWorkerUrlInput.focus();
+      } else if (adminPasswordInput) {
+        adminPasswordInput.focus();
+      }
     }, 60);
   }
 
