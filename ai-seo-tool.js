@@ -490,8 +490,6 @@
 
   const generateBtn = document.getElementById('generateBtn');
   const generateBtnLabel = document.getElementById('generateBtnLabel');
-  const generateAllBtn = document.getElementById('generateAllBtn');
-  const generateAllBtnLabel = document.getElementById('generateAllBtnLabel');
   const stopBatchBtnSide = document.getElementById('stopBatchBtnSide');
 
   const platformGrid = document.getElementById('platformGrid');
@@ -1090,15 +1088,12 @@
     const n = state.files.length;
     if (n > 1) {
       generateBtnLabel.textContent = state.mode === 'prompt'
-        ? `Generate Separate Prompts (${n} Files)`
-        : `Generate Separate SEO (${n} Files)`;
+        ? `Generate Separate Prompts (${n} Files · ${batchSpeedSelect.value}x)`
+        : `Generate Separate SEO (${n} Files · ${batchSpeedSelect.value}x)`;
     } else if (state.mode === 'prompt') {
       generateBtnLabel.textContent = `Generate AI Prompt (${engineLabel})`;
     } else {
       generateBtnLabel.textContent = `Generate ${state.tagCount} SEO Tags (${engineLabel})`;
-    }
-    if (generateAllBtnLabel) {
-      generateAllBtnLabel.textContent = `Generate All ${n} Separately (${batchSpeedSelect.value}x)`;
     }
   }
 
@@ -1548,8 +1543,6 @@
     fileQueueWrap.classList.toggle('hidden', total < 2);
 
     generateBtn.disabled = total === 0 || state.isGenerating || state.batchRunning;
-    generateAllBtn.classList.toggle('hidden', total < 2 || state.batchRunning);
-    generateAllBtn.disabled = state.batchRunning || state.isGenerating;
     stopBatchBtnSide.classList.toggle('hidden', !state.batchRunning);
 
     clearFilesBtn.disabled = total === 0 || state.batchRunning;
@@ -3710,7 +3703,6 @@ ${kwLis}
     if (entry) generateForEntry(entry, false);
   });
 
-  generateAllBtn.addEventListener('click', runConcurrentBatch);
   runBatchBtn.addEventListener('click', runConcurrentBatch);
 
   const abortBatch = () => {
