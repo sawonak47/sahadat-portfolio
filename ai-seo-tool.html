@@ -1617,10 +1617,80 @@
     .batch-card-exports {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-      padding-top: 10px;
+      gap: 7px;
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1px solid var(--border);
+    }
+    .serial-preview-stage {
+      position: relative;
+      height: 215px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background-color: rgba(13, 13, 26, 0.45);
+      background-image:
+        linear-gradient(45deg, rgba(108, 62, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(108, 62, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(108, 62, 255, 0.06) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(108, 62, 255, 0.06) 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+    .serial-preview-stage img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    }
+    .serial-preview-zoom {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(13, 13, 26, 0.78);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      pointer-events: none;
+    }
+    .serial-scan-laser {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--violet), transparent);
+      box-shadow: 0 0 16px var(--cyan);
+      top: 0;
+      animation: serial-laser 1.6s ease-in-out infinite;
+    }
+    @keyframes serial-laser {
+      0% { top: 5%; opacity: 0.9; }
+      50% { top: 92%; opacity: 1; }
+      100% { top: 5%; opacity: 0.9; }
+    }
+    .serial-loading-inline {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 200, 255, 0.3);
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.09), rgba(0, 200, 255, 0.06));
+    }
+    [data-theme="light"] .serial-preview-stage {
+      background-color: #F8FAFF;
     }
     [data-theme="light"] .file-options-bar {
       background: #F5F3FF;
@@ -2491,17 +2561,7 @@
       <section class="seo-panel" aria-live="polite">
         <div class="panel-title-row">
           <h2 class="panel-title"><i class="fas fa-cloud-arrow-up"></i> Upload Workspace &amp; Output</h2>
-          <div class="flex flex-wrap items-center gap-2">
-            <span id="resultSourceBadge" class="format-badge hidden"></span>
-            <div class="view-switcher" role="group" aria-label="Results view mode">
-              <button id="viewDetailBtn" class="view-switch-btn active" type="button" title="Single focused editor for selected file">
-                <i class="fas fa-sparkles"></i> Single
-              </button>
-              <button id="viewBatchBtn" class="view-switch-btn" type="button" title="Separate full options and SEO cards for every uploaded file">
-                <i class="fas fa-layer-group"></i> Separate Cards
-              </button>
-            </div>
-          </div>
+          <span id="resultSourceBadge" class="format-badge hidden"></span>
         </div>
 
         <!-- 18 STOCK & SEO PLATFORM SELECTOR -->
@@ -2606,11 +2666,11 @@
           </div>
         </div>
 
-        <!-- UPLOADED FILE QUEUE THUMBNAILS -->
+        <!-- UPLOADED FILE QUEUE JUMP STRIP (SHOWN WHEN 2+ FILES) -->
         <div id="fileQueueWrap" class="hidden">
           <div class="flex items-center justify-between mt-3">
-            <span class="control-label">Queue (<span id="fileCountNum">0</span>) — click any file to inspect</span>
-            <span class="font-mono text-xs" style="color:var(--text-muted)">Click preview to zoom</span>
+            <span class="control-label">Uploaded Files (<span id="fileCountNum">0</span>) — click any thumbnail to jump</span>
+            <span class="font-mono text-xs" style="color:var(--text-muted)">Shown serially below</span>
           </div>
           <div class="file-queue" id="fileQueue"></div>
         </div>
@@ -2663,224 +2723,7 @@
           </div>
         </div>
 
-        <!-- LOADING STATE -->
-        <div id="loadingResults" class="ai-loading-box hidden">
-          <div class="ai-loader-emblem">
-            <div class="ai-spinner-ring"></div>
-            <div class="ai-spinner-ring inner"></div>
-            <svg class="ai-loader-star" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="sahadatLoaderGrad" x1="4" y1="4" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stop-color="#6C3EFF"/>
-                  <stop offset="52%" stop-color="#00C8FF"/>
-                  <stop offset="100%" stop-color="#FF6B9D"/>
-                </linearGradient>
-              </defs>
-              <path d="M18 3L21.7 14.3L33 18L21.7 21.7L18 33L14.3 21.7L3 18L14.3 14.3L18 3Z" fill="url(#sahadatLoaderGrad)"/>
-            </svg>
-          </div>
-          <h3 class="font-display font-bold text-xl mb-2">Sahadat AI is analyzing your file...</h3>
-          <p id="loadingStepText" class="font-mono text-xs" style="color:var(--cyan)">Inspecting visual composition, text &amp; metadata</p>
-          <div class="ai-progress-bar"><div class="ai-progress-fill"></div></div>
-        </div>
-
-        <!-- DETAIL VIEW: SINGLE ACTIVE FILE RICH EDITOR -->
-        <div id="resultsContent" class="hidden mt-4">
-
-          <!-- Active File Mini Preview + Quick Actions -->
-          <div class="active-preview-banner">
-            <button type="button" class="active-thumb-btn" id="activeThumbZoomBtn" title="Click to view full preview">
-              <img id="activePreviewImg" src="" alt="Active file preview" />
-              <span class="active-thumb-zoom"><i class="fas fa-expand"></i></span>
-            </button>
-            <div class="flex-1 min-w-0">
-              <div class="flex flex-wrap items-center gap-2 mb-1">
-                <strong id="previewFileName" class="font-display text-sm truncate" style="max-width:280px">file.png</strong>
-                <span class="format-badge" id="resultFileBadge">PNG</span>
-              </div>
-              <p id="previewFileSpecs" class="font-mono text-xs" style="color:var(--text-muted)">0 × 0 · 0 KB</p>
-              <div class="flex flex-wrap items-center gap-2 mt-2.5">
-                <button id="regenerateSingleBtn" class="mini-copy-btn" type="button" title="Regenerate metadata for this file">
-                  <i class="fas fa-rotate"></i> Regenerate
-                </button>
-                <button id="downloadSingleSeoFileBtn" class="mini-copy-btn seo-file-accent" type="button" title="Download this file with EXIF/IPTC/XMP SEO embedded and AI footprints scrubbed">
-                  <i class="fas fa-file-shield"></i> SEO File
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- PROMPT MODE RESULT PANEL -->
-          <div id="promptResultWrap" class="hidden">
-            <div class="seo-result-card mb-4">
-              <div class="seo-result-header">
-                <span class="seo-result-label"><i class="fas fa-wand-magic-sparkles"></i> Generated AI Prompt</span>
-                <div class="flex items-center gap-2">
-                  <span class="char-pill" id="promptWordCount">0 words</span>
-                  <button class="mini-copy-btn copy-all-accent" type="button" data-copy-target="outGeneratedPrompt"><i class="fas fa-copy"></i> Copy Prompt</button>
-                </div>
-              </div>
-              <textarea id="outGeneratedPrompt" class="seo-editable" rows="5" placeholder="Generated reverse-engineered AI prompt..."></textarea>
-            </div>
-          </div>
-
-          <!-- METADATA MODE RESULT PANEL -->
-          <div id="metadataResultWrap">
-            <!-- SEO Score & Quick File Audit -->
-            <div class="seo-score-banner">
-              <div class="score-ring" id="scoreRing">
-                <svg viewBox="0 0 80 80" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="sahadatScoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#6C3EFF"/>
-                      <stop offset="60%" stop-color="#00C8FF"/>
-                      <stop offset="100%" stop-color="#22c55e"/>
-                    </linearGradient>
-                  </defs>
-                  <circle class="score-track" cx="40" cy="40" r="34"></circle>
-                  <circle class="score-arc" id="scoreArc" cx="40" cy="40" r="34"></circle>
-                </svg>
-                <span class="num" id="seoScoreNum">92</span>
-                <span class="lbl">SEO</span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-2">
-                  <strong class="font-display text-base" id="seoGradeTitle">Strong SEO Readiness</strong>
-                  <span class="format-badge" id="resultCategoryBadge" style="color:var(--violet)">Category: Graphic Resources</span>
-                </div>
-                <div class="score-tips" id="seoTipsWrap"></div>
-              </div>
-            </div>
-
-            <!-- SEO Title & Slug -->
-            <div class="seo-fields-grid two-col">
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-heading"></i> SEO Title</span>
-                  <div class="flex items-center gap-2">
-                    <span class="char-pill" id="titleCharCount">0 chars</span>
-                    <button class="mini-copy-btn" type="button" data-copy-target="outSeoTitle"><i class="fas fa-copy"></i> Copy</button>
-                  </div>
-                </div>
-                <textarea id="outSeoTitle" class="seo-editable" rows="2"></textarea>
-              </div>
-
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-link"></i> SEO Filename / Slug</span>
-                  <button class="mini-copy-btn" type="button" data-copy-target="outSeoSlug"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <textarea id="outSeoSlug" class="seo-editable mono" rows="2"></textarea>
-              </div>
-            </div>
-
-            <!-- Meta Description & Alt Text -->
-            <div class="seo-fields-grid two-col">
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-align-left"></i> Meta Description</span>
-                  <div class="flex items-center gap-2">
-                    <span class="char-pill" id="descCharCount">0 chars</span>
-                    <button class="mini-copy-btn" type="button" data-copy-target="outMetaDesc"><i class="fas fa-copy"></i> Copy</button>
-                  </div>
-                </div>
-                <textarea id="outMetaDesc" class="seo-editable" rows="3"></textarea>
-              </div>
-
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-universal-access"></i> Image / Asset Alt Text</span>
-                  <button class="mini-copy-btn" type="button" data-copy-target="outAltText"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <textarea id="outAltText" class="seo-editable" rows="3"></textarea>
-              </div>
-            </div>
-
-            <!-- SEO Caption & Category -->
-            <div class="seo-fields-grid two-col">
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-quote-left"></i> SEO Caption / Post Copy</span>
-                  <button class="mini-copy-btn" type="button" data-copy-target="outCaption"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <textarea id="outCaption" class="seo-editable" rows="2"></textarea>
-              </div>
-
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-folder-tree"></i> Stock Category (Adobe / Shutter)</span>
-                </div>
-                <select id="outCategorySelect" class="seo-select compact mt-1">
-                  <option value="1">1 — Animals</option>
-                  <option value="2">2 — Buildings and Architecture</option>
-                  <option value="3">3 — Business</option>
-                  <option value="4">4 — Drinks</option>
-                  <option value="5">5 — The Environment</option>
-                  <option value="6">6 — States of Mind</option>
-                  <option value="7">7 — Food</option>
-                  <option value="8" selected>8 — Graphic Resources</option>
-                  <option value="9">9 — Hobbies and Leisure</option>
-                  <option value="10">10 — Industry</option>
-                  <option value="11">11 — Landscapes</option>
-                  <option value="12">12 — Lifestyle</option>
-                  <option value="13">13 — People</option>
-                  <option value="14">14 — Plants and Flowers</option>
-                  <option value="15">15 — Culture and Religion</option>
-                  <option value="16">16 — Science</option>
-                  <option value="17">17 — Social Issues</option>
-                  <option value="18">18 — Sports</option>
-                  <option value="19">19 — Technology</option>
-                  <option value="20">20 — Transport</option>
-                  <option value="21">21 — Travel</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- SEO Tags & Keywords Cloud -->
-            <div class="tags-section">
-              <div class="tags-toolbar">
-                <div class="flex items-center gap-2">
-                  <span class="seo-result-label"><i class="fas fa-tags"></i> SEO Tags &amp; Keywords</span>
-                  <span class="tag-count-badge" id="selectedTagsCounter">50 / 50</span>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                  <button id="editKeywordsModeBtn" class="mini-copy-btn" type="button" title="Toggle comma-separated keyword editor">
-                    <i class="fas fa-pen"></i> Edit
-                  </button>
-                  <button id="copyAllTagsBtn" class="mini-copy-btn copy-all-accent" type="button"><i class="fas fa-copy"></i> Copy All</button>
-                  <button id="toggleAllTagsBtn" class="mini-copy-btn" type="button">Clear Selection</button>
-                </div>
-              </div>
-
-              <div id="tagsCloudWrap">
-                <p class="font-mono text-xs mb-2.5" style="color:var(--text-muted)">
-                  Click any tag to include/exclude it, or click <strong>Edit</strong> to bulk-edit comma-separated keywords.
-                </p>
-                <div class="tags-cloud" id="tagsCloud"></div>
-              </div>
-
-              <div id="keywordsRawEditWrap" class="hidden">
-                <textarea id="keywordsRawTextarea" class="seo-textarea font-mono text-xs" rows="5" placeholder="Enter keywords separated by commas..."></textarea>
-                <div class="flex justify-end mt-2">
-                  <button id="doneEditKeywordsBtn" class="mini-copy-btn copy-all-accent" type="button"><i class="fas fa-check"></i> Done Editing</button>
-                </div>
-              </div>
-
-              <!-- Copy & Export Bar -->
-              <div class="copy-actions-bar">
-                <button id="copyCommaBtn" class="action-btn primary" type="button"><i class="fas fa-copy"></i> Copy Comma Tags</button>
-                <button id="copyHashtagsBtn" class="action-btn" type="button"><i class="fas fa-hashtag"></i> Copy #Hashtags</button>
-                <button id="copyLinesBtn" class="action-btn" type="button"><i class="fas fa-list"></i> Copy Lines</button>
-                <button id="copyHtmlBtn" class="action-btn" type="button"><i class="fas fa-code"></i> Copy HTML Meta</button>
-                <button id="exportCsvBtn" class="action-btn" type="button"><i class="fas fa-file-csv"></i> CSV</button>
-                <button id="exportTxtBtn" class="action-btn" type="button"><i class="fas fa-file-alt"></i> TXT</button>
-                <button id="exportJsonBtn" class="action-btn" type="button"><i class="fas fa-file-code"></i> JSON</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- BATCH CARDS VIEW: ALL UPLOADED FILES STACKED -->
+        <!-- CONTINUOUS SERIAL OUTPUT STREAM: FILE #1 (IMAGE -> SEO/METADATA/TAGS) -> FILE #2 -> ... -->
         <div id="batchResultsList" class="batch-cards-list hidden"></div>
       </section>
 
