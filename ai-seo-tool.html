@@ -2293,6 +2293,97 @@
       text-overflow: ellipsis;
     }
 
+    /* ── CENTERED PERSISTENT DAILY QUOTA WARNING POPUP BOX ── */
+    .quota-popup-modal {
+      position: relative;
+      max-width: 580px;
+      padding: 36px 32px 30px;
+      text-align: center;
+      border: 2px solid rgba(245, 158, 11, 0.55);
+      border-radius: 24px;
+      background: var(--bg-card-solid);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+    }
+    [data-theme="light"] .quota-popup-modal {
+      background: #FFFFFF;
+      border-color: rgba(217, 119, 6, 0.45);
+      box-shadow: 0 24px 64px rgba(15, 23, 42, 0.24);
+    }
+    .quota-popup-close-x {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .quota-popup-close-x:hover {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.14);
+      color: #ef4444;
+      transform: scale(1.05);
+    }
+    [data-theme="light"] .quota-popup-close-x {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+      color: #334155;
+    }
+    .quota-popup-icon {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 20px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(255, 107, 157, 0.16));
+      border: 2px solid rgba(245, 158, 11, 0.48);
+      color: #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem;
+    }
+    [data-theme="light"] .quota-popup-icon {
+      background: linear-gradient(135deg, #FEF3C7, #FFE4E6);
+      border-color: rgba(217, 119, 6, 0.4);
+      color: #D97706;
+    }
+    .quota-popup-title {
+      font-family: var(--font-display);
+      font-size: 1.38rem;
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text-primary);
+      margin: 0 0 12px;
+      padding: 0 12px;
+    }
+    .quota-popup-text {
+      font-size: 1.04rem;
+      font-weight: 500;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin: 0 0 26px;
+      padding: 0 8px;
+    }
+    .quota-popup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .quota-popup-actions .action-btn {
+      padding: 12px 22px;
+      font-size: 0.92rem;
+    }
+
     /* Ensure .hidden always overrides local flex/grid components */
     .empty-results.hidden,
     .ai-loading-box.hidden,
@@ -2653,7 +2744,7 @@
           <div class="quota-warning-left">
             <div class="quota-warning-icon"><i class="fas fa-triangle-exclamation"></i></div>
             <div class="min-w-0">
-              <div id="quotaWarningTitle" class="quota-warning-title">Today's Free Sahadat AI daily quota is full... Come Back Tomorrow.</div>
+              <div id="quotaWarningTitle" class="quota-warning-title">Today's Free Sahadat AI daily quota is full. Come Back Tomorrow.</div>
               <p id="quotaWarningText" class="quota-warning-text">
                 Or click 'Use My Own API Key' to continue immediately with your own key.
               </p>
@@ -3176,6 +3267,32 @@
     </div>
   </div>
 
+  <!-- CENTERED PERSISTENT DAILY QUOTA WARNING POPUP BOX -->
+  <div id="quotaPopupBackdrop" class="ai-modal-backdrop" role="alertdialog" aria-modal="true" aria-labelledby="quotaPopupTitle" aria-describedby="quotaPopupText">
+    <div class="ai-modal quota-popup-modal">
+      <button id="closeQuotaPopupBtn" class="quota-popup-close-x" type="button" title="Close warning" aria-label="Close warning">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="quota-popup-icon">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+      <h3 id="quotaPopupTitle" class="quota-popup-title">
+        Today's Free Sahadat AI daily quota is full. Come Back Tomorrow.
+      </h3>
+      <p id="quotaPopupText" class="quota-popup-text">
+        Or click 'Use My Own API Key' to continue immediately with your own key.
+      </p>
+      <div class="quota-popup-actions">
+        <button type="button" id="quotaPopupUseKeyBtn" class="action-btn primary">
+          <i class="fas fa-key"></i> Use My Own API Key
+        </button>
+        <button type="button" id="quotaPopupDismissBtn" class="action-btn">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- IMAGE LIGHTBOX MODAL -->
   <div id="lightboxBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-label="Full Image Preview">
     <div class="lightbox-card">
@@ -3199,7 +3316,7 @@
     <i class="fas fa-chevron-up"></i>
   </button>
 
-  <script src="script.js?v=9"></script>
-  <script src="ai-seo-tool.js?v=9"></script>
+  <script src="script.js?v=10"></script>
+  <script src="ai-seo-tool.js?v=10"></script>
 </body>
 </html>

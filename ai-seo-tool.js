@@ -589,6 +589,14 @@
   const visitorClearKeyBtn = document.getElementById('visitorClearKeyBtn');
   const visitorSaveKeyBtn = document.getElementById('visitorSaveKeyBtn');
 
+  // Centered Persistent Quota Warning Popup DOM
+  const quotaPopupBackdrop = document.getElementById('quotaPopupBackdrop');
+  const closeQuotaPopupBtn = document.getElementById('closeQuotaPopupBtn');
+  const quotaPopupTitle = document.getElementById('quotaPopupTitle');
+  const quotaPopupText = document.getElementById('quotaPopupText');
+  const quotaPopupUseKeyBtn = document.getElementById('quotaPopupUseKeyBtn');
+  const quotaPopupDismissBtn = document.getElementById('quotaPopupDismissBtn');
+
   // API Secrets Management Modal DOM
   const apiSecretsBackdrop = document.getElementById('apiSecretsBackdrop');
   const apiSecretsModalBox = document.getElementById('apiSecretsModalBox');
@@ -743,32 +751,34 @@
     return Boolean(getActiveProxyUrl() || getLegacyLocalApiKey());
   }
 
-  let quotaBannerScrolledThisRun = false;
+  let quotaPopupShownThisRun = false;
+
+  function closeQuotaPopup() {
+    if (quotaPopupBackdrop) quotaPopupBackdrop.classList.remove('open');
+  }
 
   function showQuotaWarningBanner(isQuotaLimit = true) {
-    if (!quotaLimitBanner) return;
-    if (quotaWarningTitle) {
-      quotaWarningTitle.textContent = isQuotaLimit
-        ? "Today's Free Sahadat AI daily quota is full... Come Back Tomorrow."
-        : 'Sahadat AI server is temporarily unavailable today... Come Back Later.';
-    }
-    if (quotaWarningText) {
-      quotaWarningText.textContent = "Or click 'Use My Own API Key' to continue immediately with your own key.";
-    }
-    quotaLimitBanner.classList.remove('hidden');
-    if (!quotaBannerScrolledThisRun) {
-      quotaBannerScrolledThisRun = true;
-      try {
-        quotaLimitBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch {
-        // ignore
-      }
+    const line1 = isQuotaLimit
+      ? "Today's Free Sahadat AI daily quota is full. Come Back Tomorrow."
+      : 'Sahadat AI server is temporarily unavailable today. Come Back Later.';
+    const line2 = "Or click 'Use My Own API Key' to continue immediately with your own key.";
+
+    if (quotaWarningTitle) quotaWarningTitle.textContent = line1;
+    if (quotaWarningText) quotaWarningText.textContent = line2;
+    if (quotaLimitBanner) quotaLimitBanner.classList.remove('hidden');
+
+    if (quotaPopupTitle) quotaPopupTitle.textContent = line1;
+    if (quotaPopupText) quotaPopupText.textContent = line2;
+    if (quotaPopupBackdrop && !quotaPopupShownThisRun) {
+      quotaPopupShownThisRun = true;
+      quotaPopupBackdrop.classList.add('open');
     }
   }
 
   function hideQuotaWarningBanner() {
-    quotaBannerScrolledThisRun = false;
+    quotaPopupShownThisRun = false;
     if (quotaLimitBanner) quotaLimitBanner.classList.add('hidden');
+    closeQuotaPopup();
   }
 
   function syncVisitorByokUI() {
@@ -2323,9 +2333,9 @@
 
     if (source === 'server') {
       if (isQuotaError(err)) {
-        return "Today's Free Sahadat AI daily quota is full... Come Back Tomorrow.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
+        return "Today's Free Sahadat AI daily quota is full. Come Back Tomorrow.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
       }
-      return "Sahadat AI server is temporarily unavailable today... Come Back Later.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
+      return "Sahadat AI server is temporarily unavailable today. Come Back Later.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
     }
 
     if (source === 'visitor_byok') {
@@ -2356,7 +2366,7 @@
     entry.status = 'processing';
     entry.errorMsg = '';
     if (!isPartOfBatch) {
-      quotaBannerScrolledThisRun = false;
+      quotaPopupShownThisRun = false;
       state.isGenerating = true;
     }
     updateQueueAndActionBar();
@@ -2388,8 +2398,7 @@
       entry.errorMsg = cleanErr;
       if (err && err.source === 'server') {
         showQuotaWarningBanner(isQuotaError(err));
-      }
-      if (!isPartOfBatch) {
+      } else if (!isPartOfBatch) {
         showToast(cleanErr, 'error');
       }
       return err;
@@ -2418,7 +2427,7 @@
     }
 
     const concurrency = Math.max(1, Math.min(4, parseInt(batchSpeedSelect.value, 10) || 2));
-    quotaBannerScrolledThisRun = false;
+    quotaPopupShownThisRun = false;
     state.batchRunning = true;
     state.batchAborted = false;
     let batchServerUnavailable = false;
@@ -2452,7 +2461,7 @@
     if (wasAborted) {
       showToast(`Batch stopped (${doneCount}/${state.files.length} completed).`, 'warn');
     } else if (batchServerUnavailable) {
-      showToast("Today's shared AI quota is unavailable — add your own free API key above to process all files!", 'warn');
+      // Big centered persistent quota popup is already open on screen
     } else if (doneCount === 0 && failedCount > 0) {
       const firstErr = state.files.find(f => f.errorMsg)?.errorMsg || 'AI generation failed.';
       showToast(firstErr, 'error');
@@ -4547,6 +4556,18 @@ ${kwLis}
   if (openVisitorByokFromBannerBtn) {
     openVisitorByokFromBannerBtn.addEventListener('click', openVisitorByokModal);
   }
+  if (closeQuotaPopupBtn) {
+    closeQuotaPopupBtn.addEventListener('click', closeQuotaPopup);
+  }
+  if (quotaPopupDismissBtn) {
+    quotaPopupDismissBtn.addEventListener('click', closeQuotaPopup);
+  }
+  if (quotaPopupUseKeyBtn) {
+    quotaPopupUseKeyBtn.addEventListener('click', () => {
+      closeQuotaPopup();
+      openVisitorByokModal();
+    });
+  }
   if (dismissQuotaBannerBtn) {
     dismissQuotaBannerBtn.addEventListener('click', hideQuotaWarningBanner);
   }
@@ -4660,6 +4681,7 @@ ${kwLis}
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       if (lightboxBackdrop.classList.contains('open')) closeLightbox();
+      else if (quotaPopupBackdrop && quotaPopupBackdrop.classList.contains('open')) closeQuotaPopup();
       else if (visitorByokBackdrop && visitorByokBackdrop.classList.contains('open')) closeVisitorByokModal();
       else if (apiSecretsBackdrop.classList.contains('open')) closeApiSecretsModal();
       else if (adminModalBackdrop.classList.contains('open')) closeAdminModal();
