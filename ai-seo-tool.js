@@ -1690,7 +1690,8 @@
       'the', 'and', 'for', 'with', 'from', 'that', 'this', 'your', 'have', 'are', 'was',
       'were', 'been', 'will', 'into', 'about', 'over', 'after', 'before', 'between', 'under',
       'page', 'file', 'image', 'img', 'dsc', 'png', 'jpg', 'jpeg', 'webp', 'svg', 'pdf', 'mp4',
-      'mov', 'eps', 'copy', 'final', 'untitled', 'screenshot', 'whatsapp', 'document'
+      'mov', 'eps', 'copy', 'final', 'untitled', 'screenshot', 'whatsapp', 'document',
+      'test', 'sample', 'demo', 'temp', 'pic', 'picture', 'download', 'asset', 'photo'
     ]);
     return String(text || '')
       .toLowerCase()
@@ -1845,7 +1846,8 @@
     const categoryListText = Object.entries(STOCK_CATEGORIES).map(([id, name]) => `${id}=${name}`).join(', ');
     const sys = [
       'You are Sahadat AI, an elite microstock metadata & SEO specialist (Adobe Stock, Shutterstock, Freepik, Google SEO).',
-      'Analyze this specific visual/document carefully. Avoid trademarked brand names, camera brands, spam repetition, and fluff.',
+      'Inspect the actual image pixels carefully. Base ALL titles, descriptions, alt text, category, prompts, and keywords STRICTLY on what is visually depicted (subjects, animals/people/objects, actions, environment, lighting, composition, mood). IGNORE generic filenames like Test.jpg, IMG_1234, photo.png.',
+      'Avoid trademarked brand names, camera brands, spam repetition, and fluff.',
       'Return ONLY a valid raw JSON object (no markdown fences, no extra prose) with these exact keys:',
       '{',
       `  "seoTitle": "compelling commercial title between ${state.titleMinLen} and ${state.titleMaxLen} characters",`,
@@ -2097,7 +2099,9 @@
           });
           if (!res.ok) {
             const errTxt = await res.text().catch(() => '');
-            throw new Error(`HTTP ${res.status}: ${errTxt.slice(0, 180)}`);
+            const err = new Error(`HTTP ${res.status}: ${errTxt.slice(0, 260)}`);
+            err.status = res.status;
+            throw err;
           }
           const data = await res.json();
           rawText = data?.choices?.[0]?.message?.content || '';
@@ -2106,6 +2110,7 @@
           break;
         } catch (err) {
           lastErr = err;
+          if (err.status === 429 || err.status === 401 || err.status === 403) break;
         }
       }
       if (lastErr) throw lastErr;
@@ -2115,10 +2120,11 @@
     const entryPlatId = getEntryPlatform(entry);
     const entryTagCount = getEntryTagCount(entry);
     const parsed = parseJsonFromAiResponse(rawText);
-    const fallbackPool = buildFallbackPool(entry, [getEntryHint(entry), customPromptInput.value.trim()].filter(Boolean).join(' '));
+    const aiKeywords = Array.isArray(parsed.keywords) ? parsed.keywords : [];
+    const fallbackPool = aiKeywords.length ? [] : buildFallbackPool(entry, [getEntryHint(entry), customPromptInput.value.trim()].filter(Boolean).join(' '));
     const audit = computeFileAudit(entry);
-    const targetTagCount = entryMode === 'prompt' ? Math.max(10, Math.min(25, (parsed.keywords || []).length || 15)) : entryTagCount;
-    const keywords = enforceExactTags(parsed.keywords, targetTagCount, fallbackPool);
+    const targetTagCount = entryMode === 'prompt' ? Math.max(10, Math.min(25, aiKeywords.length || 15)) : entryTagCount;
+    const keywords = enforceExactTags(aiKeywords, targetTagCount, fallbackPool);
 
     const cleanSlug = String(parsed.seoSlug || '')
       .toLowerCase()
@@ -2148,6 +2154,18 @@
     };
   }
 
+  function formatAiErrorMessage(err) {
+    const msg = String(err && err.message || '');
+    const status = err && err.status;
+    if (status === 429 || /429|rate limit|free-models-per-day|quota|exceeded/i.test(msg)) {
+      return 'AI daily rate limit reached (HTTP 429). Open API Keys to add your own key (e.g. free Gemini key) or update the live server key in Site Admin.';
+    }
+    if (status === 401 || status === 403 || /401|403|unauthorized|invalid.*key|authentication/i.test(msg)) {
+      return 'API key rejected (HTTP 401/403). Please check or replace your API key in API Keys.';
+    }
+    return msg ? `AI analysis failed (${msg.slice(0, 140)}). Click Retry or switch API key.` : 'AI analysis failed — click Retry or check your API key.';
+  }
+
   // ── SINGLE & CONCURRENT BATCH GENERATION ──
   async function generateForEntry(entry, isPartOfBatch = false) {
     if (!entry) return;
@@ -2161,13 +2179,10 @@
     renderWorkspaceView();
 
     try {
-      let result;
-      if (hasLiveAI()) {
-        result = await callLiveAI(entry);
-      } else {
-        await new Promise(r => setTimeout(r, 420));
-        result = generateSmartLocalResult(entry);
+      if (!hasLiveAI()) {
+        throw new Error('No live AI server or API key is configured. Open API Keys to connect a provider.');
       }
+      const result = await callLiveAI(entry);
       entry.result = result;
       entry.status = 'done';
       saveToHistory(entry, result);
@@ -2181,22 +2196,12 @@
       }
     } catch (err) {
       console.error('Generation failed:', err);
-      if (isUsingBYOK()) {
-        entry.status = 'failed';
-        entry.errorMsg = err.message || 'API call failed';
-        if (!isPartOfBatch) {
-          showToast(err.message || 'BYOK API call failed — check your API key.', 'error');
-        }
-      } else {
-        // Graceful fallback for visitors when server is busy
-        const fallback = generateSmartLocalResult(entry);
-        fallback.engineMode = 'fallback';
-        fallback.engineLabel = 'Sahadat Smart Preview';
-        entry.result = fallback;
-        entry.status = 'done';
-        if (!isPartOfBatch) {
-          showToast('Generated smart SEO metadata (instant fallback mode).', 'info');
-        }
+      const cleanErr = formatAiErrorMessage(err);
+      entry.status = 'failed';
+      entry.result = null;
+      entry.errorMsg = cleanErr;
+      if (!isPartOfBatch) {
+        showToast(cleanErr, 'error');
       }
     } finally {
       if (!isPartOfBatch) {
@@ -2247,12 +2252,17 @@
     renderWorkspaceView();
 
     const doneCount = state.files.filter(f => f.status === 'done').length;
-    showToast(
-      wasAborted
-        ? `Batch stopped (${doneCount}/${state.files.length} completed).`
-        : `Batch complete! ${doneCount}/${state.files.length} files ready for CSV & SEO export.`,
-      wasAborted ? 'warn' : 'success'
-    );
+    const failedCount = state.files.filter(f => f.status === 'failed').length;
+    if (wasAborted) {
+      showToast(`Batch stopped (${doneCount}/${state.files.length} completed).`, 'warn');
+    } else if (doneCount === 0 && failedCount > 0) {
+      const firstErr = state.files.find(f => f.errorMsg)?.errorMsg || 'AI generation failed.';
+      showToast(firstErr, 'error');
+    } else if (failedCount > 0) {
+      showToast(`Batch finished: ${doneCount} done, ${failedCount} failed (click Retry or check API Keys).`, 'warn');
+    } else {
+      showToast(`Batch complete! ${doneCount}/${state.files.length} files ready for CSV & SEO export.`, 'success');
+    }
   }
 
   // ── RENDER CONTINUOUS SERIAL OUTPUT PAGE (IMAGE #1 -> SEO/METADATA/TAGS #1 -> IMAGE #2 -> ...) ──
@@ -2336,17 +2346,21 @@
             </div>
           `;
         } else if (!r) {
+          const isFailed = statusCls === 'failed';
           contentBelowImage = `
-            <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 rounded-xl" style="border:1px dashed var(--border);background:rgba(108,62,255,0.03)">
-              <span class="font-mono text-xs" style="color:var(--text-muted)">
-                ${statusCls === 'failed'
-                  ? `<i class="fas fa-triangle-exclamation mr-1" style="color:#ef4444"></i> ${escapeHtml(entry.errorMsg || 'Generation failed — click retry.')}`
+            <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 rounded-xl" style="border:1px ${isFailed ? 'solid rgba(239,68,68,0.45)' : 'dashed var(--border)'};background:${isFailed ? 'rgba(239,68,68,0.08)' : 'rgba(108,62,255,0.03)'}">
+              <span class="font-mono text-xs flex-1" style="color:${isFailed ? '#ef4444' : 'var(--text-muted)'};min-width:220px;line-height:1.55">
+                ${isFailed
+                  ? `<i class="fas fa-triangle-exclamation mr-1"></i> <strong>${escapeHtml(entry.errorMsg || 'Generation failed — click retry.')}</strong>`
                   : `Queued #${fileIdx + 1} · Ready for ${effMode === 'prompt' ? 'AI Prompt' : `${effTagCount} ${escapeHtml(platLabel)} SEO tags & metadata`}.`
                 }
               </span>
-              <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="regen" data-id="${entry.id}">
-                <i class="fas fa-wand-magic-sparkles"></i> ${statusCls === 'failed' ? 'Retry File' : 'Generate This File'}
-              </button>
+              <div class="flex items-center gap-2">
+                ${isFailed ? '<button type="button" class="mini-copy-btn" data-batch-action="open-keys"><i class="fas fa-key"></i> API Keys</button>' : ''}
+                <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="regen" data-id="${entry.id}">
+                  <i class="fas fa-wand-magic-sparkles"></i> ${isFailed ? 'Retry File' : 'Generate This File'}
+                </button>
+              </div>
             </div>
           `;
         } else if (effMode === 'prompt') {
@@ -3803,6 +3817,10 @@ ${kwLis}
     const actionEl = e.target.closest('[data-batch-action]');
     if (!actionEl) return;
     const action = actionEl.dataset.batchAction;
+    if (action === 'open-keys') {
+      openApiSecretsModal();
+      return;
+    }
     const id = actionEl.dataset.id;
     const entry = state.files.find(f => f.id === id);
     if (!entry) return;
