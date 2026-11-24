@@ -33,6 +33,7 @@
   const STORAGE_KEY_SECRETS = 'sahadat_ai_secrets_vault_v1';
   const STORAGE_KEY_CUSTOM_PROMPT = 'sahadat_ai_custom_system_prompt';
   const STORAGE_KEY_PREFS = 'sahadat_ai_seo_prefs_v1';
+  const STORAGE_KEY_VISITOR_BYOK = 'sahadat_ai_visitor_byok_v1';
 
   if (typeof window.pdfjsLib !== 'undefined') {
     window.pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -449,6 +450,51 @@
     return p.model || BYOK_PROVIDERS[provId].models[0].id;
   }
 
+  // ── VISITOR OWN API KEY (NO ADMIN PASSWORD REQUIRED — USED WHEN DAILY QUOTA IS FULL) ──
+  let visitorByok = {
+    enabled: false,
+    provider: 'gemini',
+    model: 'gemini-2.5-flash',
+    apiKey: ''
+  };
+
+  function loadVisitorByok() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_VISITOR_BYOK);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      const prov = BYOK_PROVIDERS[parsed.provider] ? parsed.provider : 'gemini';
+      const spec = BYOK_PROVIDERS[prov];
+      const model = spec.models.some(m => m.id === parsed.model) ? parsed.model : spec.models[0].id;
+      const apiKey = typeof parsed.apiKey === 'string' ? parsed.apiKey.trim() : '';
+      visitorByok = {
+        enabled: Boolean(parsed.enabled && apiKey),
+        provider: prov,
+        model,
+        apiKey
+      };
+    } catch {
+      visitorByok = { enabled: false, provider: 'gemini', model: 'gemini-2.5-flash', apiKey: '' };
+    }
+  }
+
+  function saveVisitorByok() {
+    try {
+      if (!visitorByok.apiKey) {
+        localStorage.removeItem(STORAGE_KEY_VISITOR_BYOK);
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY_VISITOR_BYOK, JSON.stringify({
+        enabled: Boolean(visitorByok.enabled),
+        provider: visitorByok.provider,
+        model: visitorByok.model,
+        apiKey: visitorByok.apiKey
+      }));
+    } catch {
+      // Ignore storage errors
+    }
+  }
+
   // ── DOM REFERENCES ──
   const openApiSecretsBtn = document.getElementById('openApiSecretsBtn');
   const engineChipLabel = document.getElementById('engineChipLabel');
@@ -517,6 +563,31 @@
   const resultSourceBadge = document.getElementById('resultSourceBadge');
   const emptyResults = document.getElementById('emptyResults');
   const batchResultsList = document.getElementById('batchResultsList');
+
+  // Daily Quota Warning Banner & Visitor Own API Key Modal DOM
+  const quotaLimitBanner = document.getElementById('quotaLimitBanner');
+  const quotaWarningTitle = document.getElementById('quotaWarningTitle');
+  const quotaWarningText = document.getElementById('quotaWarningText');
+  const openVisitorByokFromBannerBtn = document.getElementById('openVisitorByokFromBannerBtn');
+  const dismissQuotaBannerBtn = document.getElementById('dismissQuotaBannerBtn');
+  const visitorKeyActiveBar = document.getElementById('visitorKeyActiveBar');
+  const visitorKeyActiveLabel = document.getElementById('visitorKeyActiveLabel');
+  const editVisitorByokBtn = document.getElementById('editVisitorByokBtn');
+  const switchBackToServerBtn = document.getElementById('switchBackToServerBtn');
+
+  const visitorByokBackdrop = document.getElementById('visitorByokBackdrop');
+  const closeVisitorByokBtn = document.getElementById('closeVisitorByokBtn');
+  const visitorByokFeedback = document.getElementById('visitorByokFeedback');
+  const visitorByokForm = document.getElementById('visitorByokForm');
+  const visitorProvSelect = document.getElementById('visitorProvSelect');
+  const visitorModelSelect = document.getElementById('visitorModelSelect');
+  const visitorKeyInput = document.getElementById('visitorKeyInput');
+  const toggleVisitorKeyVisBtn = document.getElementById('toggleVisitorKeyVisBtn');
+  const visitorGetKeyLink = document.getElementById('visitorGetKeyLink');
+  const visitorGetKeyLabel = document.getElementById('visitorGetKeyLabel');
+  const visitorTestKeyBtn = document.getElementById('visitorTestKeyBtn');
+  const visitorClearKeyBtn = document.getElementById('visitorClearKeyBtn');
+  const visitorSaveKeyBtn = document.getElementById('visitorSaveKeyBtn');
 
   // API Secrets Management Modal DOM
   const apiSecretsBackdrop = document.getElementById('apiSecretsBackdrop');
@@ -658,11 +729,62 @@
     return Boolean(secretsVault.useOwnKey);
   }
 
+  function isUsingVisitorBYOK() {
+    return Boolean(!secretsVault.useOwnKey && visitorByok.enabled && visitorByok.apiKey && BYOK_PROVIDERS[visitorByok.provider]);
+  }
+
   function hasLiveAI() {
     if (isUsingBYOK()) {
       return Boolean(getSelectedKeyForProvider(secretsVault.activeProvider));
     }
+    if (isUsingVisitorBYOK()) {
+      return true;
+    }
     return Boolean(getActiveProxyUrl() || getLegacyLocalApiKey());
+  }
+
+  let quotaBannerScrolledThisRun = false;
+
+  function showQuotaWarningBanner(isQuotaLimit = true) {
+    if (!quotaLimitBanner) return;
+    if (quotaWarningTitle) {
+      quotaWarningTitle.textContent = isQuotaLimit
+        ? "Today's Free Sahadat AI Quota Is Full"
+        : 'Sahadat AI Server Is Temporarily Unavailable Today';
+    }
+    if (quotaWarningText) {
+      quotaWarningText.textContent = isQuotaLimit
+        ? 'Our shared free daily AI quota has been reached for today. Please add your own free API key (Gemini, OpenRouter, Groq, Mistral, OpenAI, or Claude) to keep generating right now — saved only in your browser.'
+        : 'Our shared AI server could not process requests right now. Please add your own free API key (Gemini, OpenRouter, Groq, Mistral, OpenAI, or Claude) to continue immediately — saved only in your browser.';
+    }
+    quotaLimitBanner.classList.remove('hidden');
+    if (!quotaBannerScrolledThisRun) {
+      quotaBannerScrolledThisRun = true;
+      try {
+        quotaLimitBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  function hideQuotaWarningBanner() {
+    quotaBannerScrolledThisRun = false;
+    if (quotaLimitBanner) quotaLimitBanner.classList.add('hidden');
+  }
+
+  function syncVisitorByokUI() {
+    if (!visitorKeyActiveBar) return;
+    if (isUsingVisitorBYOK()) {
+      const spec = BYOK_PROVIDERS[visitorByok.provider] || BYOK_PROVIDERS.gemini;
+      if (visitorKeyActiveLabel) {
+        visitorKeyActiveLabel.textContent = `${spec.label} · ${visitorByok.model}`;
+      }
+      visitorKeyActiveBar.classList.remove('hidden');
+      hideQuotaWarningBanner();
+    } else {
+      visitorKeyActiveBar.classList.add('hidden');
+    }
   }
 
   // ── SYNC SIDEBAR API TOGGLE + QUICK MODEL PICKER ──
@@ -725,11 +847,17 @@
     if (!secretsUnlocked) {
       if (apiQuickControls) apiQuickControls.classList.add('hidden');
       if (apiKeyMissingWarn) apiKeyMissingWarn.classList.add('hidden');
-      apiModeStatusSub.textContent = own
-        ? 'ON · Custom API Key Active (Password Protected)'
-        : 'OFF · Using Sahadat AI Server';
+      if (own) {
+        apiModeStatusSub.textContent = 'ON · Custom API Key Active (Password Protected)';
+      } else if (isUsingVisitorBYOK()) {
+        const vSpec = BYOK_PROVIDERS[visitorByok.provider] || BYOK_PROVIDERS.gemini;
+        apiModeStatusSub.textContent = `Using Your Own ${vSpec.label} API Key`;
+      } else {
+        apiModeStatusSub.textContent = 'OFF · Using Sahadat AI Server';
+      }
       engineChipLabel.textContent = 'API Keys';
       openApiSecretsBtn.classList.toggle('live', hasLiveAI());
+      syncVisitorByokUI();
       updateGenerateButtonLabels();
       return;
     }
@@ -751,11 +879,17 @@
       }
     } else {
       apiQuickControls.classList.add('hidden');
-      apiModeStatusSub.textContent = 'OFF · Using Sahadat AI Server';
+      if (isUsingVisitorBYOK()) {
+        const vSpec = BYOK_PROVIDERS[visitorByok.provider] || BYOK_PROVIDERS.gemini;
+        apiModeStatusSub.textContent = `Using Your Own ${vSpec.label} API Key`;
+      } else {
+        apiModeStatusSub.textContent = 'OFF · Using Sahadat AI Server';
+      }
       engineChipLabel.textContent = 'API Keys';
-      openApiSecretsBtn.classList.toggle('live', Boolean(getActiveProxyUrl() || getLegacyLocalApiKey()));
+      openApiSecretsBtn.classList.toggle('live', Boolean(getActiveProxyUrl() || getLegacyLocalApiKey() || isUsingVisitorBYOK()));
     }
 
+    syncVisitorByokUI();
     updateGenerateButtonLabels();
   }
 
@@ -1598,7 +1732,12 @@
     const anyDone = state.files.some(f => f.result);
     if (anyDone) {
       resultSourceBadge.classList.remove('hidden');
-      if (anyLive) {
+      if (isUsingVisitorBYOK()) {
+        const vSpec = BYOK_PROVIDERS[visitorByok.provider] || BYOK_PROVIDERS.gemini;
+        resultSourceBadge.innerHTML = `<i class="fas fa-key" style="color:var(--violet)"></i> Your ${escapeHtml(vSpec.label)} Key`;
+        resultSourceBadge.style.borderColor = 'rgba(108, 62, 255, 0.4)';
+        resultSourceBadge.style.color = 'var(--violet)';
+      } else if (anyLive) {
         resultSourceBadge.innerHTML = `<i class="fas fa-wand-magic-sparkles" style="color:#22c55e"></i> Sahadat AI Live`;
         resultSourceBadge.style.borderColor = 'rgba(34, 197, 94, 0.4)';
         resultSourceBadge.style.color = '#22c55e';
@@ -2056,7 +2195,22 @@
           break;
         }
       }
-      if (lastErr) throw lastErr;
+      if (lastErr) {
+        lastErr.source = 'owner_byok';
+        throw lastErr;
+      }
+    } else if (isUsingVisitorBYOK()) {
+      // Visitor's Own Personal API Key (stored strictly in visitor's browser)
+      const provId = visitorByok.provider;
+      const spec = BYOK_PROVIDERS[provId] || BYOK_PROVIDERS.gemini;
+      const modelId = visitorByok.model || spec.models[0].id;
+      try {
+        rawText = await callSingleByokKey(provId, visitorByok.apiKey, modelId, promptPack, maxTokens);
+        engineLabel = `Your ${spec.label} Key · ${modelId}`;
+      } catch (err) {
+        err.source = 'visitor_byok';
+        throw err;
+      }
     } else {
       // Default Sahadat AI Server Proxy (Cloudflare Worker)
       const proxyUrl = getActiveProxyUrl();
@@ -2113,7 +2267,11 @@
           if (err.status === 429 || err.status === 401 || err.status === 403) break;
         }
       }
-      if (lastErr) throw lastErr;
+      if (lastErr) {
+        lastErr.source = 'server';
+        throw lastErr;
+      }
+      hideQuotaWarningBanner();
     }
 
     const entryMode = getEntryMode(entry);
@@ -2154,14 +2312,41 @@
     };
   }
 
+  function isQuotaError(err) {
+    const msg = String(err && err.message || '');
+    const status = err && err.status;
+    return status === 429 || /429|rate limit|free-models-per-day|quota|exceeded|daily limit|credits/i.test(msg);
+  }
+
   function formatAiErrorMessage(err) {
     const msg = String(err && err.message || '');
     const status = err && err.status;
-    if (status === 429 || /429|rate limit|free-models-per-day|quota|exceeded/i.test(msg)) {
-      return 'AI daily rate limit reached (HTTP 429). Open API Keys to add your own key (e.g. free Gemini key) or update the live server key in Site Admin.';
+    const source = err && err.source;
+
+    if (source === 'server') {
+      if (isQuotaError(err)) {
+        return "Today's free Sahadat AI daily quota is full (HTTP 429). Click 'Use My Own API Key' to continue immediately with your own free key.";
+      }
+      return "Sahadat AI shared server is currently unavailable today. Click 'Use My Own API Key' to keep generating with your own free API key.";
+    }
+
+    if (source === 'visitor_byok') {
+      if (isQuotaError(err)) {
+        return "Your personal API key hit its rate/quota limit (HTTP 429). Click 'Use My Own API Key' to switch key or provider.";
+      }
+      if (status === 401 || status === 403 || /401|403|unauthorized|invalid.*key|authentication/i.test(msg)) {
+        return "Your personal API key was rejected (HTTP 401/403). Click 'Use My Own API Key' to check or replace it.";
+      }
+      return msg
+        ? `Your API key request failed (${msg.slice(0, 120)}). Click 'Use My Own API Key' or Retry.`
+        : "Your API key request failed — click 'Use My Own API Key' or Retry.";
+    }
+
+    if (isQuotaError(err)) {
+      return 'AI rate limit reached (HTTP 429). Switch to another API key or retry shortly.';
     }
     if (status === 401 || status === 403 || /401|403|unauthorized|invalid.*key|authentication/i.test(msg)) {
-      return 'API key rejected (HTTP 401/403). Please check or replace your API key in API Keys.';
+      return 'API key rejected (HTTP 401/403). Please check or replace your API key.';
     }
     return msg ? `AI analysis failed (${msg.slice(0, 140)}). Click Retry or switch API key.` : 'AI analysis failed — click Retry or check your API key.';
   }
@@ -2173,6 +2358,7 @@
     entry.status = 'processing';
     entry.errorMsg = '';
     if (!isPartOfBatch) {
+      quotaBannerScrolledThisRun = false;
       state.isGenerating = true;
     }
     updateQueueAndActionBar();
@@ -2180,7 +2366,9 @@
 
     try {
       if (!hasLiveAI()) {
-        throw new Error('No live AI server or API key is configured. Open API Keys to connect a provider.');
+        const err = new Error('No live AI server or API key is configured.');
+        err.source = 'server';
+        throw err;
       }
       const result = await callLiveAI(entry);
       entry.result = result;
@@ -2200,9 +2388,13 @@
       entry.status = 'failed';
       entry.result = null;
       entry.errorMsg = cleanErr;
+      if (err && err.source === 'server') {
+        showQuotaWarningBanner(isQuotaError(err));
+      }
       if (!isPartOfBatch) {
         showToast(cleanErr, 'error');
       }
+      return err;
     } finally {
       if (!isPartOfBatch) {
         state.isGenerating = false;
@@ -2210,6 +2402,7 @@
       updateQueueAndActionBar();
       renderWorkspaceView();
     }
+    return null;
   }
 
   async function runConcurrentBatch() {
@@ -2227,8 +2420,10 @@
     }
 
     const concurrency = Math.max(1, Math.min(4, parseInt(batchSpeedSelect.value, 10) || 2));
+    quotaBannerScrolledThisRun = false;
     state.batchRunning = true;
     state.batchAborted = false;
+    let batchServerUnavailable = false;
     // Automatically show Batch Cards when processing multiple files so user sees live progress on every card
     if (queue.length >= 2) {
       state.viewMode = 'batch';
@@ -2238,9 +2433,12 @@
 
     let pointer = 0;
     const workers = Array.from({ length: Math.min(concurrency, queue.length) }, async () => {
-      while (pointer < queue.length && !state.batchAborted) {
+      while (pointer < queue.length && !state.batchAborted && !batchServerUnavailable) {
         const entry = queue[pointer++];
-        await generateForEntry(entry, true);
+        const err = await generateForEntry(entry, true);
+        if (err && err.source === 'server') {
+          batchServerUnavailable = true;
+        }
       }
     });
 
@@ -2255,11 +2453,13 @@
     const failedCount = state.files.filter(f => f.status === 'failed').length;
     if (wasAborted) {
       showToast(`Batch stopped (${doneCount}/${state.files.length} completed).`, 'warn');
+    } else if (batchServerUnavailable) {
+      showToast("Today's shared AI quota is unavailable — add your own free API key above to process all files!", 'warn');
     } else if (doneCount === 0 && failedCount > 0) {
       const firstErr = state.files.find(f => f.errorMsg)?.errorMsg || 'AI generation failed.';
       showToast(firstErr, 'error');
     } else if (failedCount > 0) {
-      showToast(`Batch finished: ${doneCount} done, ${failedCount} failed (click Retry or check API Keys).`, 'warn');
+      showToast(`Batch finished: ${doneCount} done, ${failedCount} failed (click Retry or Use My Own API Key).`, 'warn');
     } else {
       showToast(`Batch complete! ${doneCount}/${state.files.length} files ready for CSV & SEO export.`, 'success');
     }
@@ -2356,7 +2556,11 @@
                 }
               </span>
               <div class="flex items-center gap-2">
-                ${isFailed ? '<button type="button" class="mini-copy-btn" data-batch-action="open-keys"><i class="fas fa-key"></i> API Keys</button>' : ''}
+                ${isFailed
+                  ? (isUsingBYOK() && secretsUnlocked
+                      ? '<button type="button" class="mini-copy-btn" data-batch-action="open-keys"><i class="fas fa-key"></i> API Keys</button>'
+                      : '<button type="button" class="mini-copy-btn" data-batch-action="open-visitor-keys"><i class="fas fa-key"></i> Use My Own API Key</button>')
+                  : ''}
                 <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="regen" data-id="${entry.id}">
                   <i class="fas fa-wand-magic-sparkles"></i> ${isFailed ? 'Retry File' : 'Generate This File'}
                 </button>
@@ -3821,6 +4025,10 @@ ${kwLis}
       openApiSecretsModal();
       return;
     }
+    if (action === 'open-visitor-keys') {
+      openVisitorByokModal();
+      return;
+    }
     const id = actionEl.dataset.id;
     const entry = state.files.find(f => f.id === id);
     if (!entry) return;
@@ -4276,9 +4484,181 @@ ${kwLis}
     });
   }
 
+  // ── VISITOR OWN API KEY MODAL & QUOTA BANNER EVENTS (NO ADMIN PASSWORD REQUIRED) ──
+  function setVisitorByokFeedback(msg, type) {
+    if (!visitorByokFeedback) return;
+    visitorByokFeedback.className = 'admin-feedback' + (type ? ' ' + type : '');
+    visitorByokFeedback.textContent = msg || '';
+  }
+
+  function syncVisitorProviderFields(provId, preferredModel = '') {
+    const spec = BYOK_PROVIDERS[provId] || BYOK_PROVIDERS.gemini;
+    if (visitorModelSelect) {
+      visitorModelSelect.innerHTML = spec.models
+        .map(m => `<option value="${escapeHtml(m.id)}">${escapeHtml(m.label)}</option>`)
+        .join('');
+      if (preferredModel && spec.models.some(m => m.id === preferredModel)) {
+        visitorModelSelect.value = preferredModel;
+      } else {
+        visitorModelSelect.value = spec.models[0].id;
+      }
+    }
+    if (visitorKeyInput) {
+      visitorKeyInput.placeholder = spec.placeholder;
+    }
+    if (visitorGetKeyLink) {
+      visitorGetKeyLink.href = spec.getKeyUrl;
+    }
+    if (visitorGetKeyLabel) {
+      visitorGetKeyLabel.textContent = spec.getKeyLabel;
+    }
+  }
+
+  function openVisitorByokModal() {
+    if (!visitorByokBackdrop) return;
+    setVisitorByokFeedback('', '');
+    const prov = BYOK_PROVIDERS[visitorByok.provider] ? visitorByok.provider : 'gemini';
+    if (visitorProvSelect) visitorProvSelect.value = prov;
+    syncVisitorProviderFields(prov, visitorByok.model);
+    if (visitorKeyInput) {
+      visitorKeyInput.value = visitorByok.apiKey || '';
+      visitorKeyInput.type = 'password';
+    }
+    if (toggleVisitorKeyVisBtn) {
+      toggleVisitorKeyVisBtn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+    if (visitorClearKeyBtn) {
+      visitorClearKeyBtn.classList.toggle('hidden', !visitorByok.apiKey);
+    }
+    visitorByokBackdrop.classList.add('open');
+    setTimeout(() => {
+      if (visitorKeyInput) visitorKeyInput.focus();
+    }, 60);
+  }
+
+  function closeVisitorByokModal() {
+    if (!visitorByokBackdrop) return;
+    visitorByokBackdrop.classList.remove('open');
+    setVisitorByokFeedback('', '');
+  }
+
+  if (openVisitorByokFromBannerBtn) {
+    openVisitorByokFromBannerBtn.addEventListener('click', openVisitorByokModal);
+  }
+  if (dismissQuotaBannerBtn) {
+    dismissQuotaBannerBtn.addEventListener('click', hideQuotaWarningBanner);
+  }
+  if (editVisitorByokBtn) {
+    editVisitorByokBtn.addEventListener('click', openVisitorByokModal);
+  }
+  if (switchBackToServerBtn) {
+    switchBackToServerBtn.addEventListener('click', () => {
+      visitorByok.enabled = false;
+      saveVisitorByok();
+      syncApiToggleUI();
+      renderWorkspaceView();
+      showToast('Switched back to Sahadat AI Server.', 'info');
+    });
+  }
+  if (closeVisitorByokBtn) {
+    closeVisitorByokBtn.addEventListener('click', closeVisitorByokModal);
+  }
+  if (visitorByokBackdrop) {
+    visitorByokBackdrop.addEventListener('click', e => {
+      if (e.target === visitorByokBackdrop) closeVisitorByokModal();
+    });
+  }
+  if (visitorProvSelect) {
+    visitorProvSelect.addEventListener('change', e => {
+      syncVisitorProviderFields(e.target.value, '');
+      setVisitorByokFeedback('', '');
+    });
+  }
+  if (toggleVisitorKeyVisBtn && visitorKeyInput) {
+    toggleVisitorKeyVisBtn.addEventListener('click', () => {
+      const isPwd = visitorKeyInput.type === 'password';
+      visitorKeyInput.type = isPwd ? 'text' : 'password';
+      toggleVisitorKeyVisBtn.innerHTML = `<i class="fas ${isPwd ? 'fa-eye-slash' : 'fa-eye'}"></i>`;
+    });
+  }
+  if (visitorTestKeyBtn) {
+    visitorTestKeyBtn.addEventListener('click', async () => {
+      const provId = visitorProvSelect ? visitorProvSelect.value : 'gemini';
+      const spec = BYOK_PROVIDERS[provId] || BYOK_PROVIDERS.gemini;
+      const key = visitorKeyInput ? visitorKeyInput.value.trim() : '';
+      if (!key || key.length < 8) {
+        setVisitorByokFeedback(`Please paste your ${spec.label} API key first.`, 'error');
+        return;
+      }
+      setVisitorByokFeedback('', '');
+      visitorTestKeyBtn.disabled = true;
+      visitorTestKeyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+      try {
+        const ok = await verifyProviderApiKey(provId, key);
+        if (ok) {
+          setVisitorByokFeedback(`${spec.label} API key is valid! Click Save & Continue.`, 'success');
+        } else {
+          setVisitorByokFeedback(`Key check failed — please verify your ${spec.label} API key.`, 'error');
+        }
+      } catch {
+        setVisitorByokFeedback('Network error while testing key.', 'error');
+      } finally {
+        visitorTestKeyBtn.disabled = false;
+        visitorTestKeyBtn.innerHTML = '<i class="fas fa-vial"></i> Test Key';
+      }
+    });
+  }
+  if (visitorClearKeyBtn) {
+    visitorClearKeyBtn.addEventListener('click', () => {
+      visitorByok = { enabled: false, provider: 'gemini', model: 'gemini-2.5-flash', apiKey: '' };
+      saveVisitorByok();
+      syncApiToggleUI();
+      renderWorkspaceView();
+      closeVisitorByokModal();
+      showToast('Removed your saved API key. Back to Sahadat AI Server.', 'info');
+    });
+  }
+  if (visitorByokForm) {
+    visitorByokForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const provId = visitorProvSelect ? visitorProvSelect.value : 'gemini';
+      const spec = BYOK_PROVIDERS[provId] || BYOK_PROVIDERS.gemini;
+      const modelId = visitorModelSelect ? visitorModelSelect.value : spec.models[0].id;
+      const key = visitorKeyInput ? visitorKeyInput.value.trim() : '';
+      if (!key || key.length < 8) {
+        setVisitorByokFeedback(`Please paste a valid ${spec.label} API key.`, 'error');
+        return;
+      }
+      visitorByok = {
+        enabled: true,
+        provider: provId,
+        model: modelId || spec.models[0].id,
+        apiKey: key
+      };
+      saveVisitorByok();
+      hideQuotaWarningBanner();
+      syncApiToggleUI();
+      renderWorkspaceView();
+      closeVisitorByokModal();
+
+      const pendingFiles = state.files.filter(f => f.status === 'failed' || f.status === 'waiting');
+      if (pendingFiles.length > 0 && !state.batchRunning && !state.isGenerating) {
+        showToast(`Saved your ${spec.label} API key! Continuing analysis...`, 'success');
+        if (state.files.length === 1) {
+          generateForEntry(pendingFiles[0], false);
+        } else {
+          runConcurrentBatch();
+        }
+      } else {
+        showToast(`Saved your ${spec.label} API key (browser-only)!`, 'success');
+      }
+    });
+  }
+
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       if (lightboxBackdrop.classList.contains('open')) closeLightbox();
+      else if (visitorByokBackdrop && visitorByokBackdrop.classList.contains('open')) closeVisitorByokModal();
       else if (apiSecretsBackdrop.classList.contains('open')) closeApiSecretsModal();
       else if (adminModalBackdrop.classList.contains('open')) closeAdminModal();
     }
@@ -4379,6 +4759,7 @@ ${kwLis}
         adminUpdatedAt.textContent = data.updatedAt ? new Date(data.updatedAt).toLocaleString() : 'Just now';
         adminNewKeyInput.value = '';
         adminModelInput.value = '';
+        hideQuotaWarningBanner();
         syncApiToggleUI();
         setAdminFeedback(data.message || 'Sahadat AI updated globally for all visitors!', 'success');
         showToast('Sahadat AI updated globally!');
@@ -4393,6 +4774,7 @@ ${kwLis}
 
   // ── INIT ──
   loadSecretsVault();
+  loadVisitorByok();
   loadPrefs();
   applyPrefsToControls();
   syncApiToggleUI();

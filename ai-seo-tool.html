@@ -2208,6 +2208,89 @@
       border-color: rgba(99, 54, 245, 0.2);
     }
 
+    /* ── DAILY QUOTA WARNING BANNER & VISITOR BYOK BAR ── */
+    .quota-warning-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 15px 18px;
+      margin-bottom: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(245, 158, 11, 0.48);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(255, 107, 157, 0.08));
+    }
+    .quota-warning-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1 1 260px;
+      min-width: 0;
+    }
+    .quota-warning-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.95rem;
+    }
+    .quota-warning-title {
+      font-family: var(--font-display);
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .quota-warning-text {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    .quota-warning-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .quota-warning-banner {
+      background: linear-gradient(135deg, #FFFBEB, #FFF1F2);
+      border-color: rgba(217, 119, 6, 0.35);
+    }
+    [data-theme="light"] .quota-warning-icon {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+    .visitor-key-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 14px;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.09);
+    }
+    [data-theme="light"] .visitor-key-bar {
+      background: #ECFDF5;
+      border-color: rgba(16, 185, 129, 0.32);
+    }
+    #visitorByokBackdrop .seo-select {
+      height: 44px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     /* Ensure .hidden always overrides local flex/grid components */
     .empty-results.hidden,
     .ai-loading-box.hidden,
@@ -2218,6 +2301,8 @@
     .api-key-warning.hidden,
     .batch-cards-list.hidden,
     .seo-fields-grid.hidden,
+    .quota-warning-banner.hidden,
+    .visitor-key-bar.hidden,
     #fileQueueWrap.hidden,
     #resultsContent.hidden,
     #metadataConfig.hidden,
@@ -2559,6 +2644,39 @@
         <div class="panel-title-row">
           <h2 class="panel-title"><i class="fas fa-cloud-arrow-up"></i> Upload Workspace &amp; Output</h2>
           <span id="resultSourceBadge" class="format-badge hidden"></span>
+        </div>
+
+        <!-- DAILY QUOTA EXCEEDED / SERVER UNAVAILABLE WARNING BANNER -->
+        <div id="quotaLimitBanner" class="quota-warning-banner hidden" role="alert">
+          <div class="quota-warning-left">
+            <div class="quota-warning-icon"><i class="fas fa-triangle-exclamation"></i></div>
+            <div class="min-w-0">
+              <div id="quotaWarningTitle" class="quota-warning-title">Today's Free Sahadat AI Quota Is Full</div>
+              <p id="quotaWarningText" class="quota-warning-text">
+                Our shared free daily AI quota is currently unavailable for today. Please add your own free API key (Gemini, OpenRouter, Groq, Mistral, OpenAI, or Claude) to keep generating right now — saved only in your browser.
+              </p>
+            </div>
+          </div>
+          <div class="quota-warning-actions">
+            <button type="button" id="openVisitorByokFromBannerBtn" class="action-btn primary">
+              <i class="fas fa-key"></i> Use My Own API Key
+            </button>
+            <button type="button" id="dismissQuotaBannerBtn" class="mini-copy-btn" title="Dismiss warning" aria-label="Dismiss warning">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ACTIVE VISITOR OWN API KEY STATUS BAR -->
+        <div id="visitorKeyActiveBar" class="visitor-key-bar hidden">
+          <div class="flex items-center gap-2 font-mono text-xs" style="color:var(--text-primary)">
+            <i class="fas fa-circle-check" style="color:#22c55e"></i>
+            <span>Using Your Own API Key: <strong id="visitorKeyActiveLabel" style="color:var(--violet)">Gemini</strong></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="editVisitorByokBtn" class="mini-copy-btn"><i class="fas fa-pen"></i> Change Key</button>
+            <button type="button" id="switchBackToServerBtn" class="mini-copy-btn"><i class="fas fa-rotate-left"></i> Use Sahadat AI Server</button>
+          </div>
         </div>
 
         <!-- 18 STOCK & SEO PLATFORM SELECTOR -->
@@ -2989,6 +3107,73 @@
     </div>
   </div>
 
+  <!-- VISITOR OWN API KEY MODAL (SHOWN WHEN DAILY SERVER QUOTA IS FULL — NO ADMIN PASSWORD NEEDED) -->
+  <div id="visitorByokBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="visitorByokTitle">
+    <div class="ai-modal">
+      <div class="flex items-center justify-between mb-3">
+        <h3 id="visitorByokTitle" class="font-display font-bold text-xl flex items-center gap-2">
+          <i class="fas fa-key" style="color:var(--violet)"></i> Use Your Own API Key
+        </h3>
+        <button id="closeVisitorByokBtn" class="theme-btn" type="button" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <p class="text-body text-sm leading-relaxed mb-4">
+        When today's free Sahadat AI daily quota is full, paste your own free API key below to continue generating accurate SEO metadata &amp; prompts immediately. Your key stays <strong>100% private in your browser</strong>.
+      </p>
+
+      <div id="visitorByokFeedback" class="admin-feedback"></div>
+
+      <form id="visitorByokForm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div>
+            <label for="visitorProvSelect" class="control-label block mb-1.5">AI Provider</label>
+            <select id="visitorProvSelect" class="seo-select">
+              <option value="gemini">Google Gemini (Free Tier)</option>
+              <option value="openrouter">OpenRouter (Free Models)</option>
+              <option value="groq">Groq (Free Tier)</option>
+              <option value="mistral">Mistral AI</option>
+              <option value="openai">OpenAI</option>
+              <option value="claude">Anthropic Claude</option>
+            </select>
+          </div>
+          <div>
+            <label for="visitorModelSelect" class="control-label block mb-1.5">Model Selection</label>
+            <select id="visitorModelSelect" class="seo-select"></select>
+          </div>
+        </div>
+
+        <label for="visitorKeyInput" class="control-label block mb-1.5">Your API Key</label>
+        <div class="api-key-input-wrap mb-3">
+          <input type="password" id="visitorKeyInput" class="seo-input" placeholder="AIza..." autocomplete="off" required />
+          <button type="button" id="toggleVisitorKeyVisBtn" class="eye-toggle-btn" title="Show/Hide key">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+
+        <a id="visitorGetKeyLink" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="get-key-link-btn mb-4">
+          <i class="fas fa-external-link-alt"></i>
+          <span id="visitorGetKeyLabel">Get Free API Key from Google</span>
+        </a>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-3" style="border-top:1px solid var(--border)">
+          <div class="flex items-center gap-2">
+            <button type="button" id="visitorTestKeyBtn" class="action-btn">
+              <i class="fas fa-vial"></i> Test Key
+            </button>
+            <button type="button" id="visitorClearKeyBtn" class="action-btn danger-btn hidden">
+              <i class="fas fa-trash"></i> Remove
+            </button>
+          </div>
+          <button type="submit" id="visitorSaveKeyBtn" class="action-btn primary">
+            <i class="fas fa-bolt"></i> Save &amp; Continue
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- IMAGE LIGHTBOX MODAL -->
   <div id="lightboxBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-label="Full Image Preview">
     <div class="lightbox-card">
@@ -3012,7 +3197,7 @@
     <i class="fas fa-chevron-up"></i>
   </button>
 
-  <script src="script.js?v=7"></script>
-  <script src="ai-seo-tool.js?v=7"></script>
+  <script src="script.js?v=8"></script>
+  <script src="ai-seo-tool.js?v=8"></script>
 </body>
 </html>
