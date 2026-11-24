@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI SEO Tool — Sahadat AI | Image, SVG & PDF SEO Tag Generator</title>
+  <title>AI SEO Tool — Sahadat AI | Microstock Metadata, Prompt &amp; SEO Tag Generator</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" />
   <link rel="stylesheet" href="style.css?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     /* ═══════════════════════════════════════════
        AI SEO TOOL — SAHADAT AI PAGE STYLES
     ═══════════════════════════════════════════ */
     .seo-hero {
-      padding: 132px 0 48px;
+      padding: 124px 0 42px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -34,7 +35,7 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-primary);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .ai-brand-svg {
       width: 17px;
@@ -61,9 +62,9 @@
     }
     .seo-hero-sub {
       color: var(--text-secondary);
-      max-width: 620px;
-      margin: 14px auto 0;
-      font-size: 1rem;
+      max-width: 680px;
+      margin: 12px auto 0;
+      font-size: 0.98rem;
       line-height: 1.7;
     }
     .format-badges {
@@ -71,7 +72,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
-      margin-top: 22px;
+      margin-top: 20px;
     }
     .format-badge {
       font-family: var(--font-mono);
@@ -82,19 +83,22 @@
       background: var(--glass-bg);
       border: 1px solid var(--border);
       color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     /* ── WORKSPACE GRID ── */
     .seo-workspace {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      gap: 28px;
+      gap: 24px;
       align-items: start;
       width: 100%;
     }
     @media (min-width: 1024px) {
       .seo-workspace {
-        grid-template-columns: 440px minmax(0, 1fr);
+        grid-template-columns: 396px minmax(0, 1fr);
       }
     }
 
@@ -107,15 +111,11 @@
       min-width: 0;
       width: 100%;
       max-width: 100%;
-      overflow: hidden;
+      overflow: visible;
       isolation: isolate;
     }
-    [data-theme="light"] .seo-panel {
-      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
-      box-shadow: 0 12px 32px rgba(108, 62, 255, 0.08);
-    }
     @media (min-width: 640px) {
-      .seo-panel { padding: 28px; }
+      .seo-panel { padding: 24px; }
     }
 
     .panel-title-row {
@@ -124,32 +124,33 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .panel-title {
       font-family: var(--font-display);
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       font-weight: 800;
       color: var(--text-primary);
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       margin: 0;
     }
     .panel-title i {
       color: var(--violet);
     }
 
-    /* Engine status chip (read-only for visitors) */
+    /* Engine & API buttons */
     .engine-chip {
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 5px 12px;
+      padding: 6px 12px;
       border-radius: 999px;
       font-family: var(--font-mono);
       font-size: 0.68rem;
-      letter-spacing: 0.05em;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       border: 1px solid rgba(0, 200, 255, 0.35);
       background: rgba(0, 200, 255, 0.08);
       color: var(--cyan);
@@ -178,65 +179,497 @@
       background: #22c55e;
       box-shadow: 0 0 8px #22c55e;
     }
+    .icon-pill-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.4);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.78rem;
+      transition: all 0.2s ease;
+    }
+    .icon-pill-btn:hover {
+      border-color: var(--violet);
+      color: var(--violet);
+      background: rgba(108, 62, 255, 0.12);
+    }
 
-    /* Bottom Change AI Model button for admin */
-    .admin-change-btn {
+    /* ── API KEY TOGGLE & MODEL SELECTION CARD (SIDEBAR) ── */
+    .api-toggle-card {
+      border-radius: 16px;
+      border: 1px solid rgba(108, 62, 255, 0.28);
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.09), rgba(0, 200, 255, 0.05));
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .api-toggle-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .api-toggle-info strong {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-display);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .api-toggle-sub {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* Toggle Switch */
+    .seo-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .seo-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .seo-switch-track {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.35);
+      border: 1px solid var(--border);
+      transition: background 0.22s ease, border-color 0.22s ease;
+    }
+    .seo-switch-track::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .seo-switch input:checked + .seo-switch-track {
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      border-color: transparent;
+    }
+    .seo-switch input:checked + .seo-switch-track::before {
+      transform: translateX(20px);
+    }
+
+    .api-quick-controls {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .api-quick-grid {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 8px;
+    }
+    .api-key-warning {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .api-key-warning button {
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      border-radius: 7px;
+      padding: 4px 9px;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ── MODE TABS (METADATA vs PROMPT) ── */
+    .mode-tabs-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.45);
+      margin-bottom: 16px;
+    }
+    .mode-tab-btn {
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+    }
+    .mode-tab-btn:hover {
+      color: var(--text-primary);
+    }
+    .mode-tab-btn.active {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(108, 62, 255, 0.35);
+    }
+
+    /* ── PROMPT STYLE TOGGLE PILLS ── */
+    .style-toggles-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .style-toggle-pill {
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      margin-top: 8px;
-      padding: 7px 15px;
+      padding: 7px 12px;
       border-radius: 10px;
-      border: 1px solid rgba(0, 200, 255, 0.45);
-      background: rgba(0, 200, 255, 0.1);
-      color: #38bdf8;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+      color: var(--text-secondary);
       font-family: var(--font-mono);
       font-size: 0.72rem;
       font-weight: 600;
-      letter-spacing: 0.06em;
-      box-shadow: 0 2px 14px rgba(0, 200, 255, 0.16);
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: all 0.2s ease;
+      user-select: none;
     }
-    [data-theme="light"] .admin-change-btn {
-      color: #0284c7;
-      background: rgba(0, 200, 255, 0.12);
-    }
-    .admin-change-btn:hover {
-      background: linear-gradient(135deg, #00C8FF, #6C3EFF);
-      border-color: transparent;
-      color: #ffffff;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(0, 200, 255, 0.35);
-    }
-    .admin-status-box {
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(108, 62, 255, 0.08);
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      color: var(--text-secondary);
-      margin-bottom: 14px;
-    }
-    .admin-feedback {
-      font-size: 0.8rem;
-      padding: 10px 12px;
-      border-radius: 10px;
-      margin-bottom: 14px;
+    .style-toggle-pill input {
       display: none;
     }
-    .admin-feedback.error {
-      display: block;
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      color: #f87171;
+    .style-toggle-pill .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.2s ease;
     }
-    .admin-feedback.success {
-      display: block;
+    .style-toggle-pill.active {
+      border-color: var(--cyan);
+      background: rgba(0, 200, 255, 0.13);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 1px rgba(0, 200, 255, 0.2);
+    }
+    .style-toggle-pill.active .pill-dot {
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    /* ── CONTROLS & SLIDERS ── */
+    .control-block {
+      margin-top: 14px;
+    }
+    .control-block:first-child {
+      margin-top: 0;
+    }
+    .control-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .slider-val-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--cyan);
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: rgba(0, 200, 255, 0.1);
+      border: 1px solid rgba(0, 200, 255, 0.24);
+    }
+    .tag-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 9px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(108, 62, 255, 0.2), rgba(0, 200, 255, 0.14));
+      border: 1px solid rgba(108, 62, 255, 0.35);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .tag-count-input {
+      width: 52px;
+      padding: 2px 5px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.55);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+    .tag-count-input:focus {
+      border-color: var(--cyan);
+    }
+
+    /* Custom Range Slider */
+    .seo-range {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
+      outline: none;
+      cursor: pointer;
+    }
+    .seo-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--violet);
+      box-shadow: 0 0 10px rgba(108, 62, 255, 0.5);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .seo-range::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .seo-range::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--violet);
+      box-shadow: 0 0 10px rgba(108, 62, 255, 0.5);
+      cursor: pointer;
+    }
+
+    .preset-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .preset-pill {
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .preset-pill:hover {
+      border-color: var(--violet);
+      color: var(--text-primary);
+    }
+    .preset-pill.active {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(108, 62, 255, 0.32);
+    }
+
+    .seo-select,
+    .seo-input,
+    .seo-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.45);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.84rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .seo-select.compact {
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      border-radius: 10px;
+    }
+    .seo-textarea {
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .seo-select:focus,
+    .seo-input:focus,
+    .seo-textarea:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px rgba(108, 62, 255, 0.14);
+    }
+    .seo-select option {
+      background: var(--bg-card-solid);
+      color: var(--text-primary);
+    }
+    .autosave-badge {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      padding: 2px 7px;
+      border-radius: 999px;
       background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.35);
+      border: 1px solid rgba(34, 197, 94, 0.3);
       color: #22c55e;
+      letter-spacing: 0.06em;
+    }
+    .reset-link-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      transition: color 0.2s;
+    }
+    .reset-link-btn:hover {
+      color: var(--coral);
+    }
+
+    .generate-btn {
+      width: 100%;
+      margin-top: 16px;
+      padding: 13px 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--violet) 0%, #5025ee 50%, #00A8E8 100%);
+      background-size: 200% auto;
+      color: #ffffff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      text-align: center;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      box-shadow: 0 8px 26px rgba(108, 62, 255, 0.35);
+      transition: all 0.3s ease;
+    }
+    .generate-btn:hover:not(:disabled) {
+      background-position: right center;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(108, 62, 255, 0.45);
+    }
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── 18 STOCK PLATFORM SELECTOR GRID ── */
+    .platform-grid-wrap {
+      margin-bottom: 16px;
+    }
+    .platform-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .platform-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.38);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .platform-pill:hover {
+      border-color: var(--violet);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+    .platform-pill.active {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(108, 62, 255, 0.35);
+    }
+    .platform-pill i {
+      font-size: 0.7rem;
+      opacity: 0.85;
+    }
+    .platform-logo {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      object-fit: contain;
+      flex-shrink: 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .platform-logo.needs-bg {
+      background: #ffffff;
+      padding: 2px;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+    }
+    .platform-pill.active .platform-logo {
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+    }
+    .platform-logo-svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+      display: inline-block;
     }
 
     /* ── UPLOAD DROPZONE ── */
@@ -244,7 +677,7 @@
       position: relative;
       border: 2px dashed rgba(108, 62, 255, 0.35);
       border-radius: 18px;
-      padding: 32px 20px;
+      padding: 24px 18px;
       text-align: center;
       cursor: pointer;
       background: linear-gradient(135deg, rgba(108, 62, 255, 0.06), rgba(0, 200, 255, 0.04));
@@ -255,51 +688,157 @@
     .seo-dropzone.drag-over {
       border-color: var(--cyan);
       background: linear-gradient(135deg, rgba(108, 62, 255, 0.13), rgba(0, 200, 255, 0.1));
-      box-shadow: 0 0 30px rgba(108, 62, 255, 0.18);
+      box-shadow: 0 0 28px rgba(108, 62, 255, 0.18);
       transform: translateY(-2px);
     }
     .seo-dropzone input[type="file"] {
       display: none;
     }
+    .dropzone-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .dropzone-chip {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(108, 62, 255, 0.26);
+      background: rgba(108, 62, 255, 0.09);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
     .dropzone-icon {
       position: relative;
-      width: 72px;
-      height: 72px;
-      border-radius: 22px;
-      margin: 0 auto 16px;
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      margin: 0 auto 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, rgba(108, 62, 255, 0.24), rgba(0, 200, 255, 0.18));
       border: 1.5px solid rgba(108, 62, 255, 0.45);
-      box-shadow: 0 10px 30px rgba(108, 62, 255, 0.28), inset 0 0 20px rgba(0, 200, 255, 0.14);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 8px 24px rgba(108, 62, 255, 0.25);
+      transition: transform 0.3s ease;
     }
     .dropzone-icon svg {
-      width: 38px;
-      height: 38px;
-      filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.45));
+      width: 32px;
+      height: 32px;
     }
     .seo-dropzone:hover .dropzone-icon {
-      transform: translateY(-4px) scale(1.04);
-      box-shadow: 0 14px 36px rgba(108, 62, 255, 0.4), inset 0 0 24px rgba(0, 200, 255, 0.22);
+      transform: translateY(-3px) scale(1.04);
     }
     .dropzone-title {
       font-family: var(--font-display);
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: 1rem;
       color: var(--text-primary);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .dropzone-sub {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-secondary);
     }
     .dropzone-hint {
       font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       color: var(--text-muted);
-      margin-top: 10px;
+      margin-top: 8px;
+    }
+
+    /* ── BATCH ACTION BAR ── */
+    .batch-action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+    }
+    .batch-status-readout {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .batch-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+      flex-shrink: 0;
+    }
+    .batch-status-dot.running {
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      animation: ai-pulse 1s ease-in-out infinite;
+    }
+    .batch-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      position: relative;
+    }
+
+    /* Export CSV Dropdown */
+    .export-dropdown-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .export-dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      min-width: 240px;
+      border-radius: 14px;
+      border: 1px solid var(--border-hover);
+      background: var(--bg-card-solid);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      padding: 6px;
+      z-index: 60;
+      display: none;
+    }
+    .export-dropdown-menu.open {
+      display: block;
+    }
+    .export-menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 11px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .export-menu-item:hover {
+      background: rgba(108, 62, 255, 0.14);
+      color: var(--cyan);
+    }
+    .export-menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 5px 4px;
     }
 
     /* ── FILE QUEUE STRIP ── */
@@ -308,7 +847,7 @@
       gap: 10px;
       overflow-x: auto;
       padding: 4px 2px 6px;
-      margin-top: 14px;
+      margin-top: 8px;
     }
     .file-queue-item {
       position: relative;
@@ -342,24 +881,26 @@
       font-weight: 700;
       padding: 1px 5px;
       border-radius: 4px;
-      background: rgba(13, 13, 26, 0.82);
+      background: rgba(13, 13, 26, 0.85);
       color: #F0F4FF;
       text-transform: uppercase;
     }
-    .file-queue-done {
+    .file-queue-status {
       position: absolute;
       top: 3px;
       left: 3px;
-      width: 16px;
-      height: 16px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
-      background: #22c55e;
       color: white;
       font-size: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+    .file-queue-status.done { background: #22c55e; }
+    .file-queue-status.processing { background: var(--cyan); }
+    .file-queue-status.failed { background: #ef4444; }
     .file-queue-remove {
       position: absolute;
       top: 3px;
@@ -368,7 +909,7 @@
       height: 18px;
       border-radius: 50%;
       border: none;
-      background: rgba(13, 13, 26, 0.8);
+      background: rgba(13, 13, 26, 0.82);
       color: #fff;
       font-size: 9px;
       cursor: pointer;
@@ -380,270 +921,95 @@
       background: #ef4444;
     }
 
-    /* ── ACTIVE FILE PREVIEW CARD ── */
-    .preview-stage {
-      margin-top: 16px;
+    /* ── VIEW SWITCHER (DETAIL vs BATCH CARDS) ── */
+    .view-switcher {
+      display: inline-flex;
+      gap: 4px;
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+    }
+    .view-switch-btn {
+      padding: 5px 10px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s;
+    }
+    .view-switch-btn.active {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      color: #ffffff;
+    }
+
+    /* ── ACTIVE FILE COMPACT PREVIEW BAR (IN DETAIL VIEW) ── */
+    .active-preview-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
       border-radius: 16px;
       border: 1px solid var(--border);
-      background: rgba(13, 13, 26, 0.45);
-      overflow: hidden;
+      background: rgba(13, 13, 26, 0.35);
+      margin-bottom: 16px;
     }
-    [data-theme="light"] .preview-stage {
-      background: rgba(255, 255, 255, 0.72);
-    }
-    .preview-canvas-wrap {
+    .active-thumb-btn {
       position: relative;
-      height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-      background-image:
-        linear-gradient(45deg, rgba(108, 62, 255, 0.06) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(108, 62, 255, 0.06) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, rgba(108, 62, 255, 0.06) 75%),
-        linear-gradient(-45deg, transparent 75%, rgba(108, 62, 255, 0.06) 75%);
-      background-size: 20px 20px;
-      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      width: 84px;
+      height: 84px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-card-solid);
+      padding: 0;
+      cursor: zoom-in;
+      flex-shrink: 0;
     }
-    .preview-canvas-wrap img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-    }
-    .scan-laser {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, var(--cyan), var(--violet), transparent);
-      box-shadow: 0 0 16px var(--cyan);
-      top: 0;
-      display: none;
-      animation: laser-scan 1.6s ease-in-out infinite;
-    }
-    .preview-stage.scanning .scan-laser {
+    .active-thumb-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       display: block;
     }
-    @keyframes laser-scan {
-      0% { top: 6%; opacity: 0.9; }
-      50% { top: 92%; opacity: 1; }
-      100% { top: 6%; opacity: 0.9; }
-    }
-    .preview-meta-bar {
-      padding: 12px 14px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-    }
-    .preview-filename {
-      font-weight: 600;
-      color: var(--text-primary);
-      max-width: 210px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    /* ── CONTROLS & TAG SLIDER ── */
-    .control-block {
-      margin-top: 18px;
-    }
-    .control-label-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .control-label {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-    .tag-count-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 10px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, rgba(108, 62, 255, 0.2), rgba(0, 200, 255, 0.14));
-      border: 1px solid rgba(108, 62, 255, 0.35);
-      font-family: var(--font-mono);
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .tag-count-input {
-      width: 58px;
-      padding: 3px 6px;
+    .active-thumb-zoom {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
       border-radius: 6px;
-      border: 1px solid var(--border);
-      background: rgba(13, 13, 26, 0.55);
-      color: var(--text-primary);
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-align: center;
-      outline: none;
-    }
-    [data-theme="light"] .tag-count-input {
-      background: rgba(255, 255, 255, 0.9);
-    }
-    .tag-count-input:focus {
-      border-color: var(--cyan);
-    }
-
-    /* Custom Range Slider */
-    .seo-range {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 7px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--violet), var(--cyan));
-      outline: none;
-      cursor: pointer;
-    }
-    .seo-range::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 3px solid var(--violet);
-      box-shadow: 0 0 12px rgba(108, 62, 255, 0.55);
-      cursor: pointer;
-      transition: transform 0.15s;
-    }
-    .seo-range::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-    }
-    .seo-range::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 3px solid var(--violet);
-      box-shadow: 0 0 12px rgba(108, 62, 255, 0.55);
-      cursor: pointer;
-    }
-
-    .preset-pills {
+      background: rgba(13, 13, 26, 0.8);
+      color: #ffffff;
+      font-size: 0.65rem;
       display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 10px;
-    }
-    .preset-pill {
-      padding: 5px 11px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .preset-pill:hover {
-      border-color: var(--violet);
-      color: var(--text-primary);
-    }
-    .preset-pill.active {
-      background: linear-gradient(135deg, var(--violet), #5025ee);
-      border-color: transparent;
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(108, 62, 255, 0.35);
-    }
-
-    .seo-select,
-    .seo-input {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(13, 13, 26, 0.45);
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 0.875rem;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    [data-theme="light"] .seo-select,
-    [data-theme="light"] .seo-input {
-      background: rgba(255, 255, 255, 0.85);
-    }
-    .seo-select:focus,
-    .seo-input:focus {
-      border-color: var(--violet);
-      box-shadow: 0 0 0 3px rgba(108, 62, 255, 0.14);
-    }
-    .seo-select option {
-      background: var(--bg-card-solid);
-      color: var(--text-primary);
-    }
-
-    .generate-btn {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px 18px;
-      border: none;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--violet) 0%, #5025ee 50%, #00A8E8 100%);
-      background-size: 200% auto;
-      color: #ffffff;
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 0.94rem;
-      line-height: 1.35;
-      text-align: center;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 8px 28px rgba(108, 62, 255, 0.35);
-      transition: all 0.3s ease;
-    }
-    .generate-btn:hover:not(:disabled) {
-      background-position: right center;
-      transform: translateY(-2px);
-      box-shadow: 0 12px 34px rgba(108, 62, 255, 0.45);
-    }
-    .generate-btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
     }
 
-    /* ── RESULTS PANEL ── */
+    /* ── RESULTS PANEL STATES ── */
     .empty-results {
-      min-height: 460px;
+      min-height: 360px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 40px 20px;
+      padding: 36px 18px;
     }
     .empty-orb {
       position: relative;
-      width: 112px;
-      height: 112px;
-      margin-bottom: 24px;
+      width: 104px;
+      height: 104px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -657,7 +1023,7 @@
       animation: spin-smooth 18s linear infinite;
     }
     .ai-orbit-ring.inner {
-      inset: 11px;
+      inset: 10px;
       border-style: solid;
       border-color: rgba(0, 200, 255, 0.28);
       border-top-color: var(--cyan);
@@ -665,32 +1031,31 @@
       animation-direction: reverse;
     }
     .ai-orb-core {
-      width: 68px;
-      height: 68px;
-      border-radius: 20px;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
       background: linear-gradient(135deg, rgba(108, 62, 255, 0.25), rgba(0, 200, 255, 0.16));
       border: 1.5px solid rgba(108, 62, 255, 0.45);
-      box-shadow: 0 0 32px rgba(108, 62, 255, 0.3), inset 0 0 18px rgba(0, 200, 255, 0.18);
+      box-shadow: 0 0 28px rgba(108, 62, 255, 0.28);
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .ai-orb-core svg {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       animation: star-breathe 3s ease-in-out infinite;
-      filter: drop-shadow(0 0 10px rgba(0, 200, 255, 0.5));
     }
     .feature-mini-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
       width: 100%;
-      max-width: 540px;
-      margin-top: 26px;
+      max-width: 640px;
+      margin-top: 22px;
     }
     .feature-mini {
-      padding: 14px;
+      padding: 13px;
       border-radius: 14px;
       border: 1px solid var(--border);
       background: rgba(108, 62, 255, 0.05);
@@ -708,33 +1073,33 @@
     }
     .feature-mini strong {
       display: block;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--text-primary);
       margin-bottom: 2px;
     }
     .feature-mini span {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
     }
 
     /* Loading skeleton */
     .ai-loading-box {
-      min-height: 420px;
+      min-height: 340px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 40px 20px;
+      padding: 36px 20px;
     }
     .ai-loader-emblem {
       position: relative;
-      width: 96px;
-      height: 96px;
+      width: 90px;
+      height: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
       contain: layout style paint;
     }
     .ai-spinner-ring {
@@ -755,18 +1120,17 @@
       animation: spin-smooth 1.7s linear infinite reverse;
     }
     .ai-loader-star {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       animation: star-breathe 1.6s ease-in-out infinite;
-      filter: drop-shadow(0 0 12px rgba(108, 62, 255, 0.65));
     }
     .ai-progress-bar {
-      width: 220px;
-      height: 4px;
+      width: 240px;
+      height: 5px;
       border-radius: 999px;
       background: rgba(108, 62, 255, 0.16);
       overflow: hidden;
-      margin-top: 16px;
+      margin-top: 14px;
     }
     .ai-progress-fill {
       width: 45%;
@@ -788,17 +1152,17 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 18px;
-      padding: 18px 20px;
+      gap: 16px;
+      padding: 16px 18px;
       border-radius: 16px;
       background: linear-gradient(135deg, rgba(108, 62, 255, 0.12), rgba(0, 200, 255, 0.07));
       border: 1px solid rgba(108, 62, 255, 0.3);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .score-ring {
       position: relative;
-      width: 74px;
-      height: 74px;
+      width: 68px;
+      height: 68px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -830,7 +1194,7 @@
       position: relative;
       z-index: 1;
       font-family: var(--font-display);
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 800;
       line-height: 1;
       color: var(--text-primary);
@@ -839,7 +1203,7 @@
       position: relative;
       z-index: 1;
       font-family: var(--font-mono);
-      font-size: 0.56rem;
+      font-size: 0.54rem;
       letter-spacing: 0.12em;
       color: var(--cyan);
       text-transform: uppercase;
@@ -849,27 +1213,24 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 7px;
     }
     .score-tip-pill {
       font-family: var(--font-mono);
-      font-size: 0.68rem;
-      padding: 3px 10px;
+      font-size: 0.66rem;
+      padding: 3px 9px;
       border-radius: 999px;
       background: rgba(13, 13, 26, 0.35);
       border: 1px solid var(--border);
       color: var(--text-secondary);
-    }
-    [data-theme="light"] .score-tip-pill {
-      background: rgba(255, 255, 255, 0.75);
     }
 
     /* Copyable SEO Text Fields */
     .seo-fields-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      gap: 14px;
-      margin-bottom: 22px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
     @media (min-width: 768px) {
       .seo-fields-grid.two-col {
@@ -880,56 +1241,63 @@
       border-radius: 14px;
       border: 1px solid var(--border);
       background: rgba(13, 13, 26, 0.35);
-      padding: 14px 16px;
+      padding: 13px 15px;
       min-width: 0;
       max-width: 100%;
       transition: border-color 0.2s;
-    }
-    [data-theme="light"] .seo-result-card {
-      background: rgba(255, 255, 255, 0.78);
     }
     .seo-result-card:focus-within {
       border-color: var(--violet);
     }
     .seo-result-header {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
     .seo-result-label {
       font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
+      font-size: 0.67rem;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       color: var(--violet);
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      font-weight: 600;
     }
     .char-pill {
       font-family: var(--font-mono);
-      font-size: 0.65rem;
+      font-size: 0.64rem;
       color: var(--text-muted);
       padding: 2px 7px;
       border-radius: 999px;
       border: 1px solid var(--border);
     }
+    .char-pill.good {
+      color: #22c55e;
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+    .char-pill.warn {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.35);
+    }
     .mini-copy-btn {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 5px 11px;
+      padding: 5px 10px;
       border-radius: 8px;
       border: 1px solid var(--border);
       background: rgba(26, 26, 50, 0.75);
       color: var(--text-primary);
       font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.18s;
     }
     .mini-copy-btn:hover {
       border-color: var(--violet);
@@ -947,24 +1315,31 @@
       color: #ffffff;
       box-shadow: 0 6px 16px rgba(108, 62, 255, 0.38);
     }
+    .mini-copy-btn.seo-file-accent {
+      background: linear-gradient(135deg, #00A8E8, #0284C7);
+      border-color: transparent;
+      color: #ffffff;
+    }
+    .mini-copy-btn.seo-file-accent:hover {
+      transform: translateY(-1px);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 200, 255, 0.32);
+    }
     .seo-editable {
       width: 100%;
       background: transparent;
       border: none;
       color: var(--text-primary);
       font-family: var(--font-body);
-      font-size: 0.9rem;
-      line-height: 1.55;
+      font-size: 0.88rem;
+      line-height: 1.52;
       outline: none;
       resize: vertical;
     }
     .seo-editable.mono {
       font-family: var(--font-mono);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--cyan);
-    }
-    [data-theme="light"] .seo-editable.mono {
-      color: #0284c7;
     }
 
     /* ── SEO TAGS CLOUD ── */
@@ -972,10 +1347,9 @@
       border-radius: 16px;
       border: 1px solid var(--border);
       background: rgba(13, 13, 26, 0.35);
-      padding: 18px;
-    }
-    [data-theme="light"] .tags-section {
-      background: rgba(255, 255, 255, 0.78);
+      padding: 16px;
+      min-width: 0;
+      max-width: 100%;
     }
     .tags-toolbar {
       display: flex;
@@ -983,24 +1357,24 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .tags-cloud {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      max-height: 320px;
+      gap: 7px;
+      max-height: 300px;
       overflow-y: auto;
       padding: 4px 2px;
     }
     .seo-tag-chip {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 6px 12px;
+      gap: 6px;
+      padding: 5px 11px;
       border-radius: 999px;
       font-family: var(--font-mono);
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       border: 1px solid rgba(108, 62, 255, 0.32);
       background: rgba(108, 62, 255, 0.1);
       color: var(--text-primary);
@@ -1020,15 +1394,12 @@
       text-decoration: line-through;
     }
     .seo-tag-chip .tag-idx {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       color: var(--cyan);
       opacity: 0.75;
     }
-    [data-theme="light"] .seo-tag-chip .tag-idx {
-      color: var(--violet);
-    }
     .seo-tag-chip .tag-x {
-      font-size: 0.65rem;
+      font-size: 0.64rem;
       opacity: 0.55;
     }
     .seo-tag-chip:hover .tag-x {
@@ -1036,33 +1407,11 @@
       color: var(--coral);
     }
 
-    .add-tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-    .add-tag-row .seo-input {
-      flex: 1 1 180px;
-      min-width: 0;
-    }
-    .tags-section {
-      min-width: 0;
-      max-width: 100%;
-    }
-    .preview-stage {
-      min-width: 0;
-      max-width: 100%;
-    }
-    .seo-result-header {
-      flex-wrap: wrap;
-    }
-
     .copy-actions-bar {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 16px;
+      margin-top: 14px;
       padding-top: 14px;
       border-top: 1px solid var(--border);
     }
@@ -1070,77 +1419,428 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 9px 14px;
+      padding: 8px 13px;
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--glass-bg);
       color: var(--text-primary);
       font-family: var(--font-mono);
-      font-size: 0.72rem;
+      font-size: 0.71rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .action-btn:hover {
+    .action-btn:hover:not(:disabled) {
       border-color: var(--violet);
       background: rgba(108, 62, 255, 0.14);
       transform: translateY(-1px);
+    }
+    .action-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
     }
     .action-btn.primary {
       background: linear-gradient(135deg, var(--violet), #5025ee);
       border-color: transparent;
       color: #ffffff;
     }
-    .action-btn.primary:hover {
-      box-shadow: 0 6px 20px rgba(108, 62, 255, 0.35);
+    .action-btn.primary:hover:not(:disabled) {
+      box-shadow: 0 6px 18px rgba(108, 62, 255, 0.35);
+    }
+    .action-btn.cyan-btn {
+      background: linear-gradient(135deg, #00A8E8, #0284C7);
+      border-color: transparent;
+      color: #ffffff;
+    }
+    .action-btn.cyan-btn:hover:not(:disabled) {
+      box-shadow: 0 6px 18px rgba(0, 200, 255, 0.35);
+    }
+    .action-btn.danger-btn {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
     }
 
-    /* Long-tail chips */
-    .longtail-row {
+    /* ── BATCH CARDS LIST VIEW (FREEMETADATA STYLE IN SAHADAT THEME) ── */
+    .batch-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .batch-item-card {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+      padding: 16px;
+      transition: border-color 0.2s;
+    }
+    .batch-item-card.is-active {
+      border-color: var(--violet);
+    }
+    .batch-card-head {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
     }
-    .longtail-chip {
-      font-size: 0.76rem;
-      padding: 5px 12px;
+    .batch-card-file {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+    .batch-card-thumb {
+      width: 56px;
+      height: 56px;
       border-radius: 10px;
-      border: 1px solid rgba(0, 200, 255, 0.25);
-      background: rgba(0, 200, 255, 0.08);
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: all 0.2s;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      cursor: zoom-in;
+      flex-shrink: 0;
     }
-    .longtail-chip:hover {
-      border-color: var(--cyan);
-      transform: translateY(-1px);
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 9px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .status-pill.waiting {
+      background: rgba(148, 163, 184, 0.16);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .status-pill.processing {
+      background: rgba(0, 200, 255, 0.14);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 200, 255, 0.35);
+    }
+    .status-pill.done {
+      background: rgba(34, 197, 94, 0.14);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+    .status-pill.failed {
+      background: rgba(239, 68, 68, 0.14);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.35);
     }
 
-    /* ── MODAL FOR SAHADAT AI KEY ── */
+    /* ── MODALS (API SECRETS MANAGEMENT, ADMIN, LIGHTBOX) ── */
     .ai-modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(9, 9, 26, 0.88);
+      background: rgba(9, 9, 26, 0.85);
       z-index: 10100;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
     .ai-modal-backdrop.open {
       display: flex;
     }
     .ai-modal {
       width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
+      max-width: 520px;
+      max-height: 92vh;
       overflow-y: auto;
       background: var(--bg-card-solid);
       border: 1px solid var(--border-hover);
       border-radius: 22px;
-      padding: 26px;
+      padding: 24px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+    .ai-modal.wide-modal {
+      max-width: 820px;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .api-modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .api-provider-bar {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+    }
+    .api-provider-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.45);
+    }
+    .api-prov-tab {
+      flex: 1 1 auto;
+      min-width: 96px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .api-prov-tab:hover {
+      color: var(--text-primary);
+      background: rgba(108, 62, 255, 0.08);
+    }
+    .api-prov-tab.active {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(108, 62, 255, 0.38);
+    }
+    .api-prov-count {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .api-prov-tab:not(.active) .api-prov-count {
+      background: rgba(108, 62, 255, 0.16);
+      color: var(--violet);
+    }
+    .api-modal-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      overflow-y: auto;
+      max-height: 58vh;
+    }
+    @media (min-width: 720px) {
+      .api-modal-split {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .api-modal-col {
+      padding: 22px 24px;
+    }
+    .api-modal-col.left-col {
+      border-bottom: 1px solid var(--border);
+    }
+    @media (min-width: 720px) {
+      .api-modal-col.left-col {
+        border-bottom: none;
+        border-right: 1px solid var(--border);
+      }
+    }
+    .api-col-title {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .api-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .api-key-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+    .api-key-input-wrap .seo-input {
+      padding-right: 36px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .eye-toggle-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 0.82rem;
+    }
+    .eye-toggle-btn:hover {
+      color: var(--violet);
+    }
+    .get-key-link-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(108, 62, 255, 0.45);
+      background: rgba(108, 62, 255, 0.08);
+      color: var(--violet);
+      font-family: var(--font-body);
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .get-key-link-btn:hover {
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      border-color: transparent;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .stored-keys-empty {
+      min-height: 185px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-muted);
+      gap: 8px;
+    }
+    .stored-keys-empty i {
+      font-size: 1.8rem;
+      opacity: 0.45;
+    }
+    .stored-key-card {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.35);
+      padding: 11px 12px;
+      margin-bottom: 9px;
+      transition: border-color 0.2s;
+    }
+    .stored-key-card.selected {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 1px rgba(108, 62, 255, 0.25);
+    }
+    .stored-key-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .stored-key-val {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+    .stored-key-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+    .key-status-badge {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 700;
+    }
+    .key-status-badge.untested { background: rgba(148, 163, 184, 0.16); color: var(--text-muted); }
+    .key-status-badge.valid { background: rgba(34, 197, 94, 0.16); color: #22c55e; }
+    .key-status-badge.invalid { background: rgba(239, 68, 68, 0.16); color: #ef4444; }
+    .key-status-badge.testing { background: rgba(0, 200, 255, 0.16); color: var(--cyan); }
+    .api-modal-footer {
+      padding: 15px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(13, 13, 26, 0.25);
+    }
+
+    /* Admin feedback */
+    .admin-status-box {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(108, 62, 255, 0.08);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+    .admin-feedback {
+      font-size: 0.8rem;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .admin-feedback.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+    .admin-feedback.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #22c55e;
+    }
+
+    /* Lightbox */
+    .lightbox-card {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-hover);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+    }
+    .lightbox-card img {
+      max-width: 82vw;
+      max-height: 74vh;
+      object-fit: contain;
+      border-radius: 12px;
     }
 
     /* Toast */
@@ -1193,6 +1893,41 @@
       border-color: rgba(16, 185, 129, 0.35);
       color: #047857;
     }
+    [data-theme="light"] .icon-pill-btn {
+      background: #F8FAFF;
+      color: #475569;
+    }
+    [data-theme="light"] .api-toggle-card {
+      background: linear-gradient(135deg, #F5F3FF, #F0F9FF);
+      border-color: rgba(99, 54, 245, 0.22);
+    }
+    [data-theme="light"] .mode-tabs-bar,
+    [data-theme="light"] .view-switcher {
+      background: #F1F5F9;
+      border-color: rgba(99, 54, 245, 0.15);
+    }
+    [data-theme="light"] .style-toggle-pill,
+    [data-theme="light"] .platform-pill {
+      background: #FFFFFF;
+      border-color: rgba(99, 54, 245, 0.18);
+      color: #475569;
+    }
+    [data-theme="light"] .platform-pill:hover,
+    [data-theme="light"] .style-toggle-pill:hover {
+      background: #F5F3FF;
+      color: var(--violet);
+      border-color: var(--violet);
+    }
+    [data-theme="light"] .style-toggle-pill.active {
+      background: #E0F2FE;
+      border-color: #0284C7;
+      color: #0C4A6E;
+    }
+    [data-theme="light"] .platform-pill.active {
+      background: linear-gradient(135deg, #6336F5, #4F46E5);
+      color: #FFFFFF;
+      border-color: transparent;
+    }
     [data-theme="light"] .seo-dropzone {
       background: linear-gradient(135deg, #FAF8FF, #F0F9FF);
       border-color: rgba(99, 54, 245, 0.32);
@@ -1206,13 +1941,25 @@
     [data-theme="light"] .dropzone-icon {
       background: linear-gradient(135deg, #6336F5, #0284C7);
       border-color: transparent;
-      box-shadow: 0 10px 26px rgba(99, 54, 245, 0.3);
+      box-shadow: 0 10px 24px rgba(99, 54, 245, 0.28);
     }
     [data-theme="light"] .dropzone-icon path:first-of-type {
-      stroke: rgba(255, 255, 255, 0.9);
+      stroke: rgba(255, 255, 255, 0.92);
     }
-    [data-theme="light"] .preview-canvas-wrap {
-      background-color: #F8FAFF;
+    [data-theme="light"] .batch-action-bar,
+    [data-theme="light"] .active-preview-banner,
+    [data-theme="light"] .batch-item-card,
+    [data-theme="light"] .seo-result-card,
+    [data-theme="light"] .tags-section,
+    [data-theme="light"] .stored-key-card {
+      background: #FAFBFD;
+      border-color: rgba(99, 54, 245, 0.14);
+    }
+    [data-theme="light"] .seo-select,
+    [data-theme="light"] .seo-input,
+    [data-theme="light"] .seo-textarea,
+    [data-theme="light"] .tag-count-input {
+      background: #FFFFFF;
     }
     [data-theme="light"] .preset-pill {
       background: #FFFFFF;
@@ -1228,24 +1975,23 @@
       background: linear-gradient(135deg, #F5F3FF, #F0F9FF);
       border-color: rgba(99, 54, 245, 0.22);
     }
-    [data-theme="light"] .seo-result-card,
-    [data-theme="light"] .tags-section {
-      background: #FAFBFD;
-      border-color: rgba(99, 54, 245, 0.14);
+    [data-theme="light"] .score-tip-pill {
+      background: #FFFFFF;
+    }
+    [data-theme="light"] .seo-editable.mono {
+      color: #0284c7;
     }
     [data-theme="light"] .seo-tag-chip {
       background: #F5F3FF;
       border-color: rgba(99, 54, 245, 0.24);
       color: #1E1B4B;
     }
+    [data-theme="light"] .seo-tag-chip .tag-idx {
+      color: var(--violet);
+    }
     [data-theme="light"] .seo-tag-chip:hover {
       background: #EDE9FE;
       border-color: var(--violet);
-    }
-    [data-theme="light"] .longtail-chip {
-      background: #EFF6FF;
-      border-color: rgba(2, 132, 199, 0.25);
-      color: #0C4A6E;
     }
     [data-theme="light"] .mini-copy-btn,
     [data-theme="light"] .action-btn {
@@ -1254,8 +2000,8 @@
       color: #334155;
       box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
     }
-    [data-theme="light"] .mini-copy-btn:hover,
-    [data-theme="light"] .action-btn:hover {
+    [data-theme="light"] .mini-copy-btn:hover:not(:disabled),
+    [data-theme="light"] .action-btn:hover:not(:disabled) {
       background: #F5F3FF;
       border-color: var(--violet);
       color: var(--violet);
@@ -1266,33 +2012,58 @@
       border-color: transparent;
       color: #FFFFFF;
     }
+    [data-theme="light"] .action-btn.cyan-btn,
+    [data-theme="light"] .mini-copy-btn.seo-file-accent {
+      background: linear-gradient(135deg, #0284C7, #0EA5E9);
+      border-color: transparent;
+      color: #FFFFFF;
+    }
     [data-theme="light"] .ai-modal-backdrop {
       background: rgba(15, 23, 42, 0.48);
     }
-    [data-theme="light"] .ai-modal {
+    [data-theme="light"] .ai-modal,
+    [data-theme="light"] .export-dropdown-menu {
       background: #FFFFFF;
-      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    }
+    [data-theme="light"] .api-provider-bar,
+    [data-theme="light"] .api-modal-footer {
+      background: #F8FAFF;
+    }
+    [data-theme="light"] .api-provider-tabs {
+      background: #EEF2FF;
     }
     [data-theme="light"] .admin-status-box {
       background: #F5F3FF;
       border-color: rgba(99, 54, 245, 0.2);
     }
 
-    /* Ensure .hidden overrides local flex/inline-flex components */
+    /* Ensure .hidden always overrides local flex/grid components */
     .empty-results.hidden,
     .ai-loading-box.hidden,
-    .preview-stage.hidden,
     .action-btn.hidden,
     .format-badge.hidden,
     .seo-panel.hidden,
+    .api-quick-controls.hidden,
+    .api-key-warning.hidden,
+    .batch-cards-list.hidden,
+    .seo-fields-grid.hidden,
     #fileQueueWrap.hidden,
     #resultsContent.hidden,
-    #longTailWrap.hidden,
+    #metadataConfig.hidden,
+    #promptConfig.hidden,
+    #promptResultWrap.hidden,
+    #metadataResultWrap.hidden,
+    #keywordsRawEditWrap.hidden,
+    #tagsCloudWrap.hidden,
+    #apiCustomModelWrap.hidden,
     #adminUnlockForm.hidden,
     #adminUpdateForm.hidden,
     #workerUrlRow.hidden,
-    #adminCustomEndpointRow.hidden {
-      display: none;
+    #adminCustomEndpointRow.hidden,
+    #stopBatchBtn.hidden,
+    #stopBatchBtnSide.hidden {
+      display: none !important;
     }
   </style>
 </head>
@@ -1378,39 +2149,303 @@
           <path d="M22.5 2.5L23.4 5.1L26 6L23.4 6.9L22.5 9.5L21.6 6.9L19 6L21.6 5.1L22.5 2.5Z" fill="#00C8FF"/>
         </svg>
         <span class="ai-pulse-dot"></span>
-        <span>Powered by <strong>Sahadat AI</strong></span>
+        <span>Powered by <strong>Sahadat AI</strong> · 18 Stock &amp; Web SEO Formats</span>
       </div>
       <h1 class="section-title">AI SEO <span class="gradient-text">Tool</span></h1>
       <p class="seo-hero-sub">
-        Upload any image, vector, or PDF — <strong>Sahadat AI</strong> instantly analyzes your visual &amp; document content to generate high-ranking SEO titles, descriptions, alt texts, slugs, and customizable SEO tags.
+        Batch-generate high-ranking microstock metadata, reverse-engineered AI prompts, 18 marketplace CSVs, and binary EXIF/IPTC/XMP SEO-embedded files — using <strong>Sahadat AI</strong> or your own API keys.
       </p>
       <div class="format-badges">
-        <span class="format-badge"><i class="fas fa-image mr-1" style="color:var(--violet)"></i>PNG</span>
-        <span class="format-badge"><i class="fas fa-camera mr-1" style="color:var(--cyan)"></i>JPG / JPEG</span>
-        <span class="format-badge"><i class="fas fa-bolt mr-1" style="color:var(--coral)"></i>WEBP</span>
-        <span class="format-badge"><i class="fas fa-bezier-curve mr-1" style="color:#22c55e"></i>SVG</span>
-        <span class="format-badge"><i class="fas fa-file-pdf mr-1" style="color:#f59e0b"></i>PDF</span>
+        <span class="format-badge"><i class="fas fa-image" style="color:var(--violet)"></i>PNG / JPG</span>
+        <span class="format-badge"><i class="fas fa-bolt" style="color:var(--coral)"></i>WEBP / GIF</span>
+        <span class="format-badge"><i class="fas fa-bezier-curve" style="color:#22c55e"></i>SVG / EPS / AI</span>
+        <span class="format-badge"><i class="fas fa-film" style="color:var(--cyan)"></i>MP4 / MOV</span>
+        <span class="format-badge"><i class="fas fa-file-pdf" style="color:#f59e0b"></i>PDF</span>
       </div>
     </div>
   </header>
 
   <!-- MAIN WORKSPACE -->
-  <main class="max-w-7xl mx-auto px-6 pb-20">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
     <div class="seo-workspace">
 
-      <!-- LEFT COLUMN: UPLOAD & CONTROLS -->
+      <!-- LEFT COLUMN: CONFIGURATION SIDEBAR -->
       <aside class="seo-panel">
         <div class="panel-title-row">
-          <h2 class="panel-title"><i class="fas fa-cloud-arrow-up"></i> Upload &amp; Settings</h2>
-          <button id="openAdminBtn" class="engine-chip" style="cursor:pointer;" type="button" title="Admin AI Model & Key Settings">
-            <i class="fas fa-lock"></i>
-            <span>Change AI Model</span>
+          <h2 class="panel-title"><i class="fas fa-sliders"></i> Configuration</h2>
+          <div class="flex items-center gap-2">
+            <button id="openApiSecretsBtn" class="engine-chip live" type="button" title="API Secrets & Model Selection">
+              <span class="dot-ind"></span>
+              <span id="engineChipLabel">API Keys</span>
+            </button>
+            <button id="openAdminBtn" class="icon-pill-btn" type="button" title="Site Owner Admin Settings">
+              <i class="fas fa-lock"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- API KEY TOGGLE & QUICK MODEL SELECTION -->
+        <div class="api-toggle-card">
+          <div class="api-toggle-top">
+            <div class="api-toggle-info">
+              <strong><i class="fas fa-key" style="color:var(--violet);font-size:0.78rem"></i> Use Own API Key</strong>
+              <span id="apiModeStatusSub" class="api-toggle-sub">OFF · Using Sahadat AI Server</span>
+            </div>
+            <label class="seo-switch" title="Toggle between Sahadat AI Server and your own API key">
+              <input type="checkbox" id="useOwnKeyToggle" />
+              <span class="seo-switch-track"></span>
+            </label>
+          </div>
+
+          <div id="apiQuickControls" class="api-quick-controls hidden">
+            <div class="api-quick-grid">
+              <div>
+                <label for="quickProviderSelect" class="control-label block mb-1">Provider</label>
+                <select id="quickProviderSelect" class="seo-select compact">
+                  <option value="gemini">Gemini</option>
+                  <option value="openrouter">OpenRouter</option>
+                  <option value="mistral">Mistral</option>
+                  <option value="groq">Groq</option>
+                  <option value="openai">OpenAI</option>
+                  <option value="claude">Claude</option>
+                </select>
+              </div>
+              <div>
+                <label for="quickModelSelect" class="control-label block mb-1">Model Selection</label>
+                <select id="quickModelSelect" class="seo-select compact"></select>
+              </div>
+            </div>
+            <div id="apiKeyMissingWarn" class="api-key-warning hidden">
+              <span><i class="fas fa-triangle-exclamation mr-1"></i>No key stored for <strong id="missingKeyProvName">Gemini</strong></span>
+              <button type="button" id="quickAddKeyBtn">Add Key</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODE SWITCHER: METADATA vs PROMPT -->
+        <div class="mode-tabs-bar" role="tablist" aria-label="Generation Mode">
+          <button id="tabMetadataBtn" class="mode-tab-btn active" type="button" role="tab" aria-selected="true">
+            <i class="fas fa-tags"></i> Metadata
+          </button>
+          <button id="tabPromptBtn" class="mode-tab-btn" type="button" role="tab" aria-selected="false">
+            <i class="fas fa-wand-magic-sparkles"></i> Prompt
           </button>
         </div>
 
-        <!-- Dropzone -->
-        <div class="seo-dropzone" id="seoDropZone" role="button" tabindex="0" aria-label="Upload files for SEO analysis">
-          <input type="file" id="seoFileInput" multiple accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg,.png,.jpg,.jpeg,.webp,application/pdf,.pdf" />
+        <!-- METADATA MODE CONFIG -->
+        <div id="metadataConfig">
+          <!-- Min Title Length -->
+          <div class="control-block">
+            <div class="control-label-row">
+              <label for="titleMinLenSlider" class="control-label">Min Title Length</label>
+              <span class="slider-val-badge"><span id="titleMinLenVal">65</span> chars</span>
+            </div>
+            <input type="range" id="titleMinLenSlider" class="seo-range" min="30" max="150" step="5" value="65" />
+          </div>
+
+          <!-- Max Title Length -->
+          <div class="control-block">
+            <div class="control-label-row">
+              <label for="titleMaxLenSlider" class="control-label">Max Title Length</label>
+              <span class="slider-val-badge"><span id="titleMaxLenVal">120</span> chars</span>
+            </div>
+            <input type="range" id="titleMaxLenSlider" class="seo-range" min="70" max="200" step="5" value="120" />
+          </div>
+
+          <!-- Description Length -->
+          <div class="control-block">
+            <div class="control-label-row">
+              <label for="descLenSlider" class="control-label">Description Length</label>
+              <span class="slider-val-badge"><span id="descLenVal">160</span> chars</span>
+            </div>
+            <input type="range" id="descLenSlider" class="seo-range" min="50" max="250" step="10" value="160" />
+          </div>
+
+          <!-- Keywords / SEO Tags Count -->
+          <div class="control-block">
+            <div class="control-label-row">
+              <label for="tagCountRange" class="control-label">Keywords / SEO Tags</label>
+              <div class="tag-count-badge">
+                <input type="number" id="tagCountInput" class="tag-count-input" min="5" max="150" value="50" aria-label="Number of SEO tags" />
+                <span>Tags</span>
+              </div>
+            </div>
+            <input type="range" id="tagCountRange" class="seo-range" min="5" max="100" step="1" value="50" />
+            <div class="preset-pills" id="tagPresets">
+              <button type="button" class="preset-pill" data-count="15">15</button>
+              <button type="button" class="preset-pill" data-count="25">25</button>
+              <button type="button" class="preset-pill" data-count="30">30</button>
+              <button type="button" class="preset-pill" data-count="49">49</button>
+              <button type="button" class="preset-pill active" data-count="50">50</button>
+              <button type="button" class="preset-pill" data-count="75">75</button>
+              <button type="button" class="preset-pill" data-count="100">100</button>
+            </div>
+          </div>
+
+          <!-- Output Language -->
+          <div class="control-block">
+            <label for="languageSelect" class="control-label block mb-1">Output Language</label>
+            <select id="languageSelect" class="seo-select compact">
+              <option value="English">English</option>
+              <option value="English + Bengali">English + বাংলা</option>
+              <option value="Bengali">বাংলা (Bengali)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- PROMPT MODE CONFIG -->
+        <div id="promptConfig" class="hidden">
+          <div class="control-block">
+            <div class="control-label-row">
+              <label for="promptLenSlider" class="control-label">Max Prompt Words</label>
+              <span class="slider-val-badge"><span id="promptLenVal">60</span> words</span>
+            </div>
+            <input type="range" id="promptLenSlider" class="seo-range" min="20" max="150" step="5" value="60" />
+          </div>
+
+          <div class="control-block">
+            <span class="control-label block mb-1">Prompt Styles</span>
+            <div class="style-toggles-grid" id="promptStylesGroup">
+              <label class="style-toggle-pill" for="toggleSilhouette">
+                <input type="checkbox" id="toggleSilhouette" />
+                <span class="pill-dot"></span>
+                <span>Silhouette</span>
+              </label>
+              <label class="style-toggle-pill" for="toggleWhiteBg">
+                <input type="checkbox" id="toggleWhiteBg" />
+                <span class="pill-dot"></span>
+                <span>White Background</span>
+              </label>
+              <label class="style-toggle-pill" for="toggleDigital">
+                <input type="checkbox" id="toggleDigital" />
+                <span class="pill-dot"></span>
+                <span>Digital Art</span>
+              </label>
+            </div>
+          </div>
+
+          <p class="font-mono text-xs mt-4 leading-relaxed" style="color:var(--text-muted)">
+            Reverse-engineers detailed image/stock generation prompts (Midjourney, Firefly, DALL·E, Freepik) from your uploaded visuals.
+          </p>
+        </div>
+
+        <!-- SHARED SETTINGS: CONTENT TYPE & PROCESSING SPEED -->
+        <div class="grid grid-cols-2 gap-3 control-block">
+          <div>
+            <label for="contentTypeSelect" class="control-label block mb-1">Content Type</label>
+            <select id="contentTypeSelect" class="seo-select compact">
+              <option value="None">None (Auto)</option>
+              <option value="JPG">JPG</option>
+              <option value="PNG">PNG</option>
+              <option value="WEBP">WEBP</option>
+              <option value="GIF">GIF</option>
+              <option value="MP4">MP4</option>
+              <option value="MOV">MOV</option>
+              <option value="SVG">SVG</option>
+              <option value="EPS">EPS</option>
+              <option value="AI">AI</option>
+              <option value="PDF">PDF</option>
+            </select>
+          </div>
+          <div>
+            <label for="batchSpeedSelect" class="control-label block mb-1">Processing Speed</label>
+            <select id="batchSpeedSelect" class="seo-select compact">
+              <option value="1">1x (Safe)</option>
+              <option value="2" selected>2x (Fast)</option>
+              <option value="3">3x (Standard)</option>
+              <option value="4">4x (Turbo)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- CUSTOM SYSTEM PROMPT (AUTO-SAVED) -->
+        <div class="control-block">
+          <div class="control-label-row">
+            <div class="flex items-center gap-2">
+              <label for="customPromptInput" class="control-label">Custom System Prompt</label>
+              <span class="autosave-badge">Auto-Saved</span>
+            </div>
+            <button id="restorePromptBtn" type="button" class="reset-link-btn" title="Reset custom prompt to default">
+              <i class="fas fa-rotate-left"></i> Reset
+            </button>
+          </div>
+          <textarea id="customPromptInput" class="seo-textarea" rows="3" placeholder="E.g., Write in Spanish, focus on minimalism, include commercial stock keywords, exclude brand names..."></textarea>
+        </div>
+
+        <!-- PRIMARY ACTION BUTTONS -->
+        <button id="generateBtn" class="generate-btn" type="button" disabled>
+          <svg style="width:17px;height:17px;flex-shrink:0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#FFFFFF"/>
+            <path d="M19.5 2.5L20.3 4.7L22.5 5.5L20.3 6.3L19.5 8.5L18.7 6.3L16.5 5.5L18.7 4.7L19.5 2.5Z" fill="#A5F3FC"/>
+          </svg>
+          <span id="generateBtnLabel">Generate 50 SEO Tags</span>
+        </button>
+
+        <button id="generateAllBtn" class="action-btn w-full justify-center mt-2.5 hidden" type="button">
+          <i class="fas fa-layer-group"></i>
+          <span id="generateAllBtnLabel">Generate Batch (All Files)</span>
+        </button>
+
+        <button id="stopBatchBtnSide" class="action-btn danger-btn w-full justify-center mt-2.5 hidden" type="button">
+          <i class="fas fa-stop"></i>
+          <span>Stop Batch Processing</span>
+        </button>
+      </aside>
+
+      <!-- RIGHT COLUMN: UPLOAD, 18 PLATFORMS, BATCH QUEUE & RESULTS -->
+      <section class="seo-panel" aria-live="polite">
+        <div class="panel-title-row">
+          <h2 class="panel-title"><i class="fas fa-cloud-arrow-up"></i> Upload Workspace &amp; Output</h2>
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="resultSourceBadge" class="format-badge hidden"></span>
+            <div class="view-switcher" role="group" aria-label="Results view mode">
+              <button id="viewDetailBtn" class="view-switch-btn active" type="button" title="Detailed SEO editor for selected file">
+                <i class="fas fa-sparkles"></i> Detail
+              </button>
+              <button id="viewBatchBtn" class="view-switch-btn" type="button" title="Stacked inline cards for all uploaded files">
+                <i class="fas fa-list-ul"></i> Batch Cards
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 18 STOCK & SEO PLATFORM SELECTOR -->
+        <div class="platform-grid-wrap">
+          <div class="control-label-row">
+            <span class="control-label">Target Platform &amp; CSV Format</span>
+            <span id="activePlatformHint" class="font-mono text-xs" style="color:var(--cyan)">General · Web &amp; Universal SEO</span>
+          </div>
+          <div class="platform-grid" id="platformGrid">
+            <button type="button" class="platform-pill active" data-platform="general"><svg class="platform-logo-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="4.2" ry="9.5" stroke="currentColor" stroke-width="1.6"/><path d="M2.8 9h18.4M2.8 15h18.4" stroke="currentColor" stroke-width="1.5"/></svg> General</button>
+            <button type="button" class="platform-pill" data-platform="adobe"><img class="platform-logo" src="assets/platform-logos/adobe.png" alt="Adobe Stock logo" width="18" height="18" /> Adobe</button>
+            <button type="button" class="platform-pill" data-platform="shutter"><img class="platform-logo" src="assets/platform-logos/shutter.png" alt="Shutterstock logo" width="18" height="18" /> Shutter</button>
+            <button type="button" class="platform-pill" data-platform="freepik"><img class="platform-logo" src="assets/platform-logos/freepik.png" alt="Freepik logo" width="18" height="18" /> Freepik</button>
+            <button type="button" class="platform-pill" data-platform="vecteezy"><img class="platform-logo" src="assets/platform-logos/vecteezy.png" alt="Vecteezy logo" width="18" height="18" /> Vecteezy</button>
+            <button type="button" class="platform-pill" data-platform="miricanvas"><img class="platform-logo" src="assets/platform-logos/miricanvas.png" alt="MiriCanvas logo" width="18" height="18" /> MiriCanvas</button>
+            <button type="button" class="platform-pill" data-platform="canva"><img class="platform-logo" src="assets/platform-logos/canva.png" alt="Canva logo" width="18" height="18" /> Canva</button>
+            <button type="button" class="platform-pill" data-platform="123rf"><img class="platform-logo" src="assets/platform-logos/123rf.png" alt="123RF logo" width="18" height="18" /> 123RF</button>
+            <button type="button" class="platform-pill" data-platform="deposit"><img class="platform-logo" src="assets/platform-logos/deposit.png" alt="Depositphotos logo" width="18" height="18" /> Deposit</button>
+            <button type="button" class="platform-pill" data-platform="dreamstime"><img class="platform-logo" src="assets/platform-logos/dreamstime.png" alt="Dreamstime logo" width="18" height="18" /> Dreamstime</button>
+            <button type="button" class="platform-pill" data-platform="istock"><img class="platform-logo" src="assets/platform-logos/istock.png" alt="iStock logo" width="18" height="18" /> iStock</button>
+            <button type="button" class="platform-pill" data-platform="getty"><img class="platform-logo" src="assets/platform-logos/getty.png" alt="Getty Images logo" width="18" height="18" /> Getty</button>
+            <button type="button" class="platform-pill" data-platform="alamy"><img class="platform-logo" src="assets/platform-logos/alamy.png" alt="Alamy logo" width="18" height="18" /> Alamy</button>
+            <button type="button" class="platform-pill" data-platform="pngtree"><img class="platform-logo" src="assets/platform-logos/pngtree.png" alt="Pngtree logo" width="18" height="18" /> Pngtree</button>
+            <button type="button" class="platform-pill" data-platform="pikbest"><img class="platform-logo needs-bg" src="assets/platform-logos/pikbest.png" alt="Pikbest logo" width="18" height="18" /> Pikbest</button>
+            <button type="button" class="platform-pill" data-platform="pond5"><img class="platform-logo needs-bg" src="assets/platform-logos/pond5.png" alt="Pond5 logo" width="18" height="18" /> Pond5</button>
+            <button type="button" class="platform-pill" data-platform="envato"><img class="platform-logo" src="assets/platform-logos/envato.png" alt="Envato logo" width="18" height="18" /> Envato</button>
+            <button type="button" class="platform-pill" data-platform="bigstock"><img class="platform-logo" src="assets/platform-logos/bigstock.png" alt="Bigstock logo" width="18" height="18" /> Bigstock</button>
+          </div>
+        </div>
+
+        <!-- DROPZONE -->
+        <div class="seo-dropzone" id="seoDropZone" role="button" tabindex="0" aria-label="Upload files for SEO metadata generation">
+          <input type="file" id="seoFileInput" multiple accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,video/mp4,video/quicktime,video/webm,application/pdf,application/postscript,.svg,.png,.jpg,.jpeg,.webp,.gif,.mp4,.mov,.webm,.eps,.ai,.pdf" />
+          <div class="dropzone-chips">
+            <span class="dropzone-chip"><i class="fas fa-image" style="color:var(--violet)"></i> Images</span>
+            <span class="dropzone-chip"><i class="fas fa-bezier-curve" style="color:#22c55e"></i> Vectors</span>
+            <span class="dropzone-chip"><i class="fas fa-film" style="color:var(--cyan)"></i> Videos</span>
+            <span class="dropzone-chip"><i class="fas fa-file-pdf" style="color:#f59e0b"></i> Documents</span>
+          </div>
           <div class="dropzone-icon">
             <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
               <defs>
@@ -1425,103 +2460,67 @@
               <path d="M38 6L39.4 10.1L43.5 11.5L39.4 12.9L38 17L36.6 12.9L32.5 11.5L36.6 10.1L38 6Z" fill="#00C8FF"/>
             </svg>
           </div>
-          <p class="dropzone-title">Drop files or click to browse</p>
-          <p class="dropzone-sub">Upload single or multiple files — or paste with Ctrl+V</p>
-          <p class="dropzone-hint">PNG · JPG · WEBP · SVG · PDF &nbsp;|&nbsp; Max 25MB each</p>
+          <p class="dropzone-title">Browse &amp; Upload Files — or Drop Here</p>
+          <p class="dropzone-sub">Upload single or unlimited batch files — or paste directly with Ctrl+V</p>
+          <p class="dropzone-hint">Supported: JPG, PNG, WEBP, GIF, MP4, MOV, SVG, EPS, AI, PDF &nbsp;|&nbsp; Max 50MB each</p>
         </div>
 
-        <!-- Uploaded File Queue -->
+        <!-- BATCH ACTION BAR -->
+        <div class="batch-action-bar">
+          <div class="batch-status-readout">
+            <span id="batchStatusDot" class="batch-status-dot"></span>
+            <span id="batchStatusText">System Ready.</span>
+          </div>
+          <div class="batch-btn-group">
+            <button id="clearFilesBtn" class="action-btn" type="button" disabled title="Clear all files from queue">
+              <i class="fas fa-trash-alt"></i> Clear
+            </button>
+            <button id="runBatchBtn" class="action-btn primary" type="button" disabled>
+              <i class="fas fa-bolt"></i> Generate Batch
+            </button>
+            <button id="stopBatchBtn" class="action-btn danger-btn hidden" type="button">
+              <i class="fas fa-stop"></i> Stop
+            </button>
+            <div class="export-dropdown-wrap">
+              <button id="csvDropdownBtn" class="action-btn" type="button" disabled>
+                <i class="fas fa-file-csv"></i> Download CSV <i class="fas fa-chevron-down" style="font-size:0.6rem"></i>
+              </button>
+              <div id="csvDropdownMenu" class="export-dropdown-menu">
+                <button type="button" class="export-menu-item" id="exportActivePlatformCsvBtn">
+                  <i class="fas fa-download" style="color:var(--violet)"></i>
+                  <span id="exportActivePlatformCsvLabel">Download General CSV</span>
+                </button>
+                <button type="button" class="export-menu-item" id="exportAll18CsvZipBtn">
+                  <i class="fas fa-file-zipper" style="color:var(--cyan)"></i>
+                  <span>All 18 Platforms CSV (.ZIP)</span>
+                </button>
+                <div class="export-menu-divider"></div>
+                <button type="button" class="export-menu-item" id="exportBatchJsonBtn">
+                  <i class="fas fa-file-code" style="color:#22c55e"></i>
+                  <span>Export Batch JSON</span>
+                </button>
+                <button type="button" class="export-menu-item" id="exportBatchTxtBtn">
+                  <i class="fas fa-file-lines" style="color:#f59e0b"></i>
+                  <span>Export Batch TXT</span>
+                </button>
+              </div>
+            </div>
+            <button id="exportSeoZipBtn" class="action-btn cyan-btn" type="button" disabled title="Export binary EXIF/IPTC/XMP SEO-injected files with AI footprints scrubbed (.ZIP)">
+              <i class="fas fa-file-shield"></i> Export SEO (.ZIP)
+            </button>
+          </div>
+        </div>
+
+        <!-- UPLOADED FILE QUEUE THUMBNAILS -->
         <div id="fileQueueWrap" class="hidden">
-          <div class="flex items-center justify-between mt-4 mb-1">
-            <span class="control-label">Uploaded Files (<span id="fileCountNum">0</span>)</span>
-            <button id="clearFilesBtn" class="mini-copy-btn" type="button"><i class="fas fa-trash-alt"></i> Clear</button>
+          <div class="flex items-center justify-between mt-3">
+            <span class="control-label">Queue (<span id="fileCountNum">0</span>) — click any file to inspect</span>
+            <span class="font-mono text-xs" style="color:var(--text-muted)">Click preview to zoom</span>
           </div>
           <div class="file-queue" id="fileQueue"></div>
         </div>
 
-        <!-- Active File Preview -->
-        <div id="previewStage" class="preview-stage hidden">
-          <div class="preview-canvas-wrap">
-            <div class="scan-laser"></div>
-            <img id="activePreviewImg" src="" alt="Uploaded preview" />
-          </div>
-          <div class="preview-meta-bar">
-            <span class="preview-filename" id="previewFileName">file.png</span>
-            <span id="previewFileSpecs">0 × 0 · 0 KB</span>
-          </div>
-        </div>
-
-        <!-- Tag Count Control (Default: 50) -->
-        <div class="control-block">
-          <div class="control-label-row">
-            <label for="tagCountRange" class="control-label">Number of SEO Tags</label>
-            <div class="tag-count-badge">
-              <input type="number" id="tagCountInput" class="tag-count-input" min="5" max="150" value="50" aria-label="Number of SEO tags" />
-              <span>Tags</span>
-            </div>
-          </div>
-          <input type="range" id="tagCountRange" class="seo-range" min="5" max="100" step="1" value="50" />
-          <div class="preset-pills" id="tagPresets">
-            <button type="button" class="preset-pill" data-count="15">15</button>
-            <button type="button" class="preset-pill" data-count="25">25</button>
-            <button type="button" class="preset-pill" data-count="30">30</button>
-            <button type="button" class="preset-pill active" data-count="50">50</button>
-            <button type="button" class="preset-pill" data-count="75">75</button>
-            <button type="button" class="preset-pill" data-count="100">100</button>
-          </div>
-        </div>
-
-        <!-- Platform & Language -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 control-block">
-          <div>
-            <label for="platformSelect" class="control-label block mb-2">Target Platform</label>
-            <select id="platformSelect" class="seo-select">
-              <option value="google">Google / Website SEO</option>
-              <option value="stock">Stock (Freepik / Adobe / Shutter)</option>
-              <option value="ecommerce">E-Commerce / Product</option>
-              <option value="social">Social Media &amp; YouTube</option>
-              <option value="blog">Blog &amp; Pinterest</option>
-            </select>
-          </div>
-          <div>
-            <label for="languageSelect" class="control-label block mb-2">Output Language</label>
-            <select id="languageSelect" class="seo-select">
-              <option value="English">English</option>
-              <option value="English + Bengali">English + বাংলা</option>
-              <option value="Bengali">বাংলা (Bengali)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Optional Context -->
-        <div class="control-block">
-          <label for="contextInput" class="control-label block mb-2">Optional Niche / Topic Hint</label>
-          <input type="text" id="contextInput" class="seo-input" placeholder="e.g. Minimalist agency logo, skincare bottle, SEO ebook..." />
-        </div>
-
-        <!-- Generate Buttons -->
-        <button id="generateBtn" class="generate-btn" type="button" disabled>
-          <svg style="width:18px;height:18px;flex-shrink:0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#FFFFFF"/>
-            <path d="M19.5 2.5L20.3 4.7L22.5 5.5L20.3 6.3L19.5 8.5L18.7 6.3L16.5 5.5L18.7 4.7L19.5 2.5Z" fill="#A5F3FC"/>
-          </svg>
-          <span id="generateBtnLabel">Generate 50 SEO Tags with Sahadat AI</span>
-        </button>
-
-        <button id="generateAllBtn" class="action-btn w-full justify-center mt-3 hidden" type="button">
-          <i class="fas fa-layer-group"></i>
-          <span>Batch Generate All Uploaded Files</span>
-        </button>
-      </aside>
-
-      <!-- RIGHT COLUMN: RESULTS WORKSPACE -->
-      <section class="seo-panel" aria-live="polite">
-        <div class="panel-title-row">
-          <h2 class="panel-title"><i class="fas fa-tags"></i> Sahadat AI SEO Output</h2>
-          <span id="resultSourceBadge" class="format-badge hidden"></span>
-        </div>
-
-        <!-- Empty State -->
+        <!-- EMPTY STATE -->
         <div id="emptyResults" class="empty-results">
           <div class="empty-orb">
             <div class="ai-orbit-ring"></div>
@@ -1542,29 +2541,34 @@
             </div>
           </div>
           <h3 class="font-display font-bold text-2xl mb-2">Sahadat AI is ready</h3>
-          <p class="text-body max-w-md text-sm leading-relaxed">
-            Upload a <strong>PNG, JPG, WebP, SVG, or PDF</strong> on the left, pick how many SEO tags you want (default <strong>50</strong>), and let <strong>Sahadat AI</strong> craft your full SEO metadata kit.
+          <p class="text-body max-w-lg text-sm leading-relaxed">
+            Upload images, vectors, videos, or PDFs above, pick any of the <strong>18 microstock &amp; SEO platforms</strong>, and batch-generate metadata, AI prompts, CSVs, and binary EXIF/IPTC/XMP-embedded SEO files.
           </p>
           <div class="feature-mini-grid">
             <div class="feature-mini">
-              <i class="fas fa-hashtag"></i>
-              <strong>50+ Smart Tags</strong>
-              <span>Pick any count from 5 to 150</span>
+              <i class="fas fa-store"></i>
+              <strong>18 Stock Platforms</strong>
+              <span>Adobe, Shutter, Freepik &amp; more</span>
             </div>
             <div class="feature-mini">
-              <i class="fas fa-file-lines"></i>
-              <strong>Full SEO Texts</strong>
-              <span>Title, meta desc, alt text &amp; slug</span>
+              <i class="fas fa-file-shield"></i>
+              <strong>EXIF/IPTC/XMP Embed</strong>
+              <span>Purges AI traces &amp; embeds SEO</span>
             </div>
             <div class="feature-mini">
-              <i class="fas fa-copy"></i>
-              <strong>1-Click Exports</strong>
-              <span>CSV, TXT, JSON, HTML &amp; #tags</span>
+              <i class="fas fa-wand-magic-sparkles"></i>
+              <strong>Metadata &amp; Prompt</strong>
+              <span>SEO tags + image-to-prompt</span>
+            </div>
+            <div class="feature-mini">
+              <i class="fas fa-key"></i>
+              <strong>Multi-AI BYOK Vault</strong>
+              <span>6 providers + key rotation</span>
             </div>
           </div>
         </div>
 
-        <!-- Loading State -->
+        <!-- LOADING STATE -->
         <div id="loadingResults" class="ai-loading-box hidden">
           <div class="ai-loader-emblem">
             <div class="ai-spinner-ring"></div>
@@ -1585,122 +2589,204 @@
           <div class="ai-progress-bar"><div class="ai-progress-fill"></div></div>
         </div>
 
-        <!-- Generated Output Content -->
-        <div id="resultsContent" class="hidden">
+        <!-- DETAIL VIEW: SINGLE ACTIVE FILE RICH EDITOR -->
+        <div id="resultsContent" class="hidden mt-4">
 
-          <!-- SEO Score & Quick File Audit -->
-          <div class="seo-score-banner">
-            <div class="score-ring" id="scoreRing">
-              <svg viewBox="0 0 80 80" aria-hidden="true">
-                <defs>
-                  <linearGradient id="sahadatScoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#6C3EFF"/>
-                    <stop offset="60%" stop-color="#00C8FF"/>
-                    <stop offset="100%" stop-color="#22c55e"/>
-                  </linearGradient>
-                </defs>
-                <circle class="score-track" cx="40" cy="40" r="34"></circle>
-                <circle class="score-arc" id="scoreArc" cx="40" cy="40" r="34"></circle>
-              </svg>
-              <span class="num" id="seoScoreNum">92</span>
-              <span class="lbl">SEO</span>
-            </div>
+          <!-- Active File Mini Preview + Quick Actions -->
+          <div class="active-preview-banner">
+            <button type="button" class="active-thumb-btn" id="activeThumbZoomBtn" title="Click to view full preview">
+              <img id="activePreviewImg" src="" alt="Active file preview" />
+              <span class="active-thumb-zoom"><i class="fas fa-expand"></i></span>
+            </button>
             <div class="flex-1 min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <strong class="font-display text-base" id="seoGradeTitle">Strong SEO Readiness</strong>
+              <div class="flex flex-wrap items-center gap-2 mb-1">
+                <strong id="previewFileName" class="font-display text-sm truncate" style="max-width:280px">file.png</strong>
                 <span class="format-badge" id="resultFileBadge">PNG</span>
               </div>
-              <div class="score-tips" id="seoTipsWrap"></div>
+              <p id="previewFileSpecs" class="font-mono text-xs" style="color:var(--text-muted)">0 × 0 · 0 KB</p>
+              <div class="flex flex-wrap items-center gap-2 mt-2.5">
+                <button id="regenerateSingleBtn" class="mini-copy-btn" type="button" title="Regenerate metadata for this file">
+                  <i class="fas fa-rotate"></i> Regenerate
+                </button>
+                <button id="downloadSingleSeoFileBtn" class="mini-copy-btn seo-file-accent" type="button" title="Download this file with EXIF/IPTC/XMP SEO embedded and AI footprints scrubbed">
+                  <i class="fas fa-file-shield"></i> SEO File
+                </button>
+              </div>
             </div>
           </div>
 
-          <!-- SEO Title & Slug -->
-          <div class="seo-fields-grid two-col">
-            <div class="seo-result-card">
+          <!-- PROMPT MODE RESULT PANEL -->
+          <div id="promptResultWrap" class="hidden">
+            <div class="seo-result-card mb-4">
               <div class="seo-result-header">
-                <span class="seo-result-label"><i class="fas fa-heading"></i> SEO Title</span>
+                <span class="seo-result-label"><i class="fas fa-wand-magic-sparkles"></i> Generated AI Prompt</span>
                 <div class="flex items-center gap-2">
-                  <span class="char-pill" id="titleCharCount">0 chars</span>
-                  <button class="mini-copy-btn" type="button" data-copy-target="outSeoTitle"><i class="fas fa-copy"></i> Copy</button>
+                  <span class="char-pill" id="promptWordCount">0 words</span>
+                  <button class="mini-copy-btn copy-all-accent" type="button" data-copy-target="outGeneratedPrompt"><i class="fas fa-copy"></i> Copy Prompt</button>
                 </div>
               </div>
-              <textarea id="outSeoTitle" class="seo-editable" rows="2"></textarea>
-            </div>
-
-            <div class="seo-result-card">
-              <div class="seo-result-header">
-                <span class="seo-result-label"><i class="fas fa-link"></i> SEO Filename / Slug</span>
-                <button class="mini-copy-btn" type="button" data-copy-target="outSeoSlug"><i class="fas fa-copy"></i> Copy</button>
-              </div>
-              <textarea id="outSeoSlug" class="seo-editable mono" rows="2"></textarea>
+              <textarea id="outGeneratedPrompt" class="seo-editable" rows="5" placeholder="Generated reverse-engineered AI prompt..."></textarea>
             </div>
           </div>
 
-          <!-- Meta Description & Alt Text -->
-          <div class="seo-fields-grid two-col">
-            <div class="seo-result-card">
-              <div class="seo-result-header">
-                <span class="seo-result-label"><i class="fas fa-align-left"></i> Meta Description</span>
+          <!-- METADATA MODE RESULT PANEL -->
+          <div id="metadataResultWrap">
+            <!-- SEO Score & Quick File Audit -->
+            <div class="seo-score-banner">
+              <div class="score-ring" id="scoreRing">
+                <svg viewBox="0 0 80 80" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="sahadatScoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#6C3EFF"/>
+                      <stop offset="60%" stop-color="#00C8FF"/>
+                      <stop offset="100%" stop-color="#22c55e"/>
+                    </linearGradient>
+                  </defs>
+                  <circle class="score-track" cx="40" cy="40" r="34"></circle>
+                  <circle class="score-arc" id="scoreArc" cx="40" cy="40" r="34"></circle>
+                </svg>
+                <span class="num" id="seoScoreNum">92</span>
+                <span class="lbl">SEO</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <strong class="font-display text-base" id="seoGradeTitle">Strong SEO Readiness</strong>
+                  <span class="format-badge" id="resultCategoryBadge" style="color:var(--violet)">Category: Graphic Resources</span>
+                </div>
+                <div class="score-tips" id="seoTipsWrap"></div>
+              </div>
+            </div>
+
+            <!-- SEO Title & Slug -->
+            <div class="seo-fields-grid two-col">
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-heading"></i> SEO Title</span>
+                  <div class="flex items-center gap-2">
+                    <span class="char-pill" id="titleCharCount">0 chars</span>
+                    <button class="mini-copy-btn" type="button" data-copy-target="outSeoTitle"><i class="fas fa-copy"></i> Copy</button>
+                  </div>
+                </div>
+                <textarea id="outSeoTitle" class="seo-editable" rows="2"></textarea>
+              </div>
+
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-link"></i> SEO Filename / Slug</span>
+                  <button class="mini-copy-btn" type="button" data-copy-target="outSeoSlug"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <textarea id="outSeoSlug" class="seo-editable mono" rows="2"></textarea>
+              </div>
+            </div>
+
+            <!-- Meta Description & Alt Text -->
+            <div class="seo-fields-grid two-col">
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-align-left"></i> Meta Description</span>
+                  <div class="flex items-center gap-2">
+                    <span class="char-pill" id="descCharCount">0 chars</span>
+                    <button class="mini-copy-btn" type="button" data-copy-target="outMetaDesc"><i class="fas fa-copy"></i> Copy</button>
+                  </div>
+                </div>
+                <textarea id="outMetaDesc" class="seo-editable" rows="3"></textarea>
+              </div>
+
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-universal-access"></i> Image / Asset Alt Text</span>
+                  <button class="mini-copy-btn" type="button" data-copy-target="outAltText"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <textarea id="outAltText" class="seo-editable" rows="3"></textarea>
+              </div>
+            </div>
+
+            <!-- SEO Caption & Category -->
+            <div class="seo-fields-grid two-col">
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-quote-left"></i> SEO Caption / Post Copy</span>
+                  <button class="mini-copy-btn" type="button" data-copy-target="outCaption"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <textarea id="outCaption" class="seo-editable" rows="2"></textarea>
+              </div>
+
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-folder-tree"></i> Stock Category (Adobe / Shutter)</span>
+                </div>
+                <select id="outCategorySelect" class="seo-select compact mt-1">
+                  <option value="1">1 — Animals</option>
+                  <option value="2">2 — Buildings and Architecture</option>
+                  <option value="3">3 — Business</option>
+                  <option value="4">4 — Drinks</option>
+                  <option value="5">5 — The Environment</option>
+                  <option value="6">6 — States of Mind</option>
+                  <option value="7">7 — Food</option>
+                  <option value="8" selected>8 — Graphic Resources</option>
+                  <option value="9">9 — Hobbies and Leisure</option>
+                  <option value="10">10 — Industry</option>
+                  <option value="11">11 — Landscapes</option>
+                  <option value="12">12 — Lifestyle</option>
+                  <option value="13">13 — People</option>
+                  <option value="14">14 — Plants and Flowers</option>
+                  <option value="15">15 — Culture and Religion</option>
+                  <option value="16">16 — Science</option>
+                  <option value="17">17 — Social Issues</option>
+                  <option value="18">18 — Sports</option>
+                  <option value="19">19 — Technology</option>
+                  <option value="20">20 — Transport</option>
+                  <option value="21">21 — Travel</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- SEO Tags & Keywords Cloud -->
+            <div class="tags-section">
+              <div class="tags-toolbar">
                 <div class="flex items-center gap-2">
-                  <span class="char-pill" id="descCharCount">0 chars</span>
-                  <button class="mini-copy-btn" type="button" data-copy-target="outMetaDesc"><i class="fas fa-copy"></i> Copy</button>
+                  <span class="seo-result-label"><i class="fas fa-tags"></i> SEO Tags &amp; Keywords</span>
+                  <span class="tag-count-badge" id="selectedTagsCounter">50 / 50</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <button id="editKeywordsModeBtn" class="mini-copy-btn" type="button" title="Toggle comma-separated keyword editor">
+                    <i class="fas fa-pen"></i> Edit
+                  </button>
+                  <button id="copyAllTagsBtn" class="mini-copy-btn copy-all-accent" type="button"><i class="fas fa-copy"></i> Copy All</button>
+                  <button id="toggleAllTagsBtn" class="mini-copy-btn" type="button">Clear Selection</button>
                 </div>
               </div>
-              <textarea id="outMetaDesc" class="seo-editable" rows="3"></textarea>
-            </div>
 
-            <div class="seo-result-card">
-              <div class="seo-result-header">
-                <span class="seo-result-label"><i class="fas fa-universal-access"></i> Image / Asset Alt Text</span>
-                <button class="mini-copy-btn" type="button" data-copy-target="outAltText"><i class="fas fa-copy"></i> Copy</button>
+              <div id="tagsCloudWrap">
+                <p class="font-mono text-xs mb-2.5" style="color:var(--text-muted)">
+                  Click any tag to include/exclude it, or click <strong>Edit</strong> to bulk-edit comma-separated keywords.
+                </p>
+                <div class="tags-cloud" id="tagsCloud"></div>
               </div>
-              <textarea id="outAltText" class="seo-editable" rows="3"></textarea>
+
+              <div id="keywordsRawEditWrap" class="hidden">
+                <textarea id="keywordsRawTextarea" class="seo-textarea font-mono text-xs" rows="5" placeholder="Enter keywords separated by commas..."></textarea>
+                <div class="flex justify-end mt-2">
+                  <button id="doneEditKeywordsBtn" class="mini-copy-btn copy-all-accent" type="button"><i class="fas fa-check"></i> Done Editing</button>
+                </div>
+              </div>
+
+              <!-- Copy & Export Bar -->
+              <div class="copy-actions-bar">
+                <button id="copyCommaBtn" class="action-btn primary" type="button"><i class="fas fa-copy"></i> Copy Comma Tags</button>
+                <button id="copyHashtagsBtn" class="action-btn" type="button"><i class="fas fa-hashtag"></i> Copy #Hashtags</button>
+                <button id="copyLinesBtn" class="action-btn" type="button"><i class="fas fa-list"></i> Copy Lines</button>
+                <button id="copyHtmlBtn" class="action-btn" type="button"><i class="fas fa-code"></i> Copy HTML Meta</button>
+                <button id="exportCsvBtn" class="action-btn" type="button"><i class="fas fa-file-csv"></i> CSV</button>
+                <button id="exportTxtBtn" class="action-btn" type="button"><i class="fas fa-file-alt"></i> TXT</button>
+                <button id="exportJsonBtn" class="action-btn" type="button"><i class="fas fa-file-code"></i> JSON</button>
+              </div>
             </div>
           </div>
-
-          <!-- SEO Caption / Summary -->
-          <div class="seo-fields-grid">
-            <div class="seo-result-card">
-              <div class="seo-result-header">
-                <span class="seo-result-label"><i class="fas fa-quote-left"></i> SEO Caption / Post Copy</span>
-                <button class="mini-copy-btn" type="button" data-copy-target="outCaption"><i class="fas fa-copy"></i> Copy</button>
-              </div>
-              <textarea id="outCaption" class="seo-editable" rows="2"></textarea>
-            </div>
-          </div>
-
-          <!-- SEO Tags & Keywords Cloud -->
-          <div class="tags-section">
-            <div class="tags-toolbar">
-              <div class="flex items-center gap-3">
-                <span class="seo-result-label"><i class="fas fa-tags"></i> SEO Tags &amp; Keywords</span>
-                <span class="tag-count-badge" id="selectedTagsCounter">50 / 50</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button id="copyAllTagsBtn" class="mini-copy-btn copy-all-accent" type="button"><i class="fas fa-copy"></i> Copy All</button>
-                <button id="toggleAllTagsBtn" class="mini-copy-btn" type="button">Clear Selection</button>
-              </div>
-            </div>
-
-            <p class="font-mono text-xs mb-3" style="color:var(--text-muted)">
-              Click any tag to include or exclude it before copying.
-            </p>
-
-            <div class="tags-cloud" id="tagsCloud"></div>
-
-            <!-- Copy & Export Bar -->
-            <div class="copy-actions-bar">
-              <button id="copyCommaBtn" class="action-btn primary" type="button"><i class="fas fa-copy"></i> Copy Comma Tags</button>
-              <button id="copyHashtagsBtn" class="action-btn" type="button"><i class="fas fa-hashtag"></i> Copy #Hashtags</button>
-              <button id="copyLinesBtn" class="action-btn" type="button"><i class="fas fa-list"></i> Copy Lines</button>
-              <button id="copyHtmlBtn" class="action-btn" type="button"><i class="fas fa-code"></i> Copy HTML Meta</button>
-              <button id="exportCsvBtn" class="action-btn" type="button"><i class="fas fa-file-csv"></i> CSV</button>
-              <button id="exportTxtBtn" class="action-btn" type="button"><i class="fas fa-file-alt"></i> TXT</button>
-              <button id="exportJsonBtn" class="action-btn" type="button"><i class="fas fa-file-code"></i> JSON</button>
-            </div>
-          </div>
-
         </div>
+
+        <!-- BATCH CARDS VIEW: ALL UPLOADED FILES STACKED -->
+        <div id="batchResultsList" class="batch-cards-list hidden"></div>
       </section>
 
     </div>
@@ -1736,7 +2822,131 @@
     </div>
   </footer>
 
-  <!-- PASSWORD-PROTECTED ADMIN MODAL (CHANGE AI KEY) -->
+  <!-- API SECRETS MANAGEMENT MODAL (MULTI-PROVIDER + MODEL SELECTION + KEY VAULT) -->
+  <div id="apiSecretsBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="apiSecretsTitle">
+    <div class="ai-modal wide-modal">
+      <div class="api-modal-header">
+        <h3 id="apiSecretsTitle" class="font-display font-bold text-xl flex items-center gap-2.5">
+          <i class="fas fa-key" style="color:var(--violet)"></i> API Secrets Management
+        </h3>
+        <button id="closeApiSecretsBtn" class="theme-btn" type="button" aria-label="Close API Secrets Management">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- 6 Provider Tabs -->
+      <div class="api-provider-bar">
+        <div class="api-provider-tabs" id="apiProviderTabs" role="tablist">
+          <button type="button" class="api-prov-tab active" data-prov="gemini">
+            <i class="fab fa-google"></i> <span>Gemini</span> <span class="api-prov-count" data-prov-count="gemini">0</span>
+          </button>
+          <button type="button" class="api-prov-tab" data-prov="openrouter">
+            <i class="fas fa-network-wired"></i> <span>OpenRouter</span> <span class="api-prov-count" data-prov-count="openrouter">0</span>
+          </button>
+          <button type="button" class="api-prov-tab" data-prov="mistral">
+            <i class="fas fa-wind"></i> <span>Mistral</span> <span class="api-prov-count" data-prov-count="mistral">0</span>
+          </button>
+          <button type="button" class="api-prov-tab" data-prov="groq">
+            <i class="fas fa-bolt"></i> <span>Groq</span> <span class="api-prov-count" data-prov-count="groq">0</span>
+          </button>
+          <button type="button" class="api-prov-tab" data-prov="openai">
+            <i class="fas fa-brain"></i> <span>OpenAI</span> <span class="api-prov-count" data-prov-count="openai">0</span>
+          </button>
+          <button type="button" class="api-prov-tab" data-prov="claude">
+            <i class="fas fa-robot"></i> <span>Claude</span> <span class="api-prov-count" data-prov-count="claude">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Two-Column Configuration + Stored Keys -->
+      <div class="api-modal-split">
+        <!-- LEFT: CONFIGURATION -->
+        <div class="api-modal-col left-col">
+          <h4 class="api-col-title">
+            <span>Configuration</span>
+            <span id="apiProvBadge" class="font-mono text-xs" style="color:var(--cyan)">Gemini</span>
+          </h4>
+
+          <div class="mb-4">
+            <label for="apiModalModelSelect" class="control-label block mb-2">Model Selection</label>
+            <select id="apiModalModelSelect" class="seo-select"></select>
+            <div id="apiCustomModelWrap" class="mt-2 hidden">
+              <input type="text" id="apiCustomModelInput" class="seo-input font-mono text-xs" placeholder="Enter exact custom model ID..." autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="apiModalKeyInput" class="control-label block mb-2">Add New API Key</label>
+            <div class="api-input-row">
+              <div class="api-key-input-wrap">
+                <input type="password" id="apiModalKeyInput" class="seo-input" placeholder="AIza..." autocomplete="off" />
+                <button type="button" id="toggleNewKeyVisBtn" class="eye-toggle-btn" title="Show/Hide key">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <button type="button" id="saveProviderKeyBtn" class="action-btn primary" style="padding:0 18px;">
+                Save
+              </button>
+            </div>
+          </div>
+
+          <a id="getApiKeyLink" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="get-key-link-btn">
+            <i class="fas fa-key"></i>
+            <span id="getApiKeyLabel">Get API Key from Google</span>
+          </a>
+
+          <div class="flex items-center justify-between gap-3 mt-5 pt-4" style="border-top:1px solid var(--border)">
+            <div>
+              <span class="font-mono text-xs font-semibold block" style="color:var(--text-primary)">Auto-Rotate Keys</span>
+              <span class="font-mono" style="font-size:0.64rem;color:var(--text-muted)">Switch to next stored key on 429 rate limits</span>
+            </div>
+            <label class="seo-switch" title="Auto-rotate stored keys on rate limit">
+              <input type="checkbox" id="autoRotateKeysToggle" checked />
+              <span class="seo-switch-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- RIGHT: STORED KEYS -->
+        <div class="api-modal-col">
+          <h4 class="api-col-title">
+            <span>Stored Keys (<span id="storedKeysCountNum">0</span>)</span>
+            <div class="flex items-center gap-1.5" id="storedKeysGlobalActions">
+              <button type="button" id="copyAllKeysBtn" class="mini-copy-btn" title="Copy all keys for this provider">
+                <i class="fas fa-copy"></i> Copy All
+              </button>
+              <button type="button" id="testAllKeysBtn" class="mini-copy-btn" title="Test all stored keys for this provider">
+                <i class="fas fa-vial"></i> Test All
+              </button>
+            </div>
+          </h4>
+
+          <div id="storedKeysList"></div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="api-modal-footer">
+        <div class="flex flex-wrap items-center gap-4">
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <span class="seo-switch">
+              <input type="checkbox" id="modalOwnKeyToggle" />
+              <span class="seo-switch-track"></span>
+            </span>
+            <span class="font-mono text-xs font-semibold" style="color:var(--text-primary)">Use Own API Key</span>
+          </label>
+          <button type="button" id="openAdminFromSecretsBtn" class="mini-copy-btn" title="Configure site-wide Sahadat AI Cloudflare Worker">
+            <i class="fas fa-shield-halved"></i> Site Admin
+          </button>
+        </div>
+        <button type="button" id="apiSecretsDoneBtn" class="action-btn primary" style="padding:10px 22px;">
+          <i class="fas fa-check"></i> Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSWORD-PROTECTED ADMIN MODAL (SITE-WIDE WORKER KEY) -->
   <div id="adminModalBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
     <div class="ai-modal">
       <div class="flex items-center justify-between mb-4">
@@ -1753,7 +2963,7 @@
       <!-- STEP 1: PASSWORD GATE -->
       <form id="adminUnlockForm">
         <p class="text-body text-sm leading-relaxed mb-4">
-          Restricted to site owner. Enter admin password to update the live <strong>Sahadat AI</strong> key for all visitors.
+          Restricted to site owner. Enter admin password to update the live <strong>Sahadat AI</strong> server key for all visitors.
         </p>
         <div id="workerUrlRow" class="mb-3 hidden">
           <label for="adminWorkerUrlInput" class="control-label block mb-2">Cloudflare Worker URL</label>
@@ -1768,7 +2978,7 @@
         </div>
       </form>
 
-      <!-- STEP 2: UPDATE KEY (ONLY SHOWN AFTER SERVER VERIFIES PASSWORD) -->
+      <!-- STEP 2: UPDATE KEY -->
       <form id="adminUpdateForm" class="hidden">
         <div class="admin-status-box">
           <div><strong>Provider:</strong> <span id="adminActiveProvider" style="color:var(--violet)">—</span></div>
@@ -1784,6 +2994,7 @@
           <option value="openai">OpenAI (sk-...)</option>
           <option value="gemini">Google Gemini (AIza...)</option>
           <option value="anthropic">Anthropic Claude (sk-ant-...)</option>
+          <option value="mistral">Mistral AI</option>
           <option value="groq">Groq (gsk_...)</option>
           <option value="xai">xAI Grok (xai-...)</option>
           <option value="custom">Custom OpenAI-Compatible URL</option>
@@ -1817,6 +3028,22 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- IMAGE LIGHTBOX MODAL -->
+  <div id="lightboxBackdrop" class="ai-modal-backdrop" role="dialog" aria-modal="true" aria-label="Full Image Preview">
+    <div class="lightbox-card">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <strong id="lightboxTitle" class="font-display text-sm block">Preview</strong>
+          <span id="lightboxSpecs" class="font-mono text-xs" style="color:var(--text-muted)"></span>
+        </div>
+        <button id="closeLightboxBtn" class="theme-btn" type="button" aria-label="Close preview">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <img id="lightboxImg" src="" alt="Full size preview" />
     </div>
   </div>
 

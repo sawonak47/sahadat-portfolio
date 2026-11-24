@@ -179,26 +179,131 @@ if (statsSection) {
 // ── PORTFOLIO FILTER ──
 const filterBtns = document.querySelectorAll('.filter-btn');
 const portfolioItems = document.querySelectorAll('.portfolio-item');
+const ytShortsShowcase = document.getElementById('yt-shorts-showcase');
+const portfolioGrid = document.getElementById('portfolio-grid');
 
 filterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     filterBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const filter = btn.getAttribute('data-filter');
-    portfolioItems.forEach((item, i) => {
-      const cat = item.getAttribute('data-category');
-      const show = filter === 'all' || cat === filter;
+    let visibleIdx = 0;
+
+    portfolioItems.forEach((item) => {
+      const cats = (item.getAttribute('data-category') || '').trim().split(/\s+/);
+      const show = filter === 'all' || cats.includes(filter);
       if (show) {
         item.classList.remove('hidden');
+        item.classList.add('visible');
         item.style.animationName = 'reveal-up';
         item.style.animationDuration = '0.4s';
-        item.style.animationDelay = (i * 0.05) + 's';
+        item.style.animationDelay = (visibleIdx * 0.05) + 's';
         item.style.animationFillMode = 'both';
+        visibleIdx++;
       } else {
         item.classList.add('hidden');
       }
     });
+
+    if (ytShortsShowcase) {
+      const hasVisibleShorts = ytShortsShowcase.querySelectorAll('.portfolio-item:not(.hidden)').length > 0;
+      ytShortsShowcase.classList.toggle('hidden', !hasVisibleShorts);
+    }
+    if (portfolioGrid) {
+      const hasVisibleProjects = portfolioGrid.querySelectorAll('.portfolio-item:not(.hidden)').length > 0;
+      portfolioGrid.classList.toggle('hidden', !hasVisibleProjects);
+    }
   });
+});
+
+// ── YOUTUBE SHORTS LIGHTBOX PLAYER ──
+const ytModal = document.getElementById('yt-modal');
+const ytModalIframe = document.getElementById('yt-modal-iframe');
+const ytModalTitle = document.getElementById('yt-modal-title');
+const ytModalSubmeta = document.getElementById('yt-modal-submeta');
+const ytModalCounter = document.getElementById('yt-modal-counter');
+const ytModalExtLink = document.getElementById('yt-modal-ext-link');
+const ytPrevBtn = document.getElementById('yt-prev-btn');
+const ytNextBtn = document.getElementById('yt-next-btn');
+const ytPrevMobile = document.getElementById('yt-prev-mobile');
+const ytNextMobile = document.getElementById('yt-next-mobile');
+const ytCloseTriggers = document.querySelectorAll('[data-yt-close]');
+
+const ytShortsList = Array.from(document.querySelectorAll('.yt-short-item')).map(el => ({
+  id: el.dataset.ytId || '',
+  url: el.dataset.ytUrl || '',
+  title: el.dataset.ytTitle || 'YouTube Short',
+  episode: el.dataset.ytEpisode || '',
+  views: el.dataset.ytViews || ''
+})).filter(v => v.id);
+
+let activeShortIndex = 0;
+let lastYtTrigger = null;
+
+function renderActiveShort(index) {
+  if (!ytShortsList.length || !ytModalIframe) return;
+  activeShortIndex = (index + ytShortsList.length) % ytShortsList.length;
+  const video = ytShortsList[activeShortIndex];
+
+  ytModalIframe.src = `https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0&playsinline=1`;
+  ytModalIframe.title = video.title;
+  if (ytModalTitle) ytModalTitle.textContent = video.title;
+  if (ytModalSubmeta) ytModalSubmeta.textContent = [video.episode, video.views].filter(Boolean).join(' · ');
+  if (ytModalCounter) ytModalCounter.textContent = `${activeShortIndex + 1} / ${ytShortsList.length}`;
+  if (ytModalExtLink) ytModalExtLink.href = video.url || `https://www.youtube.com/shorts/${video.id}`;
+}
+
+function openYtModal(videoId, triggerEl) {
+  const idx = ytShortsList.findIndex(v => v.id === videoId);
+  if (idx === -1) return;
+
+  // Fallback when opened directly via file:// (YouTube blocks iframe embeds with no HTTP Referer)
+  if (window.location.protocol === 'file:') {
+    window.open(ytShortsList[idx].url || `https://www.youtube.com/shorts/${videoId}`, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  if (!ytModal) return;
+  lastYtTrigger = triggerEl || document.activeElement;
+  renderActiveShort(idx);
+  ytModal.classList.add('open');
+  ytModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  const closeBtn = document.getElementById('yt-modal-close');
+  if (closeBtn) closeBtn.focus();
+}
+
+function closeYtModal() {
+  if (!ytModal || !ytModal.classList.contains('open')) return;
+  ytModal.classList.remove('open');
+  ytModal.setAttribute('aria-hidden', 'true');
+  if (ytModalIframe) ytModalIframe.src = '';
+  if (!foOverlay || !foOverlay.classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
+  if (lastYtTrigger && typeof lastYtTrigger.focus === 'function') {
+    lastYtTrigger.focus();
+  }
+}
+
+document.querySelectorAll('[data-yt-play]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    openYtModal(btn.getAttribute('data-yt-play'), btn);
+  });
+});
+
+ytCloseTriggers.forEach(el => el.addEventListener('click', closeYtModal));
+if (ytPrevBtn) ytPrevBtn.addEventListener('click', () => renderActiveShort(activeShortIndex - 1));
+if (ytNextBtn) ytNextBtn.addEventListener('click', () => renderActiveShort(activeShortIndex + 1));
+if (ytPrevMobile) ytPrevMobile.addEventListener('click', () => renderActiveShort(activeShortIndex - 1));
+if (ytNextMobile) ytNextMobile.addEventListener('click', () => renderActiveShort(activeShortIndex + 1));
+
+document.addEventListener('keydown', (e) => {
+  if (!ytModal || !ytModal.classList.contains('open')) return;
+  if (e.key === 'Escape') closeYtModal();
+  else if (e.key === 'ArrowLeft') renderActiveShort(activeShortIndex - 1);
+  else if (e.key === 'ArrowRight') renderActiveShort(activeShortIndex + 1);
 });
 
 // ── TESTIMONIALS SLIDER ──

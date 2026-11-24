@@ -60,6 +60,13 @@ const PROVIDERS = {
     fallbackModel: 'llama-3.2-90b-vision-preview',
     style: 'openai'
   },
+  mistral: {
+    label: 'Mistral AI',
+    endpoint: 'https://api.mistral.ai/v1/chat/completions',
+    defaultModel: 'pixtral-12b-2409',
+    fallbackModel: 'pixtral-large-latest',
+    style: 'openai'
+  },
   xai: {
     label: 'xAI (Grok)',
     endpoint: 'https://api.x.ai/v1/chat/completions',
@@ -186,6 +193,12 @@ async function validateProviderKey(provider, apiKey, customEndpoint) {
       });
       return r.ok;
     }
+    if (provider === 'mistral') {
+      const r = await fetch('https://api.mistral.ai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      return r.ok;
+    }
     if (provider === 'xai') {
       const r = await fetch('https://api.x.ai/v1/models', {
         headers: { 'Authorization': `Bearer ${apiKey}` }
@@ -253,6 +266,14 @@ async function fetchLiveModelsForProvider(provider, apiKey) {
     }
     if (provider === 'groq') {
       const r = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.data || []).slice(0, 30).map(m => ({ id: m.id, label: m.id }));
+    }
+    if (provider === 'mistral') {
+      const r = await fetch('https://api.mistral.ai/v1/models', {
         headers: { 'Authorization': `Bearer ${apiKey}` }
       });
       if (!r.ok) return [];
