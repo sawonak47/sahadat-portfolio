@@ -2214,8 +2214,8 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      padding: 15px 18px;
+      gap: 16px;
+      padding: 18px 20px;
       margin-bottom: 16px;
       border-radius: 16px;
       border: 1px solid rgba(245, 158, 11, 0.48);
@@ -2224,14 +2224,14 @@
     .quota-warning-left {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      flex: 1 1 260px;
+      gap: 14px;
+      flex: 1 1 300px;
       min-width: 0;
     }
     .quota-warning-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 11px;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
       background: rgba(245, 158, 11, 0.2);
       border: 1px solid rgba(245, 158, 11, 0.4);
       color: #f59e0b;
@@ -2239,18 +2239,20 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
     }
     .quota-warning-title {
       font-family: var(--font-display);
-      font-size: 0.94rem;
+      font-size: 1.08rem;
       font-weight: 800;
+      line-height: 1.35;
       color: var(--text-primary);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     .quota-warning-text {
-      font-size: 0.8rem;
-      line-height: 1.5;
+      font-size: 0.94rem;
+      font-weight: 500;
+      line-height: 1.45;
       color: var(--text-secondary);
       margin: 0;
     }
@@ -2406,7 +2408,7 @@
           <path d="M22.5 2.5L23.4 5.1L26 6L23.4 6.9L22.5 9.5L21.6 6.9L19 6L21.6 5.1L22.5 2.5Z" fill="#00C8FF"/>
         </svg>
         <span class="ai-pulse-dot"></span>
-        <span>Powered by <strong>Sahadat AI</strong> · 18 Stock &amp; Web SEO Formats</span>
+        <span>Powered by <strong>Sahadat AI</strong></span>
       </div>
       <h1 class="section-title">AI SEO <span class="gradient-text">Tool</span></h1>
       <p class="seo-hero-sub">
@@ -2651,9 +2653,9 @@
           <div class="quota-warning-left">
             <div class="quota-warning-icon"><i class="fas fa-triangle-exclamation"></i></div>
             <div class="min-w-0">
-              <div id="quotaWarningTitle" class="quota-warning-title">Today's Free Sahadat AI Quota Is Full</div>
+              <div id="quotaWarningTitle" class="quota-warning-title">Today's Free Sahadat AI daily quota is full... Come Back Tomorrow.</div>
               <p id="quotaWarningText" class="quota-warning-text">
-                Our shared free daily AI quota is currently unavailable for today. Please add your own free API key (Gemini, OpenRouter, Groq, Mistral, OpenAI, or Claude) to keep generating right now — saved only in your browser.
+                Or click 'Use My Own API Key' to continue immediately with your own key.
               </p>
             </div>
           </div>
@@ -3197,7 +3199,7 @@
     <i class="fas fa-chevron-up"></i>
   </button>
 
-  <script src="script.js?v=8"></script>
-  <script src="ai-seo-tool.js?v=8"></script>
+  <script src="script.js?v=9"></script>
+  <script src="ai-seo-tool.js?v=9"></script>
 </body>
 </html>

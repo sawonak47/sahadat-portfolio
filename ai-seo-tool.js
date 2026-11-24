@@ -749,13 +749,11 @@
     if (!quotaLimitBanner) return;
     if (quotaWarningTitle) {
       quotaWarningTitle.textContent = isQuotaLimit
-        ? "Today's Free Sahadat AI Quota Is Full"
-        : 'Sahadat AI Server Is Temporarily Unavailable Today';
+        ? "Today's Free Sahadat AI daily quota is full... Come Back Tomorrow."
+        : 'Sahadat AI server is temporarily unavailable today... Come Back Later.';
     }
     if (quotaWarningText) {
-      quotaWarningText.textContent = isQuotaLimit
-        ? 'Our shared free daily AI quota has been reached for today. Please add your own free API key (Gemini, OpenRouter, Groq, Mistral, OpenAI, or Claude) to keep generating right now — saved only in your browser.'
-        : 'Our shared AI server could not process requests right now. Please add your own free API key (Gemini, OpenRouter, Groq, Mistral, OpenAI, or Claude) to continue immediately — saved only in your browser.';
+      quotaWarningText.textContent = "Or click 'Use My Own API Key' to continue immediately with your own key.";
     }
     quotaLimitBanner.classList.remove('hidden');
     if (!quotaBannerScrolledThisRun) {
@@ -2325,9 +2323,9 @@
 
     if (source === 'server') {
       if (isQuotaError(err)) {
-        return "Today's free Sahadat AI daily quota is full (HTTP 429). Click 'Use My Own API Key' to continue immediately with your own free key.";
+        return "Today's Free Sahadat AI daily quota is full... Come Back Tomorrow.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
       }
-      return "Sahadat AI shared server is currently unavailable today. Click 'Use My Own API Key' to keep generating with your own free API key.";
+      return "Sahadat AI server is temporarily unavailable today... Come Back Later.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
     }
 
     if (source === 'visitor_byok') {
@@ -2547,14 +2545,18 @@
           `;
         } else if (!r) {
           const isFailed = statusCls === 'failed';
+          const errLines = String(entry.errorMsg || 'Generation failed — click retry.').split('\n').filter(Boolean);
+          const failedMsgHtml = errLines.length > 1
+            ? `<div style="font-size:0.95rem;font-weight:700;line-height:1.4;margin-bottom:3px"><i class="fas fa-triangle-exclamation mr-1.5"></i>${escapeHtml(errLines[0])}</div><div style="font-size:0.88rem;font-weight:500;line-height:1.45;opacity:0.92">${escapeHtml(errLines.slice(1).join(' '))}</div>`
+            : `<div style="font-size:0.92rem;font-weight:700;line-height:1.45"><i class="fas fa-triangle-exclamation mr-1.5"></i>${escapeHtml(errLines[0])}</div>`;
           contentBelowImage = `
-            <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 rounded-xl" style="border:1px ${isFailed ? 'solid rgba(239,68,68,0.45)' : 'dashed var(--border)'};background:${isFailed ? 'rgba(239,68,68,0.08)' : 'rgba(108,62,255,0.03)'}">
-              <span class="font-mono text-xs flex-1" style="color:${isFailed ? '#ef4444' : 'var(--text-muted)'};min-width:220px;line-height:1.55">
+            <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-4 rounded-xl" style="border:1px ${isFailed ? 'solid rgba(239,68,68,0.45)' : 'dashed var(--border)'};background:${isFailed ? 'rgba(239,68,68,0.08)' : 'rgba(108,62,255,0.03)'}">
+              <div class="${isFailed ? 'flex-1' : 'font-mono text-xs flex-1'}" style="color:${isFailed ? '#ef4444' : 'var(--text-muted)'};min-width:240px;line-height:1.5">
                 ${isFailed
-                  ? `<i class="fas fa-triangle-exclamation mr-1"></i> <strong>${escapeHtml(entry.errorMsg || 'Generation failed — click retry.')}</strong>`
+                  ? failedMsgHtml
                   : `Queued #${fileIdx + 1} · Ready for ${effMode === 'prompt' ? 'AI Prompt' : `${effTagCount} ${escapeHtml(platLabel)} SEO tags & metadata`}.`
                 }
-              </span>
+              </div>
               <div class="flex items-center gap-2">
                 ${isFailed
                   ? (isUsingBYOK() && secretsUnlocked
