@@ -1224,19 +1224,7 @@
 
   function updateGenerateButtonLabels() {
     if (state.isGenerating || state.batchRunning) return;
-    const engineLabel = (secretsUnlocked && isUsingBYOK())
-      ? (BYOK_PROVIDERS[secretsVault.activeProvider]?.label || 'BYOK')
-      : 'Sahadat AI';
-    const n = state.files.length;
-    if (n > 1) {
-      generateBtnLabel.textContent = state.mode === 'prompt'
-        ? `Generate Separate Prompts (${n} Files · ${batchSpeedSelect.value}x)`
-        : `Generate Separate SEO (${n} Files · ${batchSpeedSelect.value}x)`;
-    } else if (state.mode === 'prompt') {
-      generateBtnLabel.textContent = `Generate AI Prompt (${engineLabel})`;
-    } else {
-      generateBtnLabel.textContent = `Generate ${state.tagCount} SEO Tags (${engineLabel})`;
-    }
+    if (generateBtnLabel) generateBtnLabel.textContent = 'Generate';
   }
 
   // ── COLOR PALETTE EXTRACTION ──
