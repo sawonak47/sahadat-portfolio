@@ -1537,6 +1537,98 @@
       color: #ef4444;
       border: 1px solid rgba(239, 68, 68, 0.35);
     }
+    .file-index-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, var(--violet), #5025ee);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .batch-score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: rgba(108, 62, 255, 0.14);
+      border: 1px solid rgba(108, 62, 255, 0.32);
+      color: var(--violet);
+    }
+    .file-options-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(108, 62, 255, 0.06);
+      margin-bottom: 12px;
+    }
+    .file-opt-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .file-opt-field.wide {
+      grid-column: span 2;
+    }
+    @media (max-width: 639px) {
+      .file-opt-field.wide {
+        grid-column: span 1;
+      }
+    }
+    .file-opt-field label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .file-opt-control {
+      width: 100%;
+      padding: 6px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(13, 13, 26, 0.5);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.76rem;
+      outline: none;
+    }
+    .file-opt-control:focus {
+      border-color: var(--violet);
+    }
+    .file-opt-control option {
+      background: var(--bg-card-solid);
+      color: var(--text-primary);
+    }
+    .batch-card-exports {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    [data-theme="light"] .file-options-bar {
+      background: #F5F3FF;
+      border-color: rgba(99, 54, 245, 0.16);
+    }
+    [data-theme="light"] .file-opt-control {
+      background: #FFFFFF;
+    }
 
     /* ── MODALS (API SECRETS MANAGEMENT, ADMIN, LIGHTBOX) ── */
     .ai-modal-backdrop {
@@ -2402,11 +2494,11 @@
           <div class="flex flex-wrap items-center gap-2">
             <span id="resultSourceBadge" class="format-badge hidden"></span>
             <div class="view-switcher" role="group" aria-label="Results view mode">
-              <button id="viewDetailBtn" class="view-switch-btn active" type="button" title="Detailed SEO editor for selected file">
-                <i class="fas fa-sparkles"></i> Detail
+              <button id="viewDetailBtn" class="view-switch-btn active" type="button" title="Single focused editor for selected file">
+                <i class="fas fa-sparkles"></i> Single
               </button>
-              <button id="viewBatchBtn" class="view-switch-btn" type="button" title="Stacked inline cards for all uploaded files">
-                <i class="fas fa-list-ul"></i> Batch Cards
+              <button id="viewBatchBtn" class="view-switch-btn" type="button" title="Separate full options and SEO cards for every uploaded file">
+                <i class="fas fa-layer-group"></i> Separate Cards
               </button>
             </div>
           </div>

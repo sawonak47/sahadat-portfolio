@@ -1078,6 +1078,8 @@
     const active = getActiveEntry();
     if (active && active.result && state.viewMode === 'detail') {
       renderResult(active);
+    } else if (state.viewMode === 'batch' && state.files.length) {
+      renderBatchCards();
     }
     if (shouldSave) savePrefs();
   }
@@ -1091,6 +1093,9 @@
     });
     activePlatformHint.textContent = spec.hint;
     exportActivePlatformCsvLabel.textContent = `Download ${spec.name} CSV`;
+    if (state.viewMode === 'batch' && state.files.length) {
+      renderBatchCards();
+    }
     if (announce) {
       savePrefs();
       showToast(`Switched to ${spec.name} format`, 'info');
@@ -1106,7 +1111,28 @@
       btn.classList.toggle('active', parseInt(btn.dataset.count, 10) === n);
     });
     updateGenerateButtonLabels();
+    if (state.viewMode === 'batch' && state.files.length) {
+      renderBatchCards();
+    }
     if (shouldSave) savePrefs();
+  }
+
+  function getEntryMode(entry) {
+    return (entry && entry.options && entry.options.mode) || state.mode;
+  }
+
+  function getEntryPlatform(entry) {
+    const pid = entry && entry.options && entry.options.platform;
+    return (pid && PLATFORMS[pid]) ? pid : state.platform;
+  }
+
+  function getEntryTagCount(entry) {
+    const n = entry && entry.options && entry.options.tagCount;
+    return (Number.isFinite(n) && n >= 5 && n <= 150) ? n : state.tagCount;
+  }
+
+  function getEntryHint(entry) {
+    return String((entry && entry.options && entry.options.hint) || '').trim();
   }
 
   function updateGenerateButtonLabels() {
@@ -1114,14 +1140,18 @@
     const engineLabel = (secretsUnlocked && isUsingBYOK())
       ? (BYOK_PROVIDERS[secretsVault.activeProvider]?.label || 'BYOK')
       : 'Sahadat AI';
-    if (state.mode === 'prompt') {
+    const n = state.files.length;
+    if (n > 1) {
+      generateBtnLabel.textContent = state.mode === 'prompt'
+        ? `Generate Separate Prompts (${n} Files)`
+        : `Generate Separate SEO (${n} Files)`;
+    } else if (state.mode === 'prompt') {
       generateBtnLabel.textContent = `Generate AI Prompt (${engineLabel})`;
     } else {
       generateBtnLabel.textContent = `Generate ${state.tagCount} SEO Tags (${engineLabel})`;
     }
-    const n = state.files.length;
     if (generateAllBtnLabel) {
-      generateAllBtnLabel.textContent = `Generate Batch (${n} Files · ${batchSpeedSelect.value}x)`;
+      generateAllBtnLabel.textContent = `Generate All ${n} Separately (${batchSpeedSelect.value}x)`;
     }
   }
 
@@ -1527,7 +1557,13 @@
           status: 'waiting',
           errorMsg: '',
           result: null,
-          batchEditingKw: false
+          batchEditingKw: false,
+          options: {
+            mode: '',
+            platform: '',
+            tagCount: null,
+            hint: ''
+          }
         };
         state.files.push(entry);
         state.activeId = entry.id;
@@ -1539,10 +1575,16 @@
     }
 
     if (addedCount > 0) {
+      // Automatically show Separate Cards when 2+ files are uploaded so every file has its own options & output
+      if (state.files.length >= 2) {
+        state.viewMode = 'batch';
+      }
       updateQueueAndActionBar();
       renderWorkspaceView();
       showToast(
-        addedCount === 1 ? `Loaded "${state.files[state.files.length - 1].name}"` : `Loaded ${addedCount} files into queue`,
+        state.files.length >= 2
+          ? `Loaded ${addedCount} file(s) — each file now has its own separate options & SEO card!`
+          : `Loaded "${state.files[state.files.length - 1].name}"`,
         'info'
       );
     }
@@ -1795,21 +1837,26 @@
   }
 
   function generateSmartLocalResult(entry) {
-    const platSpec = PLATFORMS[state.platform] || PLATFORMS.general;
-    const customHint = customPromptInput.value.trim();
+    const entryPlatId = getEntryPlatform(entry);
+    const platSpec = PLATFORMS[entryPlatId] || PLATFORMS.general;
+    const entryTagCount = getEntryTagCount(entry);
+    const entryMode = getEntryMode(entry);
+    const fileHint = getEntryHint(entry);
+    const customHint = [fileHint, customPromptInput.value.trim()].filter(Boolean).join(' ');
     const filenameClean = entry.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
-    const topic = (filenameClean && !/^(img|image|dsc|screenshot|whatsapp|untitled|photo)\s*\d*$/i.test(filenameClean))
-      ? filenameClean
-      : entry.formatLabel === 'PDF' ? 'Professional Digital Document Guide'
-      : ['SVG', 'EPS', 'AI'].includes(entry.formatLabel) ? 'Modern Scalable Vector Graphic'
-      : ['MP4', 'MOV', 'WEBM'].includes(entry.formatLabel) ? 'Cinematic High-Resolution Stock Footage'
-      : 'Creative High-Resolution Visual Design';
+    const topic = fileHint ||
+      ((filenameClean && !/^(img|image|dsc|screenshot|whatsapp|untitled|photo)\s*\d*$/i.test(filenameClean))
+        ? filenameClean
+        : entry.formatLabel === 'PDF' ? 'Professional Digital Document Guide'
+        : ['SVG', 'EPS', 'AI'].includes(entry.formatLabel) ? 'Modern Scalable Vector Graphic'
+        : ['MP4', 'MOV', 'WEBM'].includes(entry.formatLabel) ? 'Cinematic High-Resolution Stock Footage'
+        : 'Creative High-Resolution Visual Design');
 
     const titleCap = topic.replace(/\b\w/g, ch => ch.toUpperCase());
     const colorsStr = (entry.dominantColors || []).slice(0, 2).join(' and ');
     const slugBase = titleCap.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 56) || 'seo-optimized-asset';
     const fallbackPool = buildFallbackPool(entry, customHint);
-    const keywords = enforceExactTags(fallbackPool, state.tagCount, fallbackPool);
+    const keywords = enforceExactTags(fallbackPool, entryTagCount, fallbackPool);
     const audit = computeFileAudit(entry);
 
     const styleSuffix = [];
@@ -1820,7 +1867,8 @@
     const generatedPrompt = `${titleCap}${colorsStr ? ` featuring ${colorsStr} color palette` : ''}, crisp composition, studio lighting, ultra-detailed commercial stock quality${styleSuffix.length ? ', ' + styleSuffix.join(', ') : ''}.`;
 
     return {
-      mode: state.mode,
+      mode: entryMode,
+      platform: entryPlatId,
       seoTitle: `${titleCap} — High-Quality ${entry.formatLabel} Asset for ${platSpec.name}`.slice(0, state.titleMaxLen),
       metaDescription: `Explore ${titleCap}, a clean ${entry.formatLabel} asset${colorsStr ? ` with ${colorsStr} tones` : ''}, crafted for ${platSpec.name}. Optimized with high-intent commercial keywords and search-ready metadata.`.slice(0, state.descLen),
       altText: `${titleCap} — ${entry.formatLabel} visual${colorsStr ? ` in ${colorsStr} tones` : ''} (${entry.width}×${entry.height})`,
@@ -1852,12 +1900,16 @@
   }
 
   function buildGenerationMessages(entry) {
-    const platSpec = PLATFORMS[state.platform] || PLATFORMS.general;
+    const entryPlatId = getEntryPlatform(entry);
+    const entryMode = getEntryMode(entry);
+    const entryTagCount = getEntryTagCount(entry);
+    const fileHint = getEntryHint(entry);
+    const platSpec = PLATFORMS[entryPlatId] || PLATFORMS.general;
     const forcedType = contentTypeSelect.value !== 'None' ? contentTypeSelect.value : entry.formatLabel;
     const customSys = customPromptInput.value.trim();
     const language = languageSelect.value;
 
-    if (state.mode === 'prompt') {
+    if (entryMode === 'prompt') {
       const styleDirectives = [];
       if (state.promptStyles.silhouette) styleDirectives.push('MUST incorporate clean silhouette style');
       if (state.promptStyles.whiteBg) styleDirectives.push('MUST specify isolated on a pure white background');
@@ -1865,7 +1917,7 @@
 
       const sys = [
         'You are Sahadat AI, an expert visual prompt engineer for Midjourney, Adobe Firefly, DALL-E, and Freepik AI.',
-        'Analyze the uploaded visual carefully and reverse-engineer a vivid, production-ready generation prompt.',
+        'Analyze this specific uploaded visual carefully and reverse-engineer a vivid, production-ready generation prompt.',
         'Return ONLY a valid raw JSON object (no markdown fences, no commentary):',
         '{',
         `  "generatedPrompt": "detailed image generation prompt up to ${state.promptMaxWords} words max",`,
@@ -1873,12 +1925,14 @@
         '  "keywords": ["10 to 20 descriptive style and subject keywords"]',
         '}',
         styleDirectives.length ? `Required style constraints: ${styleDirectives.join('; ')}.` : '',
+        fileHint ? `Specific topic/focus for this file: ${fileHint}` : '',
         customSys ? `Additional user instructions: ${customSys}` : ''
       ].filter(Boolean).join('\n');
 
       const usrText = [
         `File: ${entry.name} (${forcedType}, ${entry.width}x${entry.height})`,
         entry.dominantColors.length ? `Colors: ${entry.dominantColors.join(', ')}` : '',
+        fileHint ? `File-specific hint: ${fileHint}` : '',
         entry.extractedText ? `Extracted text:\n${entry.extractedText}` : '',
         `Create a reverse-engineered AI prompt of at most ${state.promptMaxWords} words.`
       ].filter(Boolean).join('\n');
@@ -1894,7 +1948,7 @@
     const categoryListText = Object.entries(STOCK_CATEGORIES).map(([id, name]) => `${id}=${name}`).join(', ');
     const sys = [
       'You are Sahadat AI, an elite microstock metadata & SEO specialist (Adobe Stock, Shutterstock, Freepik, Google SEO).',
-      'Analyze the provided visual/document carefully. Avoid trademarked brand names, camera brands, spam repetition, and fluff.',
+      'Analyze this specific visual/document carefully. Avoid trademarked brand names, camera brands, spam repetition, and fluff.',
       'Return ONLY a valid raw JSON object (no markdown fences, no extra prose) with these exact keys:',
       '{',
       `  "seoTitle": "compelling commercial title between ${state.titleMinLen} and ${state.titleMaxLen} characters",`,
@@ -1904,15 +1958,16 @@
       '  "seoCaption": "engaging 1-2 sentence caption",',
       `  "categoryId": 8,`,
       '  "generatedPrompt": "concise 25-45 word visual prompt describing the image for Freepik/AI metadata",',
-      `  "keywords": ["tag 1", "tag 2", ... EXACTLY ${state.tagCount} unique, non-duplicate, high-ranking SEO keywords],`,
+      `  "keywords": ["tag 1", "tag 2", ... EXACTLY ${entryTagCount} unique, non-duplicate, high-ranking SEO keywords],`,
       '  "seoTips": ["3 concise, specific SEO optimization tips for this asset"]',
       '}',
       `Rules:`,
       `- "seoTitle" MUST be between ${state.titleMinLen} and ${state.titleMaxLen} characters.`,
       `- "metaDescription" MUST be close to ${state.descLen} characters (do not exceed ${state.descLen + 20}).`,
-      `- "keywords" MUST contain EXACTLY ${state.tagCount} distinct, single or 2-word relevant keywords (no # prefix, no duplicates, no brand names).`,
+      `- "keywords" MUST contain EXACTLY ${entryTagCount} distinct, single or 2-word relevant keywords (no # prefix, no duplicates, no brand names).`,
       `- "categoryId" MUST be one integer from: ${categoryListText}.`,
       `- Target platform: ${platSpec.name}. Content type: ${forcedType}. Output language: ${language}.`,
+      fileHint ? `- Specific topic/focus for this file: ${fileHint}` : '',
       customSys ? `- Custom user system instructions: ${customSys}` : ''
     ].filter(Boolean).join('\n');
 
@@ -1920,8 +1975,9 @@
       `File name: ${entry.name}`,
       `Format: ${forcedType} (${entry.width}x${entry.height}${entry.formatLabel === 'PDF' ? `, ${entry.pageCount} pages` : ''}${entry.duration ? `, ${entry.duration.toFixed(1)}s` : ''}, ${formatBytes(entry.sizeBytes)})`,
       entry.dominantColors.length ? `Dominant colors: ${entry.dominantColors.join(', ')}` : '',
+      fileHint ? `File-specific topic/hint: ${fileHint}` : '',
       entry.extractedText ? `Extracted text/metadata:\n${entry.extractedText}` : '',
-      `Generate EXACTLY ${state.tagCount} unique SEO keywords plus full metadata JSON for ${platSpec.name}.`
+      `Generate EXACTLY ${entryTagCount} unique SEO keywords plus full metadata JSON for ${platSpec.name}.`
     ].filter(Boolean).join('\n');
 
     return {
@@ -2157,10 +2213,13 @@
       if (lastErr) throw lastErr;
     }
 
+    const entryMode = getEntryMode(entry);
+    const entryPlatId = getEntryPlatform(entry);
+    const entryTagCount = getEntryTagCount(entry);
     const parsed = parseJsonFromAiResponse(rawText);
-    const fallbackPool = buildFallbackPool(entry, customPromptInput.value.trim());
+    const fallbackPool = buildFallbackPool(entry, [getEntryHint(entry), customPromptInput.value.trim()].filter(Boolean).join(' '));
     const audit = computeFileAudit(entry);
-    const targetTagCount = state.mode === 'prompt' ? Math.max(10, Math.min(25, (parsed.keywords || []).length || 15)) : state.tagCount;
+    const targetTagCount = entryMode === 'prompt' ? Math.max(10, Math.min(25, (parsed.keywords || []).length || 15)) : entryTagCount;
     const keywords = enforceExactTags(parsed.keywords, targetTagCount, fallbackPool);
 
     const cleanSlug = String(parsed.seoSlug || '')
@@ -2173,7 +2232,8 @@
     const categoryId = STOCK_CATEGORIES[catNum] ? catNum : 8;
 
     return {
-      mode: state.mode,
+      mode: entryMode,
+      platform: entryPlatId,
       seoTitle: String(parsed.seoTitle || '').trim() || entry.name,
       metaDescription: String(parsed.metaDescription || '').trim(),
       altText: String(parsed.altText || '').trim(),
@@ -2193,13 +2253,16 @@
   // ── SINGLE & CONCURRENT BATCH GENERATION ──
   async function generateForEntry(entry, isPartOfBatch = false) {
     if (!entry) return;
+    const entryMode = getEntryMode(entry);
+    const entryPlatId = getEntryPlatform(entry);
+    const entryTagCount = getEntryTagCount(entry);
     entry.status = 'processing';
     entry.errorMsg = '';
     if (!isPartOfBatch) {
       state.isGenerating = true;
-      loadingStepText.textContent = state.mode === 'prompt'
+      loadingStepText.textContent = entryMode === 'prompt'
         ? `Reverse-engineering AI prompt for "${entry.name}"...`
-        : `Analyzing "${entry.name}" for ${state.tagCount} ${PLATFORMS[state.platform].name} SEO tags...`;
+        : `Analyzing "${entry.name}" for ${entryTagCount} ${(PLATFORMS[entryPlatId] || PLATFORMS.general).name} SEO tags...`;
     }
     updateQueueAndActionBar();
     renderWorkspaceView();
@@ -2217,7 +2280,7 @@
       saveToHistory(entry, result);
       if (!isPartOfBatch) {
         showToast(
-          state.mode === 'prompt'
+          entryMode === 'prompt'
             ? `Generated AI prompt for "${entry.name}"!`
             : `Generated ${result.tags.length} SEO tags for "${entry.name}"!`,
           'success'
@@ -2396,11 +2459,23 @@
     renderTagsCloud(entry);
   }
 
-  // ── RENDER BATCH CARDS VIEW (ALL FILES STACKED INLINE) ──
+  // ── RENDER SEPARATE PER-FILE CARDS (FULL INDIVIDUAL OPTIONS & OUTPUT PER IMAGE/FILE) ──
   function renderBatchCards() {
+    const platOptionsHtml = Object.values(PLATFORMS)
+      .map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`)
+      .join('');
+    const catOptionsHtml = Object.entries(STOCK_CATEGORIES)
+      .map(([cid, cname]) => `<option value="${cid}">${cid} — ${escapeHtml(cname)}</option>`)
+      .join('');
+
     batchResultsList.innerHTML = state.files
-      .map(entry => {
+      .map((entry, fileIdx) => {
         const r = entry.result;
+        const opts = entry.options || { mode: '', platform: '', tagCount: null, hint: '' };
+        const effMode = getEntryMode(entry);
+        const effPlatId = getEntryPlatform(entry);
+        const effTagCount = getEntryTagCount(entry);
+        const platLabel = (PLATFORMS[effPlatId] || PLATFORMS.general).name;
         const statusCls = entry.status || 'waiting';
         const statusLabel =
           statusCls === 'done' ? '<i class="fas fa-check"></i> Done' :
@@ -2409,7 +2484,13 @@
           'Waiting...';
 
         const titleVal = r ? (r.seoTitle || '') : '';
-        const descVal = r ? (state.mode === 'prompt' ? (r.generatedPrompt || '') : (r.metaDescription || '')) : '';
+        const slugVal = r ? (r.seoSlug || '') : '';
+        const descVal = r ? (r.metaDescription || '') : '';
+        const altVal = r ? (r.altText || '') : '';
+        const capVal = r ? (r.seoCaption || '') : '';
+        const promptVal = r ? (r.generatedPrompt || '') : '';
+        const promptWords = promptVal.trim() ? promptVal.trim().split(/\s+/).length : 0;
+        const catId = r ? (r.categoryId || 8) : 8;
         const tags = r ? (r.tags || []) : [];
         const activeTags = tags.filter(t => t.selected);
 
@@ -2417,22 +2498,139 @@
           ? `
             <textarea class="seo-textarea font-mono text-xs" rows="3" data-batch-kw-raw="${entry.id}" placeholder="Enter keywords separated by commas...">${escapeHtml(tags.map(t => t.text).join(', '))}</textarea>
             <div class="flex justify-end mt-2">
-              <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="kw-done" data-id="${entry.id}"><i class="fas fa-check"></i> Done</button>
+              <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="kw-done" data-id="${entry.id}"><i class="fas fa-check"></i> Done Editing</button>
             </div>
           `
           : `
-            <div class="tags-cloud" style="max-height:130px;">
+            <div class="tags-cloud" style="max-height:175px;">
               ${tags.length
                 ? tags.map((t, idx) => `
-                    <span class="seo-tag-chip ${t.selected ? '' : 'deselected'}" data-batch-tag-toggle="${entry.id}" data-idx="${idx}">
+                    <span class="seo-tag-chip ${t.selected ? '' : 'deselected'}" data-batch-tag-toggle="${entry.id}" data-idx="${idx}" title="Click to toggle">
+                      <span class="tag-idx">${idx + 1}</span>
                       <span>${escapeHtml(t.text)}</span>
                       <i class="fas fa-times tag-x" data-batch-tag-del="${entry.id}" data-idx="${idx}" title="Remove"></i>
                     </span>
                   `).join('')
-                : '<span class="font-mono text-xs" style="color:var(--text-muted)">No keywords generated yet.</span>'
+                : '<span class="font-mono text-xs" style="color:var(--text-muted)">Click <strong>Generate</strong> on this file (or Generate Batch above) to generate separate SEO tags.</span>'
               }
             </div>
           `;
+
+        const platSelectHtml = `
+          <option value="" ${!opts.platform ? 'selected' : ''}>Global (${escapeHtml((PLATFORMS[state.platform] || PLATFORMS.general).name)})</option>
+          ${Object.values(PLATFORMS).map(p => `<option value="${escapeHtml(p.id)}" ${opts.platform === p.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('')}
+        `;
+
+        const catSelectInner = Object.entries(STOCK_CATEGORIES)
+          .map(([cid, cname]) => `<option value="${cid}" ${String(catId) === String(cid) ? 'selected' : ''}>${cid} — ${escapeHtml(cname)}</option>`)
+          .join('');
+
+        const bodyFieldsHtml = !r
+          ? `
+            <div class="flex flex-wrap items-center justify-between gap-3 px-3 py-3 rounded-xl" style="border:1px dashed var(--border);background:rgba(108,62,255,0.03)">
+              <span class="font-mono text-xs" style="color:var(--text-muted)">
+                ${statusCls === 'processing'
+                  ? `<i class="fas fa-spinner fa-spin mr-1" style="color:var(--cyan)"></i> Sahadat AI is generating separate ${effMode === 'prompt' ? 'AI prompt' : `${effTagCount} SEO tags (${platLabel})`} for this file...`
+                  : `Ready to generate separate ${effMode === 'prompt' ? 'AI prompt' : `${effTagCount} SEO tags (${platLabel})`} for <strong>${escapeHtml(entry.name)}</strong>.`
+                }
+              </span>
+              <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="regen" data-id="${entry.id}" ${statusCls === 'processing' ? 'disabled' : ''}>
+                <i class="fas fa-wand-magic-sparkles"></i> Generate This File
+              </button>
+            </div>
+          `
+          : effMode === 'prompt'
+            ? `
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-wand-magic-sparkles"></i> Generated AI Prompt · <span data-b-pcount="${entry.id}">${promptWords}</span> words</span>
+                  <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="copy-prompt" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy Prompt</button>
+                </div>
+                <textarea class="seo-editable" rows="4" data-batch-prompt="${entry.id}" placeholder="Generated AI prompt...">${escapeHtml(promptVal)}</textarea>
+              </div>
+            `
+            : `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div class="seo-result-card">
+                  <div class="seo-result-header">
+                    <span class="seo-result-label"><i class="fas fa-heading"></i> SEO Title · <span data-b-tcount="${entry.id}">${titleVal.length}</span> chars</span>
+                    <button type="button" class="mini-copy-btn" data-batch-action="copy-title" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy</button>
+                  </div>
+                  <textarea class="seo-editable" rows="2" data-batch-title="${entry.id}" placeholder="SEO Title...">${escapeHtml(titleVal)}</textarea>
+                </div>
+
+                <div class="seo-result-card">
+                  <div class="seo-result-header">
+                    <span class="seo-result-label"><i class="fas fa-link"></i> SEO Filename / Slug</span>
+                    <button type="button" class="mini-copy-btn" data-batch-action="copy-slug" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy</button>
+                  </div>
+                  <textarea class="seo-editable mono" rows="2" data-batch-slug="${entry.id}" placeholder="seo-friendly-slug.jpg">${escapeHtml(slugVal)}</textarea>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div class="seo-result-card">
+                  <div class="seo-result-header">
+                    <span class="seo-result-label"><i class="fas fa-align-left"></i> Meta Description · <span data-b-dcount="${entry.id}">${descVal.length}</span> chars</span>
+                    <button type="button" class="mini-copy-btn" data-batch-action="copy-desc" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy</button>
+                  </div>
+                  <textarea class="seo-editable" rows="2" data-batch-desc="${entry.id}" placeholder="Meta description...">${escapeHtml(descVal)}</textarea>
+                </div>
+
+                <div class="seo-result-card">
+                  <div class="seo-result-header">
+                    <span class="seo-result-label"><i class="fas fa-universal-access"></i> Alt Text</span>
+                    <button type="button" class="mini-copy-btn" data-batch-action="copy-alt" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy</button>
+                  </div>
+                  <textarea class="seo-editable" rows="2" data-batch-alt="${entry.id}" placeholder="Accessible alt text...">${escapeHtml(altVal)}</textarea>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div class="seo-result-card">
+                  <div class="seo-result-header">
+                    <span class="seo-result-label"><i class="fas fa-quote-left"></i> SEO Caption</span>
+                    <button type="button" class="mini-copy-btn" data-batch-action="copy-caption" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy</button>
+                  </div>
+                  <textarea class="seo-editable" rows="2" data-batch-caption="${entry.id}" placeholder="SEO caption...">${escapeHtml(capVal)}</textarea>
+                </div>
+
+                <div class="seo-result-card">
+                  <div class="seo-result-header">
+                    <span class="seo-result-label"><i class="fas fa-folder-tree"></i> Stock Category</span>
+                  </div>
+                  <select class="seo-select compact mt-1" data-batch-cat="${entry.id}">${catSelectInner}</select>
+                </div>
+              </div>
+
+              <div class="seo-result-card">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-tags"></i> SEO Tags · ${activeTags.length} / ${tags.length}</span>
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <button type="button" class="mini-copy-btn" data-batch-action="kw-edit" data-id="${entry.id}">
+                      <i class="fas ${entry.batchEditingKw ? 'fa-eye' : 'fa-pen'}"></i> ${entry.batchEditingKw ? 'View' : 'Edit'}
+                    </button>
+                    <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="copy-kw" data-id="${entry.id}">
+                      <i class="fas fa-copy"></i> Copy All
+                    </button>
+                    <button type="button" class="mini-copy-btn" data-batch-action="kw-toggle-all" data-id="${entry.id}">
+                      ${activeTags.length === 0 ? 'Select All' : 'Clear'}
+                    </button>
+                  </div>
+                </div>
+                ${kwHtml}
+                <div class="batch-card-exports">
+                  <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="copy-kw" data-id="${entry.id}"><i class="fas fa-copy"></i> Comma</button>
+                  <button type="button" class="mini-copy-btn" data-batch-action="copy-hash" data-id="${entry.id}"><i class="fas fa-hashtag"></i> #Tags</button>
+                  <button type="button" class="mini-copy-btn" data-batch-action="copy-lines" data-id="${entry.id}"><i class="fas fa-list"></i> Lines</button>
+                  <button type="button" class="mini-copy-btn" data-batch-action="copy-html" data-id="${entry.id}"><i class="fas fa-code"></i> HTML</button>
+                  <button type="button" class="mini-copy-btn" data-batch-action="exp-csv" data-id="${entry.id}"><i class="fas fa-file-csv"></i> CSV</button>
+                  <button type="button" class="mini-copy-btn" data-batch-action="exp-txt" data-id="${entry.id}"><i class="fas fa-file-alt"></i> TXT</button>
+                  <button type="button" class="mini-copy-btn" data-batch-action="exp-json" data-id="${entry.id}"><i class="fas fa-file-code"></i> JSON</button>
+                  <button type="button" class="mini-copy-btn seo-file-accent" data-batch-action="seo-file" data-id="${entry.id}"><i class="fas fa-file-shield"></i> SEO File</button>
+                </div>
+              </div>
+            `;
 
         return `
           <div class="batch-item-card ${entry.id === state.activeId ? 'is-active' : ''}" data-batch-card="${entry.id}">
@@ -2441,23 +2639,25 @@
                 <img src="${entry.previewDataUrl}" alt="${escapeHtml(entry.name)}" class="batch-card-thumb" data-batch-action="zoom" data-id="${entry.id}" title="Click to preview full image" />
                 <div class="min-w-0">
                   <div class="flex flex-wrap items-center gap-2">
-                    <strong class="font-display text-sm truncate" style="max-width:260px">${escapeHtml(entry.name)}</strong>
+                    <span class="file-index-pill">#${fileIdx + 1}</span>
+                    <strong class="font-display text-sm truncate" style="max-width:240px">${escapeHtml(entry.name)}</strong>
                     <span class="format-badge">${escapeHtml(entry.formatLabel)}</span>
                     <span class="status-pill ${statusCls}">${statusLabel}</span>
+                    ${r ? `<span class="batch-score-pill"><i class="fas fa-gauge-high"></i> SEO ${r.seoScore}</span>` : ''}
                   </div>
-                  <span class="font-mono text-xs block mt-0.5" style="color:var(--text-muted)">
+                  <span class="font-mono text-xs block mt-1" style="color:var(--text-muted)">
                     ${entry.width}×${entry.height} · ${formatBytes(entry.sizeBytes)}${entry.errorMsg ? ' · ' + escapeHtml(entry.errorMsg) : ''}
                   </span>
                 </div>
               </div>
               <div class="flex flex-wrap items-center gap-1.5">
-                <button type="button" class="mini-copy-btn" data-batch-action="inspect" data-id="${entry.id}" title="Open in Detail Editor">
-                  <i class="fas fa-sliders"></i> Detail
+                <button type="button" class="mini-copy-btn" data-batch-action="inspect" data-id="${entry.id}" title="Open in Single View">
+                  <i class="fas fa-expand"></i> Single
                 </button>
-                <button type="button" class="mini-copy-btn" data-batch-action="regen" data-id="${entry.id}" title="Generate / Regenerate">
+                <button type="button" class="mini-copy-btn" data-batch-action="regen" data-id="${entry.id}" ${statusCls === 'processing' ? 'disabled' : ''} title="Generate / Regenerate this file only">
                   <i class="fas fa-rotate"></i> ${r ? 'Regenerate' : 'Generate'}
                 </button>
-                <button type="button" class="mini-copy-btn seo-file-accent" data-batch-action="seo-file" data-id="${entry.id}" ${!r ? 'disabled style="opacity:0.45;cursor:not-allowed"' : ''} title="Download single file with EXIF/IPTC/XMP SEO embedded (AI footprints scrubbed)">
+                <button type="button" class="mini-copy-btn seo-file-accent" data-batch-action="seo-file" data-id="${entry.id}" ${!r ? 'disabled style="opacity:0.45;cursor:not-allowed"' : ''} title="Download this single file with EXIF/IPTC/XMP SEO embedded">
                   <i class="fas fa-file-shield"></i> SEO File
                 </button>
                 <button type="button" class="mini-copy-btn" data-batch-action="remove" data-id="${entry.id}" title="Remove file" style="color:#ef4444">
@@ -2466,42 +2666,37 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-heading"></i> Title · <span data-b-tcount="${entry.id}">${titleVal.length}</span> chars</span>
-                  <button type="button" class="mini-copy-btn" data-batch-action="copy-title" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <input type="text" class="seo-editable" data-batch-title="${entry.id}" value="${escapeHtml(titleVal)}" placeholder="Title..." />
+            <!-- PER-FILE SEPARATE OPTIONS BAR -->
+            <div class="file-options-bar">
+              <div class="file-opt-field">
+                <label>Mode</label>
+                <select class="file-opt-control" data-file-opt="mode" data-id="${entry.id}">
+                  <option value="" ${!opts.mode ? 'selected' : ''}>Global (${state.mode === 'prompt' ? 'Prompt' : 'Metadata'})</option>
+                  <option value="metadata" ${opts.mode === 'metadata' ? 'selected' : ''}>Metadata</option>
+                  <option value="prompt" ${opts.mode === 'prompt' ? 'selected' : ''}>Prompt</option>
+                </select>
               </div>
-
-              <div class="seo-result-card">
-                <div class="seo-result-header">
-                  <span class="seo-result-label"><i class="fas fa-align-left"></i> ${state.mode === 'prompt' ? 'Generated Prompt' : 'Description'} · <span data-b-dcount="${entry.id}">${descVal.length}</span> chars</span>
-                  <button type="button" class="mini-copy-btn" data-batch-action="copy-desc" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <textarea class="seo-editable" rows="2" data-batch-desc="${entry.id}" placeholder="Description or Generated Prompt...">${escapeHtml(descVal)}</textarea>
+              <div class="file-opt-field">
+                <label>Platform</label>
+                <select class="file-opt-control" data-file-opt="platform" data-id="${entry.id}">${platSelectHtml}</select>
+              </div>
+              <div class="file-opt-field">
+                <label>SEO Tags</label>
+                <input type="number" min="5" max="150" class="file-opt-control font-mono" data-file-opt="tagCount" data-id="${entry.id}" value="${effTagCount}" title="Custom tag count for this file" />
+              </div>
+              <div class="file-opt-field wide">
+                <label>File Topic / Niche Hint</label>
+                <input type="text" class="file-opt-control" data-file-opt="hint" data-id="${entry.id}" value="${escapeHtml(opts.hint || '')}" placeholder="Optional custom topic or instruction for this file..." />
               </div>
             </div>
 
-            <div class="seo-result-card">
-              <div class="seo-result-header">
-                <span class="seo-result-label"><i class="fas fa-tags"></i> Keywords · ${activeTags.length}</span>
-                <div class="flex items-center gap-1.5">
-                  <button type="button" class="mini-copy-btn" data-batch-action="kw-edit" data-id="${entry.id}">
-                    <i class="fas ${entry.batchEditingKw ? 'fa-eye' : 'fa-pen'}"></i> ${entry.batchEditingKw ? 'View' : 'Edit'}
-                  </button>
-                  <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="copy-kw" data-id="${entry.id}">
-                    <i class="fas fa-copy"></i> Copy
-                  </button>
-                </div>
-              </div>
-              ${kwHtml}
-            </div>
+            ${bodyFieldsHtml}
           </div>
         `;
       })
       .join('');
+    void platOptionsHtml;
+    void catOptionsHtml;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -3620,6 +3815,10 @@ ${kwLis}
       state.keywordsRawEditing = false;
       updateQueueAndActionBar();
       renderWorkspaceView();
+      if (state.viewMode === 'batch') {
+        const card = batchResultsList.querySelector(`[data-batch-card="${state.activeId}"]`);
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
   });
 
@@ -3645,8 +3844,7 @@ ${kwLis}
   });
 
   generateBtn.addEventListener('click', () => {
-    const entry = getActiveEntry();
-    if (!entry) {
+    if (!state.files.length) {
       showToast('Please upload a file first!', 'warn');
       return;
     }
@@ -3655,7 +3853,13 @@ ${kwLis}
       openApiSecretsModal(secretsVault.activeProvider);
       return;
     }
-    generateForEntry(entry, false);
+    // When multiple files are uploaded, generate separate metadata/SEO for EVERY file individually!
+    if (state.files.length > 1) {
+      runConcurrentBatch();
+      return;
+    }
+    const entry = getActiveEntry();
+    if (entry) generateForEntry(entry, false);
   });
 
   generateAllBtn.addEventListener('click', runConcurrentBatch);
@@ -3968,11 +4172,84 @@ ${kwLis}
       renderWorkspaceView();
     } else if (action === 'copy-title') {
       copyText(entry.result?.seoTitle || '', 'Copied title!');
+    } else if (action === 'copy-slug') {
+      copyText(entry.result?.seoSlug || '', 'Copied SEO slug!');
     } else if (action === 'copy-desc') {
-      copyText(state.mode === 'prompt' ? (entry.result?.generatedPrompt || '') : (entry.result?.metaDescription || ''), 'Copied!');
+      copyText(entry.result?.metaDescription || '', 'Copied description!');
+    } else if (action === 'copy-alt') {
+      copyText(entry.result?.altText || '', 'Copied alt text!');
+    } else if (action === 'copy-caption') {
+      copyText(entry.result?.seoCaption || '', 'Copied caption!');
+    } else if (action === 'copy-prompt') {
+      copyText(entry.result?.generatedPrompt || '', 'Copied AI prompt!');
     } else if (action === 'copy-kw') {
       const kws = getSelectedTagTexts(entry);
-      copyText(kws.join(', '), `Copied ${kws.length} keywords!`);
+      copyText(kws.join(', '), `Copied ${kws.length} tags for "${entry.name}"!`);
+    } else if (action === 'copy-hash') {
+      const kws = getSelectedTagTexts(entry);
+      copyText(kws.map(t => '#' + t.replace(/[^a-z0-9\u0980-\u09FF]+/gi, '')).join(' '), `Copied ${kws.length} #hashtags for "${entry.name}"!`);
+    } else if (action === 'copy-lines') {
+      const kws = getSelectedTagTexts(entry);
+      copyText(kws.join('\n'), `Copied ${kws.length} lines for "${entry.name}"!`);
+    } else if (action === 'copy-html') {
+      if (!entry.result) return;
+      const kws = getSelectedTagTexts(entry);
+      const r = entry.result;
+      const snippet = entry.formatLabel === 'PDF'
+        ? `<meta name="title" content="${escapeHtml(r.seoTitle)}">\n<meta name="description" content="${escapeHtml(r.metaDescription)}">\n<meta name="keywords" content="${escapeHtml(kws.join(', '))}">\n<a href="${escapeHtml(r.seoSlug)}" title="${escapeHtml(r.seoTitle)}">${escapeHtml(r.altText)}</a>`
+        : `<meta name="title" content="${escapeHtml(r.seoTitle)}">\n<meta name="description" content="${escapeHtml(r.metaDescription)}">\n<meta name="keywords" content="${escapeHtml(kws.join(', '))}">\n<img src="${escapeHtml(r.seoSlug)}" alt="${escapeHtml(r.altText)}" title="${escapeHtml(r.seoTitle)}" loading="lazy" />`;
+      copyText(snippet, `Copied HTML meta for "${entry.name}"!`);
+    } else if (action === 'exp-csv') {
+      if (!entry.result) return;
+      const pid = getEntryPlatform(entry);
+      const spec = PLATFORMS[pid] || PLATFORMS.general;
+      const base = (entry.result.seoSlug || entry.name).replace(/\.[^.]+$/, '');
+      downloadFile(`${base}-${spec.id}.csv`, buildCsvForPlatform(pid, [entry]), 'text/csv;charset=utf-8');
+      showToast(`Exported ${spec.name} CSV for "${entry.name}"!`);
+    } else if (action === 'exp-txt') {
+      if (!entry.result) return;
+      const r = entry.result;
+      const kws = getSelectedTagTexts(entry);
+      const txt = [
+        `=== SAHADAT AI — SEO REPORT (${entry.name}) ===`,
+        `Platform: ${(PLATFORMS[getEntryPlatform(entry)] || PLATFORMS.general).name}`,
+        `SEO Title: ${r.seoTitle}`,
+        `SEO Filename: ${r.seoSlug}`,
+        `Meta Description: ${r.metaDescription}`,
+        `Alt Text: ${r.altText}`,
+        `Caption: ${r.seoCaption}`,
+        r.generatedPrompt ? `Prompt: ${r.generatedPrompt}` : '',
+        '',
+        `SEO Tags (${kws.length}):`,
+        kws.join(', ')
+      ].filter(Boolean).join('\n');
+      downloadFile(((r.seoSlug || entry.name).replace(/\.[^.]+$/, '') || 'sahadat-seo') + '.txt', txt, 'text/plain;charset=utf-8');
+      showToast(`Exported TXT for "${entry.name}"!`);
+    } else if (action === 'exp-json') {
+      if (!entry.result) return;
+      const r = entry.result;
+      const kws = getSelectedTagTexts(entry);
+      const payload = {
+        generator: 'Sahadat AI',
+        filename: entry.name,
+        platform: (PLATFORMS[getEntryPlatform(entry)] || PLATFORMS.general).name,
+        seoTitle: r.seoTitle,
+        seoSlug: r.seoSlug,
+        metaDescription: r.metaDescription,
+        altText: r.altText,
+        seoCaption: r.seoCaption,
+        category: STOCK_CATEGORIES[r.categoryId || 8],
+        generatedPrompt: r.generatedPrompt || '',
+        tagCount: kws.length,
+        keywords: kws
+      };
+      downloadFile(((r.seoSlug || entry.name).replace(/\.[^.]+$/, '') || 'sahadat-seo') + '.json', JSON.stringify(payload, null, 2), 'application/json');
+      showToast(`Exported JSON for "${entry.name}"!`);
+    } else if (action === 'kw-toggle-all') {
+      if (!entry.result) return;
+      const anySelected = entry.result.tags.some(t => t.selected);
+      entry.result.tags.forEach(t => { t.selected = !anySelected; });
+      renderBatchCards();
     } else if (action === 'kw-edit') {
       if (!entry.result) return;
       if (entry.batchEditingKw) {
@@ -3999,27 +4276,91 @@ ${kwLis}
     }
   });
 
+  batchResultsList.addEventListener('change', e => {
+    const optName = e.target.dataset.fileOpt;
+    if (optName) {
+      const entry = state.files.find(f => f.id === e.target.dataset.id);
+      if (!entry) return;
+      if (!entry.options) entry.options = { mode: '', platform: '', tagCount: null, hint: '' };
+      if (optName === 'mode') {
+        entry.options.mode = e.target.value;
+        renderBatchCards();
+      } else if (optName === 'platform') {
+        entry.options.platform = e.target.value;
+        if (!entry.result) renderBatchCards();
+      } else if (optName === 'tagCount') {
+        const n = Math.max(5, Math.min(150, parseInt(e.target.value, 10) || state.tagCount));
+        entry.options.tagCount = n;
+        e.target.value = n;
+        if (!entry.result) renderBatchCards();
+      }
+      return;
+    }
+    const catIdTarget = e.target.dataset.batchCat;
+    if (catIdTarget) {
+      const entry = state.files.find(f => f.id === catIdTarget);
+      if (entry && entry.result) {
+        entry.result.categoryId = parseInt(e.target.value, 10) || 8;
+      }
+    }
+  });
+
   batchResultsList.addEventListener('input', e => {
+    const optName = e.target.dataset.fileOpt;
+    if (optName === 'hint') {
+      const entry = state.files.find(f => f.id === e.target.dataset.id);
+      if (entry) {
+        if (!entry.options) entry.options = { mode: '', platform: '', tagCount: null, hint: '' };
+        entry.options.hint = e.target.value;
+      }
+      return;
+    }
     const tId = e.target.dataset.batchTitle;
     if (tId) {
       const entry = state.files.find(f => f.id === tId);
-      if (entry) {
-        if (!entry.result) entry.result = generateSmartLocalResult(entry);
+      if (entry && entry.result) {
         entry.result.seoTitle = e.target.value;
         const cnt = batchResultsList.querySelector(`[data-b-tcount="${tId}"]`);
         if (cnt) cnt.textContent = String(e.target.value.length);
       }
       return;
     }
+    const sId = e.target.dataset.batchSlug;
+    if (sId) {
+      const entry = state.files.find(f => f.id === sId);
+      if (entry && entry.result) entry.result.seoSlug = e.target.value;
+      return;
+    }
     const dId = e.target.dataset.batchDesc;
     if (dId) {
       const entry = state.files.find(f => f.id === dId);
-      if (entry) {
-        if (!entry.result) entry.result = generateSmartLocalResult(entry);
-        if (state.mode === 'prompt') entry.result.generatedPrompt = e.target.value;
-        else entry.result.metaDescription = e.target.value;
+      if (entry && entry.result) {
+        entry.result.metaDescription = e.target.value;
         const cnt = batchResultsList.querySelector(`[data-b-dcount="${dId}"]`);
         if (cnt) cnt.textContent = String(e.target.value.length);
+      }
+      return;
+    }
+    const aId = e.target.dataset.batchAlt;
+    if (aId) {
+      const entry = state.files.find(f => f.id === aId);
+      if (entry && entry.result) entry.result.altText = e.target.value;
+      return;
+    }
+    const cId = e.target.dataset.batchCaption;
+    if (cId) {
+      const entry = state.files.find(f => f.id === cId);
+      if (entry && entry.result) entry.result.seoCaption = e.target.value;
+      return;
+    }
+    const pId = e.target.dataset.batchPrompt;
+    if (pId) {
+      const entry = state.files.find(f => f.id === pId);
+      if (entry && entry.result) {
+        entry.result.generatedPrompt = e.target.value;
+        const words = e.target.value.trim() ? e.target.value.trim().split(/\s+/).length : 0;
+        const cnt = batchResultsList.querySelector(`[data-b-pcount="${pId}"]`);
+        if (cnt) cnt.textContent = String(words);
       }
     }
   });
