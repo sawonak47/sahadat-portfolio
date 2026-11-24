@@ -759,7 +759,7 @@
 
   function showQuotaWarningBanner(isQuotaLimit = true) {
     const line1 = isQuotaLimit
-      ? "Today's Free Sahadat AI daily quota is full. Come Back Tomorrow."
+      ? "Today's Sahadat AI Free daily quota is finished. Come Back Tomorrow."
       : 'Sahadat AI server is temporarily unavailable today. Come Back Later.';
     const line2 = "Or click 'Use My Own API Key' to continue immediately with your own key.";
 
@@ -2333,7 +2333,7 @@
 
     if (source === 'server') {
       if (isQuotaError(err)) {
-        return "Today's Free Sahadat AI daily quota is full. Come Back Tomorrow.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
+        return "Today's Sahadat AI Free daily quota is finished. Come Back Tomorrow.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
       }
       return "Sahadat AI server is temporarily unavailable today. Come Back Later.\nOr click 'Use My Own API Key' to continue immediately with your own key.";
     }
