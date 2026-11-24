@@ -2375,7 +2375,23 @@
           const gradeTitle = (r.seoScore >= 88) ? 'Excellent SEO Readiness' : (r.seoScore >= 75) ? 'Strong SEO Readiness' : 'Good — Quick Wins Available';
           const gradId = `sahadatScoreGrad_${entry.id}`;
 
+          const promptBoxHtml = promptVal
+            ? `
+              <div class="seo-result-card mb-3">
+                <div class="seo-result-header">
+                  <span class="seo-result-label"><i class="fas fa-wand-magic-sparkles"></i> Generated AI Prompt</span>
+                  <div class="flex items-center gap-2">
+                    <span class="char-pill"><span data-b-pcount="${entry.id}">${promptWords}</span> words · ${promptVal.length} chars</span>
+                    <button type="button" class="mini-copy-btn copy-all-accent" data-batch-action="copy-prompt" data-id="${entry.id}"><i class="fas fa-copy"></i> Copy Prompt</button>
+                  </div>
+                </div>
+                <textarea class="seo-editable" rows="3" data-batch-prompt="${entry.id}" placeholder="Generated AI prompt...">${escapeHtml(promptVal)}</textarea>
+              </div>
+            `
+            : '';
+
           contentBelowImage = `
+            ${promptBoxHtml}
             <!-- SEO Score & Quick Audit -->
             <div class="seo-score-banner">
               <div class="score-ring">
